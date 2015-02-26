@@ -1,36 +1,17 @@
-# Freifunk (Gütersloh) Gluon Gateway Module
+# Freifunk Gateway Module
 
-Based on https://github.com/ffnord/ffnord-puppet-gateway --
-forked due to different goals; while the aim is "works for us"
-initially, any bugfixes, additions etc. to make this a complete
-module to puppetize a Freifunk Gluon Gateway from scratch are
-more then welcome.
+* Martin Schütte <info@mschuette.name>
+* Daniel Ehlers <danielehlers@mindeye.net>
 
-Definition of done: run "puppet apply --verbose /root/gateway.pp",
-this should setup a working Gluon Gateway with the selected options
-(IC-VPN, IPv4-exit via OpenVPN/GRE/locally, ...) for the configured
-communitiy/communities, usable after a reboot.
+This module tries to automate the configuration of a FFNord Freifunk Gateway.
+The idea is to implement the step-by-step guide on http://wiki.freifunk.net/Freifunk_Hamburg/Gateway with multi community support and almost all other FFNord tools.
 
-It's considered a replacement for the plenty Wiki pages out there
-on how to do that, but in a automated, repeatable way (hence the
-use of puppet). Please note that puppet is only to be run once (or
-maybe on major updates to the code), NOT constantly. Hence all
-volatile data, e. g. from git repositories, need to be fetched
-via cronjobs, which puppet should set up for you. puppet is used
-to boot-strap your system, NOT to keep it in shape, at least not
-in terms of the Gluon Gateway functionality.
+Basically this is a complete rewrite of the puppet scripts provided by the
+Freifunk Hamburg Community.
 
-As stated, credits to get this going in the first place go to
-the FFNord people, which started their work as "a complete rewrite
-of the puppet scripts provided by the Freifunk Hamburg Community".
-
-
-
-The 'ffgt_gln_gw::mesh' block will setup a bridge, fastd, batman,
-ntp, dhcpd, dns (bind9), radvd, bird, bird6 and firewall rules for
-IPv4 and IPv6.
-There are types for setting up monitoring, icvpn, anonymous vpn,
-local exit and alfred announcements.
+The 'ffgt_gln_gw::mesh' block will setup a bridge, fastd, batman, ntp, dhcpd, dns (bind9),
+radvd, bird6 and firewall rules vor IPv4 and IPv6.
+There are types for setting up monitoring, icvpn, anonymous vpn and alfred announcements.
 
 ## Open Problems
 
@@ -68,7 +49,7 @@ downloaded manually):
 
 ```
 cd /etc/puppet/modules
-git clone https://github.com/ffgtso/ffgt-gln-gw-puppet.git ffgt_gln_gw
+git clone https://github.com/ffgt_gln_gw/ffgt_gln_gw-puppet-gateway ffgt_gln_gw
 ```
 
 ### Parameters
@@ -90,9 +71,9 @@ Example puppet code (save e.g. as `/root/gateway.pp`):
 ```
 # Global parameters for this host
 class { 'ffgt_gln_gw::params':
-  router_id => "192.0.0.1", # The id of this router, probably the ipv4 address
+  router_id => "10.35.0.1", # The id of this router, probably the ipv4 address
                             # of the mesh device of the providing community
-  icvpn_as => "64496",      # The as of the providing community (public or private)
+  icvpn_as => "65035",      # The as of the providing community
   wan_devices => ['eth0']   # A array of devices which should be in the wan zone
 }
 
@@ -100,7 +81,7 @@ class { 'ffgt_gln_gw::params':
 ffgt_gln_gw::mesh { 'mesh_ffgc':
       mesh_name    => "Freifunk Gotham City",
       mesh_code    => "ffgc",
-      mesh_as      => 64496,
+      mesh_as      => 65035,
       mesh_mac     => "de:ad:be:ef:de:ad",
       mesh_ipv6    => "fd35:f308:a922::ff00/64,
       mesh_ipv4    => "10.35.0.1/19",
@@ -109,7 +90,7 @@ ffgt_gln_gw::mesh { 'mesh_ffgc':
       mesh_peerings => "/root/mesh_peerings.yaml",
 
       fastd_secret => "/root/fastd_secret.key",
-      fastd_port   => 10000,
+      fastd_port   => 10035,
       fastd_peers_git => 'git://somehost/peers.git',
 
       dhcp_ranges => [ '10.35.0.2 10.35.0.254'
@@ -223,9 +204,6 @@ ffgt_gln_gw::dhcpd::static {
 ```
 
 #### ICVPN Type
-
-This sets up conenctivity to the IC-VPN with the provided information.
-
 ```
 ffgt_gln_gw :: icvpn::setup {
   icvpn_as,            # AS of the community peering
@@ -238,7 +216,6 @@ ffgt_gln_gw :: icvpn::setup {
 ```
 
 #### IPv4 Uplink via GRE Tunnel
-
 This is a module for an IPv4 Uplink via GRE tunnel and BGP.
 This module and the VPN module are mutually exclusive.
 Define the ffgt_gln_gw::uplink::ip class once and ffgt_gln_gw::uplink::tunnel
@@ -261,26 +238,8 @@ ffgt_gln_gw::uplink::tunnel {
 }
 ```
 
-#### IPv4 Uplink via local exit
-
-This is a module for terminating IPv4 locally. Be sure you know what you are
-doing, e. g. run this only outside of Germany or with IPs that are properly
-registered to an ISP, or the Störerhaftung will bite you badly.
-This module and the VPN and uplink::tunnel modules are mutually exclusive.
-Define the ffgt_gln_gw::uplink::local once well.
-
-```
-ffgt_gln_gw::uplink::local {
-    'localexit':
-      local_public_ip,  # local public IPv4 of this gateway
-      local_net_to_nat  # local network to be NATted to local_public_ip
-}
-```
-
 #### Peering description
-
 Be aware that currently the own system mesh address will not be filtered.
-(This is the mesh_peerings file looked for above.)
 
 ```
 gc-gw1:
