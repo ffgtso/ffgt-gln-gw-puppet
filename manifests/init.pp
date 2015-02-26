@@ -10,6 +10,7 @@ define ffgt_gln_gw::mesh(
   $mesh_peerings,    # path to the local peerings description yaml file
 
   $fastd_peers_git,  # fastd peers
+  $fastd_bb_git,     # fastd backbone peers
   $fastd_secret,     # fastd secret
   $fastd_port,       # fastd port
   $peer_limit = -1,  # optionally set peer limit
@@ -74,7 +75,8 @@ define ffgt_gln_gw::mesh(
     fastd_port   => $fastd_port,
     peer_limit => $peer_limit,
     use_blacklist => $use_blacklist,
-    fastd_peers_git => $fastd_peers_git;
+    fastd_peers_git => $fastd_peers_git,
+    fastd_bb_git => $fastd_bb_git;
   } ->
   ffgt_gln_gw::radvd { "br-${mesh_code}":
     mesh_ipv6_address    => $mesh_ipv6_address,

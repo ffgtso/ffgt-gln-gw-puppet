@@ -9,7 +9,13 @@ pull() {
       cd "$FASTD_PEER"
       git pull -q
     fi
-  done 
+  done
+  for FASTD_PEER in $(find ${FASTD_ROOT} -type d -name backbone); do
+    if [ -d "${FASTD_PEER}/.git" ] ; then
+      cd "$FASTD_PEER"
+      git pull -q
+    fi
+  done
 }
 
 reload() {
