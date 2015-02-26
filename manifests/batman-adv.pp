@@ -1,13 +1,13 @@
-define ffnord::batman-adv( $mesh_code
+define ffgt_gln_gw::batman-adv( $mesh_code
                          , $batman_it = 5000
                          ) {
-  include ffnord::resources::batman-adv
-  include ffnord::firewall
+  include ffgt_gln_gw::resources::batman-adv
+  include ffgt_gln_gw::firewall
 
   file {
     "/etc/network/interfaces.d/${mesh_code}-batman":
     ensure => file,
-    content => template('ffnord/etc/network/mesh-batman.erb'),
+    content => template('ffgt_gln_gw/etc/network/mesh-batman.erb'),
     require => [Package['batctl'],Package['batman-adv-dkms']];
   }
 
@@ -17,7 +17,7 @@ define ffnord::batman-adv( $mesh_code
      line => "alias batctl-${mesh_code}='batctl -m bat-${mesh_code}'"
   }
 
-  ffnord::firewall::device { "bat-${mesh_code}":
+  ffgt_gln_gw::firewall::device { "bat-${mesh_code}":
     chain => "bat"
   } 
 }

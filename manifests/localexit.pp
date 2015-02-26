@@ -1,4 +1,4 @@
-class ffgt_gln_gw::uplink ( 
+class ffgt_gln_gw::localexit ( 
   $gw_control_ip     = "8.8.8.8",     # Control ip addr 
   $gw_bandwidth      = 54,            # How much bandwith we should have up/down per mesh interface
 ) {
@@ -12,7 +12,7 @@ class ffgt_gln_gw::uplink (
   }
 }
 
-class ffgt_gln_gw::uplink::ip (
+class ffgt_gln_gw::localexit::ip (
   $nat_network,
   $tunnel_network,
 ) inherits ffgt_gln_gw::params {
@@ -34,7 +34,7 @@ class ffgt_gln_gw::uplink::ip (
   file {
     "/etc/network/interfaces.d/dummy0":
       ensure => file,
-      content => template("ffgt_gln_gw/etc/network/uplink-dummy.erb");
+      content => template("ffgt_gln_gw/etc/network/localexit-dummy.erb");
   } ->
   exec {
     "start_dummy_interface_0":
@@ -45,7 +45,7 @@ class ffgt_gln_gw::uplink::ip (
                  ];
   }
 
-  class { 'ffgt_gln_gw::uplink': }
+  class { 'ffgt_gln_gw::localexit': }
  
   # Define Firewall rule for masquerade
   file {
@@ -54,7 +54,7 @@ class ffgt_gln_gw::uplink::ip (
        owner => 'root',
        group => 'root',
        mode => '0644',
-       content => inline_template("ip4tables -t nat -A POSTROUTING -o uplink-+ ! -d <%=@tunnel_network%> -j SNAT --to <%=@nat_ip%>"),
+       content => inline_template("ip4tables -t nat -A POSTROUTING -o localexit-+ ! -d <%=@tunnel_network%> -j SNAT --to <%=@nat_ip%>"),
        require => [File['/etc/iptables.d/']];
      '/etc/iptables.d/910-Clamp-mss':
        ensure => file,
@@ -83,7 +83,7 @@ class ffgt_gln_gw::uplink::ip (
   }
 }
 
-define ffgt_gln_gw::uplink::tunnel (
+define ffgt_gln_gw::localexit::tunnel (
   $local_public_ip,
   $remote_public_ip,
   $local_ipv4,

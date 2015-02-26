@@ -1,4 +1,4 @@
-define ffnord::dhcpd (
+define ffgt_gln_gw::dhcpd (
   $mesh_code,
 
   $ipv4_address,
@@ -9,19 +9,19 @@ define ffnord::dhcpd (
   $dns_servers = [],
   ) {
 
-  include ffnord::dhcpd::base
-  include ffnord::dhcpd::service
+  include ffgt_gln_gw::dhcpd::base
+  include ffgt_gln_gw::dhcpd::service
 
   if $ranges != [] {
 
     file { "/etc/dhcp/interface-${name}.conf":
       ensure => file,
-      content => template("ffnord/etc/dhcp/interface.erb"),
+      content => template("ffgt_gln_gw/etc/dhcp/interface.erb"),
       require => [Package['isc-dhcp-server']],
       notify => [Service['isc-dhcp-server']];
     } 
 
-    file_line { "ffnord::dhcpd::${name}-rule":
+    file_line { "ffgt_gln_gw::dhcpd::${name}-rule":
       path => '/etc/dhcp/dhcpd.conf',
       line => "include \"/etc/dhcp/interface-${name}.conf\";",
       require => [File['/etc/dhcp/dhcpd.conf']],
@@ -30,9 +30,9 @@ define ffnord::dhcpd (
   }
 }
 
-class ffnord::dhcpd::base {
+class ffgt_gln_gw::dhcpd::base {
 
-  ffnord::monitor::nrpe::check_command {
+  ffgt_gln_gw::monitor::nrpe::check_command {
     "dhcpd":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C dhcpd';
   }
@@ -48,19 +48,19 @@ class ffnord::dhcpd::base {
       mode   => '0644',
       owner  => 'root',
       group  => 'root',
-      source => 'puppet:///modules/ffnord/etc/dhcp/dhcpd.conf',
+      source => 'puppet:///modules/ffgt_gln_gw/etc/dhcp/dhcpd.conf',
       require => [Package['isc-dhcp-server']],
       notify => [Service['isc-dhcp-server']];
   }
   
-  ffnord::firewall::service { 'dhcpd':
+  ffgt_gln_gw::firewall::service { 'dhcpd':
     chains => ['mesh'],
     ports  => ['67','68'],
     protos => ['udp'];
   }
 }
 
-class ffnord::dhcpd::service {
+class ffgt_gln_gw::dhcpd::service {
   service { 
     'isc-dhcp-server': 
       ensure => running,
@@ -69,10 +69,10 @@ class ffnord::dhcpd::service {
   }
 }
 
-define ffnord::dhcpd::static (
+define ffgt_gln_gw::dhcpd::static (
   $static_git, # git repo with static file
 ) {
-  include ffnord::dhcpd::base
+  include ffgt_gln_gw::dhcpd::base
 
   $static_name = $name
 
@@ -120,7 +120,7 @@ define ffnord::dhcpd::static (
      owner => 'root',
      group => 'root',
      mode => '0755',
-     source => 'puppet:///modules/ffnord/usr/local/bin/update-statics',
+     source => 'puppet:///modules/ffgt_gln_gw/usr/local/bin/update-statics',
      require =>  Vcsrepo["/etc/dhcp/statics/${static_name}/"];
   }
 

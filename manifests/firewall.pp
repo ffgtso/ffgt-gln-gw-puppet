@@ -26,9 +26,9 @@
  * 
  */
 
-class ffnord::firewall (
-  $wan_devices = $ffnord::params::wan_devices
-) inherits ffnord::params {
+class ffgt_gln_gw::firewall (
+  $wan_devices = $ffgt_gln_gw::params::wan_devices
+) inherits ffgt_gln_gw::params {
 
   package { 
     'iptables-persistent':
@@ -56,34 +56,34 @@ class ffnord::firewall (
       owner => 'root',
       group => 'root',
       mode => '0755',
-      source => "puppet:///modules/ffnord/usr/local/bin/build-firewall";
+      source => "puppet:///modules/ffgt_gln_gw/usr/local/bin/build-firewall";
     '/etc/iptables.d/000-RESET': 
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/000-RESET",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/000-RESET",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/001-CHAINS':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/001-CHAINS",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/001-CHAINS",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/050-FORWARD-PreProcessing': 
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/050-FORWARD-PreProcessing",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/050-FORWARD-PreProcessing",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/050-INPUT-PreProcessing': 
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/050-INPUT-PreProcessing",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/050-INPUT-PreProcessing",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/200-block-ranges':
       ensure => file,
@@ -91,51 +91,51 @@ class ffnord::firewall (
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/200-block-ranges",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/200-block-ranges",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/200-block-bcp38':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/200-block-bcp38",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/200-block-bcp38",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/500-Allow-SSH':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/500-Allow-SSH",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/500-Allow-SSH",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/900-FORWARD-drop':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/900-FORWARD-drop",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/900-FORWARD-drop",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/900-INPUT-drop':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/900-INPUT-drop",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/900-INPUT-drop",
       require => File['/etc/iptables.d/'];
     '/etc/iptables.d/900-LOG-drop':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => "puppet:///modules/ffnord/etc/iptables.d/900-LOG-drop",
+      source => "puppet:///modules/ffgt_gln_gw/etc/iptables.d/900-LOG-drop",
       require => File['/etc/iptables.d/'];
   }
 
-  ffnord::firewall::device { $wan_devices:
+  ffgt_gln_gw::firewall::device { $wan_devices:
     chain => 'wan';
   }
 }
 
-define ffnord::firewall::service (
+define ffgt_gln_gw::firewall::service (
  $protos = ["tcp"],  # Possible values "tcp,udp"
  $chains = ["mesh"], # Possible values "mesh,wan"
  $ports = [],
@@ -165,11 +165,11 @@ ip46tables -A <%=chain%>-input -p <%=proto%> -m <%=proto%> --dport <%=port%> -j 
 }
 
 # Process packages from devices into the chains
-define ffnord::firewall::device (
+define ffgt_gln_gw::firewall::device (
   $chain = "mesh" # Possible values are "mesh","wan"
 ) {
 
- include ffnord::firewall
+ include ffgt_gln_gw::firewall
 
  file { "/etc/iptables.d/100-device-${name}": 
    ensure => file,
@@ -185,11 +185,11 @@ ip46tables -A forward -i <%=@name%> -j <%=@chain%>-forward
 }
 
 # Allow device for mesh forwarding
-define ffnord::firewall::forward (
+define ffgt_gln_gw::firewall::forward (
   $chain = "mesh" # Possible values are "mesh","wan"
 ) {
 
- include ffnord::firewall
+ include ffgt_gln_gw::firewall
 
  file { "/etc/iptables.d/800-${chain}-forward-ACCEPT-${name}": 
    ensure => file,

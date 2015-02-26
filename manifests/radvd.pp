@@ -1,11 +1,11 @@
-define ffnord::radvd (
+define ffgt_gln_gw::radvd (
     $mesh_ipv6_address,
     $mesh_ipv6_prefix,
     $mesh_ipv6_prefixlen
   ) {
 
-  include ffnord::radvd::base
-  include ffnord::resources::radvd
+  include ffgt_gln_gw::radvd::base
+  include ffgt_gln_gw::resources::radvd
 
   $interface = $name
 
@@ -13,17 +13,17 @@ define ffnord::radvd (
   ->
   file { "/etc/radvd.conf.d/interface-${name}.conf": 
        ensure => file,
-       content => template('ffnord/etc/radvd.conf.erb');
+       content => template('ffgt_gln_gw/etc/radvd.conf.erb');
   }  
   ->
-  Class[ffnord::resources::radvd]
+  Class[ffgt_gln_gw::resources::radvd]
   -> 
   Service[radvd]
 }
 
-class ffnord::radvd::base () {
+class ffgt_gln_gw::radvd::base () {
 
-  ffnord::monitor::nrpe::check_command {
+  ffgt_gln_gw::monitor::nrpe::check_command {
     "radvd":
       command => '/usr/lib/nagios/plugins/check_procs -w 2:2 -c 2:2 -C radvd';
   }

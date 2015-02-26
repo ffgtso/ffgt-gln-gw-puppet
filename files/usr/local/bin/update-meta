@@ -1,4 +1,4 @@
-#!/bin/bash /usr/local/include/ffnord-update.common
+#!/bin/bash /usr/local/include/ffgt_gln_gw-update.common
 
 REPOSITORY=/var/lib/icvpn-meta/
 

@@ -106,6 +106,8 @@ ffgt_gln_gw::mesh { 'mesh_ffgc':
       mesh_ipv4    => "10.35.0.1/19",
       mesh_mtu     => "1426",
       range_ipv4   => "10.35.0.0/16",
+      include_dn42_routes => "no",  # yes/to to include routes from DN42
+      include_chaos_routes => "no", # yes/no to include routes from ChaosVPN
       mesh_peerings => "/root/mesh_peerings.yaml",
 
       fastd_secret => "/root/fastd_secret.key",

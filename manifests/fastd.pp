@@ -1,4 +1,4 @@
-define ffnord::fastd( $mesh_name
+define ffgt_gln_gw::fastd( $mesh_name
                      , $mesh_code
                      , $mesh_mac
                      , $mesh_mtu = 1426
@@ -12,10 +12,10 @@ define ffnord::fastd( $mesh_name
                      ) {
   #validate_re($mesh_mac, '^de:ad:be:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}$')
 
-  include ffnord::resources::fastd
-  include ffnord::resources::fastd::auto_fetch_keys
+  include ffgt_gln_gw::resources::fastd
+  include ffgt_gln_gw::resources::fastd::auto_fetch_keys
 
-  ffnord::monitor::nrpe::check_command {
+  ffgt_gln_gw::monitor::nrpe::check_command {
     "fastd_${mesh_code}":
       command => "/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C fastd -a \"${mesh_code}-mesh-vpn\"";
   }
@@ -23,38 +23,38 @@ define ffnord::fastd( $mesh_name
   file {
     "/etc/fastd/${mesh_code}-mesh-vpn/":
       ensure =>directory,
-             require => Package[ffnord::resources::fastd];
+             require => Package[ffgt_gln_gw::resources::fastd];
     "/etc/fastd/${mesh_code}-mesh-vpn/backbone":
       ensure =>directory,
-             require => Package[ffnord::resources::fastd];
+             require => Package[ffgt_gln_gw::resources::fastd];
     "/etc/fastd/${mesh_code}-mesh-vpn/fastd.conf":
       ensure => file,
-             notify => Service[ffnord::resources::fastd],
-             content => template('ffnord/etc/fastd/fastd.conf.erb');
+             notify => Service[ffgt_gln_gw::resources::fastd],
+             content => template('ffgt_gln_gw/etc/fastd/fastd.conf.erb');
     "/etc/fastd/${mesh_code}-mesh-vpn/fastd-blacklist.sh":
       ensure => file,
-             notify => Service[ffnord::resources::fastd],
-             content => template('ffnord/etc/fastd/fastd-blacklist.sh.erb'),
+             notify => Service[ffgt_gln_gw::resources::fastd],
+             content => template('ffgt_gln_gw/etc/fastd/fastd-blacklist.sh.erb'),
              mode => '0766';
    "/etc/fastd/${mesh_code}-mesh-vpn/fastd-blacklist.json":
       ensure => file,
-             notify => Service[ffnord::resources::fastd],
-             content => template('ffnord/etc/fastd/fastd-blacklist.json.erb');
+             notify => Service[ffgt_gln_gw::resources::fastd],
+             content => template('ffgt_gln_gw/etc/fastd/fastd-blacklist.json.erb');
     "/etc/fastd/${mesh_code}-mesh-vpn/secret.conf":
       ensure => file,
       source => $fastd_secret,
       mode => '0600',
   } ->
-  ffnord::batman-adv { "ffnord_batman_adv_${mesh_code}":
+  ffgt_gln_gw::batman-adv { "ffgt_gln_gw_batman_adv_${mesh_code}":
     mesh_code => $mesh_code;
   } ->
   vcsrepo { "/etc/fastd/${mesh_code}-mesh-vpn/peers":
     ensure   => present,
     provider => git,
     source   => $fastd_peers_git,
-    notify   => Class[ffnord::resources::fastd::auto_fetch_keys];
+    notify   => Class[ffgt_gln_gw::resources::fastd::auto_fetch_keys];
   } ->
-  ffnord::firewall::service { "fastd-${mesh_code}":
+  ffgt_gln_gw::firewall::service { "fastd-${mesh_code}":
     ports  => [$fastd_port],
     protos => ['udp'],
     chains => ['wan']
@@ -76,6 +76,6 @@ define ffnord::fastd( $mesh_name
      line => "alias fastd-query-${mesh_code}='FASTD_SOCKET=/var/run/fastd-status.${mesh_code}.sock fastd-query'"
   }
 
-  ffnord::etckeeper::ignore { "/etc/fastd/${mesh_code}-mesh-vpn/peers/": }
+  ffgt_gln_gw::etckeeper::ignore { "/etc/fastd/${mesh_code}-mesh-vpn/peers/": }
 
 }

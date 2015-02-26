@@ -1,11 +1,13 @@
-class ffnord::bird4 (
-  $router_id = $ffnord::params::router_id,
-  $icvpn_as  = $ffnord::params::icvpn_as
-) inherits ffnord::params {
+class ffgt_gln_gw::bird4 (
+  $router_id = $ffgt_gln_gw::params::router_id,
+  $icvpn_as  = $ffgt_gln_gw::params::icvpn_as,
+  $include_chaos = $ffgt_gln_gw::params::include_chaos_routes,
+  $include_dn42  = $ffgt_gln_gw::params::include_dn42_routes
+) inherits ffgt_gln_gw::params {
 
-  require ffnord::resources::repos
+  require ffgt_gln_gw::resources::repos
  
-  ffnord::monitor::nrpe::check_command {
+  ffgt_gln_gw::monitor::nrpe::check_command {
     "bird":
       command => '/usr/lib/nagios/plugins/check_procs -w 1:1 -c 1:1 -C bird';
   }
@@ -29,7 +31,7 @@ class ffnord::bird4 (
     '/etc/bird/bird.conf':
       ensure => file,
       mode => "0644",
-      content => template("ffnord/etc/bird/bird.conf.erb"),
+      content => template("ffgt_gln_gw/etc/bird/bird.conf.erb"),
       require => [Package['bird'],File['/etc/bird/']];
     '/etc/bird.conf':
       ensure => link,
@@ -48,10 +50,10 @@ class ffnord::bird4 (
       subscribe => File['/etc/bird/bird.conf'];
   }
 
-  include ffnord::resources::bird
+  include ffgt_gln_gw::resources::bird
 }
 
-define ffnord::bird4::mesh (
+define ffgt_gln_gw::bird4::mesh (
   $mesh_code,
 
   $mesh_ipv4_address,
@@ -63,9 +65,11 @@ define ffnord::bird4::mesh (
 
   $site_ipv4_prefix,
   $site_ipv4_prefixlen,
+  $include_chaos,
+  $include_dn42,
 ) {
 
-  include ffnord::bird4
+  include ffgt_gln_gw::bird4
 
   file_line { "bird-${mesh_code}-include":
     path => '/etc/bird/bird.conf',
@@ -76,7 +80,7 @@ define ffnord::bird4::mesh (
 
   file { "/etc/bird/bird.conf.d/${mesh_code}.conf":
     mode => "0644",
-    content => template("ffnord/etc/bird/bird.interface.conf.erb"),
+    content => template("ffgt_gln_gw/etc/bird/bird.interface.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird-${mesh_code}-include"],
@@ -85,7 +89,7 @@ define ffnord::bird4::mesh (
   }
 }
 
-define ffnord::bird4::icvpn (
+define ffgt_gln_gw::bird4::icvpn (
   $icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
@@ -94,9 +98,9 @@ define ffnord::bird4::icvpn (
   $tinc_keyfile,
   ){
 
-  include ffnord::bird4
-  include ffnord::resources::meta
-  include ffnord::icvpn
+  include ffgt_gln_gw::bird4
+  include ffgt_gln_gw::resources::meta
+  include ffgt_gln_gw::icvpn
 
   $icvpn_name = $name
 
@@ -113,7 +117,7 @@ define ffnord::bird4::icvpn (
       line => 'include "/etc/bird/bird.conf.d/icvpn-peers.conf";',
       require => [
         File['/etc/bird/bird.conf'],
-        Class['ffnord::resources::meta']
+        Class['ffgt_gln_gw::resources::meta']
       ],
       notify  => Service['bird'];
   } 
@@ -121,11 +125,11 @@ define ffnord::bird4::icvpn (
   # Process meta data from tinc directory
   file { "/etc/bird/bird.conf.d/icvpn-template.conf":
     mode => "0644",
-    content => template("ffnord/etc/bird/bird.icvpn-template.conf.erb"),
+    content => template("ffgt_gln_gw/etc/bird/bird.icvpn-template.conf.erb"),
     require => [ 
       File['/etc/bird/bird.conf.d/'],
       Package['bird'],
-      Class['ffnord::tinc'],
+      Class['ffgt_gln_gw::tinc'],
     ],
     notify  => [
       Service['bird'],

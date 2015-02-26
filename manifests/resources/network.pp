@@ -1,11 +1,11 @@
-class ffnord::resources::network {
+class ffgt_gln_gw::resources::network {
   
   file { 
     '/etc/network/interfaces.d':
       ensure => directory;
   } ->
   file_line { 
-    'ffnord::resources::network::if':
+    'ffgt_gln_gw::resources::network::if':
       path => '/etc/network/interfaces',
       line => 'source /etc/network/interfaces.d/*';
   } ->

@@ -1,11 +1,11 @@
-class ffnord::maintenance (
-  $maintenance = $ffnord::params::maintenance
-) inherits ffnord::params {
-  include ffnord::resources::ffnord
+class ffgt_gln_gw::maintenance (
+  $maintenance = $ffgt_gln_gw::params::maintenance
+) inherits ffgt_gln_gw::params {
+  include ffgt_gln_gw::resources::ffgt_gln_gw
 
-  Class['ffnord::resources::ffnord'] ->
+  Class['ffgt_gln_gw::resources::ffgt_gln_gw'] ->
 
-  ffnord::resources::ffnord::field {
+  ffgt_gln_gw::resources::ffgt_gln_gw::field {
     "MAINTENANCE": value => "${maintenance}";
   }
 
@@ -15,6 +15,6 @@ class ffnord::maintenance (
       owner => 'root',
       group => 'root',
       mode => '0755',
-      source => 'puppet:///modules/ffnord/usr/local/bin/maintenance';
+      source => 'puppet:///modules/ffgt_gln_gw/usr/local/bin/maintenance';
   }
 }

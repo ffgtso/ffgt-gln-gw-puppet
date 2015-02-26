@@ -1,4 +1,4 @@
-#!/bin/bash /usr/local/include/ffnord-update.common
+#!/bin/bash /usr/local/include/ffgt_gln_gw-update.common
 
 pull() {
   for ZONE in $(find /etc/bind/zones -mindepth 1 -maxdepth 1 -type d); do

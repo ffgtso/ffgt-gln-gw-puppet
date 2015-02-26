@@ -1,20 +1,20 @@
 #!/bin/bash
 
 ##This is small script that stops the radvd service and puts a timestamp in the
-##/etc/ffnord file. This timestamp is read out when ask for status. So we know
+##/etc/ffgt_gln_gw file. This timestamp is read out when ask for status. So we know
 ##when the maintenance mode was activated.
 
-. /etc/ffnord
+. /etc/ffgt_gln_gw
 
 case $1 in
   on)
-    sed -i -e 's/^MAINTENANCE=.*$/MAINTENANCE='$(date +%s)'/' /etc/ffnord
+    sed -i -e 's/^MAINTENANCE=.*$/MAINTENANCE='$(date +%s)'/' /etc/ffgt_gln_gw
     /etc/init.d/radvd stop
     update-rc.d radvd remove
     update-rc.d isc-dhcp-server remove
     ;;
   off)
-    sed -i -e 's/^MAINTENANCE=.*$/MAINTENANCE=0/' /etc/ffnord
+    sed -i -e 's/^MAINTENANCE=.*$/MAINTENANCE=0/' /etc/ffgt_gln_gw
     /etc/init.d/radvd start
     update-rc.d radvd defaults
     update-rc.d isc-dhcp-server defaults

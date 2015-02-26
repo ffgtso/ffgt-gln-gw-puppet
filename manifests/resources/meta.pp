@@ -1,6 +1,6 @@
-class ffnord::resources::meta {
+class ffgt_gln_gw::resources::meta {
 
-  include ffnord::resources::update
+  include ffgt_gln_gw::resources::update
 
   vcsrepo { 
      '/var/lib/icvpn-meta/':
@@ -39,8 +39,8 @@ class ffnord::resources::meta {
       owner => 'root',
       group => 'root',
       mode => '0754',
-      source => "puppet:///modules/ffnord/usr/local/bin/update-meta",
-      require => Class['ffnord::resources::update'];
+      source => "puppet:///modules/ffgt_gln_gw/usr/local/bin/update-meta",
+      require => Class['ffgt_gln_gw::resources::update'];
   }
 
   exec {
@@ -63,8 +63,8 @@ class ffnord::resources::meta {
   }
 }
 
-define ffnord::resources::meta::dns_zone_exclude(){
-  ffnord::resources::ffnord::field {
+define ffgt_gln_gw::resources::meta::dns_zone_exclude(){
+  ffgt_gln_gw::resources::ffgt_gln_gw::field {
     "DNS_ZONE_EXCLUDE_${name}": value => "${name}";
   }
 }

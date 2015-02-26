@@ -1,43 +1,43 @@
-class ffnord::vpn ( 
+class ffgt_gln_gw::vpn ( 
   $gw_vpn_interface  = "tun-anonvpn", # Interface name for the anonymous vpn
   $gw_control_ip     = "8.8.8.8",     # Control ip addr 
   $gw_bandwidth      = 54,            # How much bandwith we should have up/down per mesh interface
 ) {
 
-  include ffnord::resources::ffnord
+  include ffgt_gln_gw::resources::ffgt_gln_gw
 
   class {
-    'ffnord::resources::checkgw':
+    'ffgt_gln_gw::resources::checkgw':
       gw_control_ip => $gw_control_ip,
       gw_bandwidth => $gw_bandwidth,
   }
 }
 
-class ffnord::vpn::provider () {
+class ffgt_gln_gw::vpn::provider () {
 
-  include ffnord::firewall
+  include ffgt_gln_gw::firewall
 
   service {'openvpn':
     ensure  => running,
     hasrestart => true,
     require => Package['openvpn'],
-    notify => Class['ffnord::vpn'];
+    notify => Class['ffgt_gln_gw::vpn'];
   }
  
   package { 'openvpn':
     ensure => installed;
   }
 
-  class { 'ffnord::vpn': }
+  class { 'ffgt_gln_gw::vpn': }
  
-  ffnord::monitor::nrpe::check_command {
+  ffgt_gln_gw::monitor::nrpe::check_command {
     "openvpn_anonvpn":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C openvpn -a "ovpn-anonvpn"';
   }
 
-  ffnord::monitor::vnstat::device { 'tun-anonvpn': }
+  ffgt_gln_gw::monitor::vnstat::device { 'tun-anonvpn': }
 
-  ffnord::firewall::forward { 'tun-anonvpn':
+  ffgt_gln_gw::firewall::forward { 'tun-anonvpn':
     chain => 'mesh'
   }
 
@@ -55,7 +55,7 @@ class ffnord::vpn::provider () {
       owner => "root",
       group => "root",
       mode => "0755",
-      source => "puppet:///modules/ffnord/etc/openvpn/anonvpn-up.sh",
+      source => "puppet:///modules/ffgt_gln_gw/etc/openvpn/anonvpn-up.sh",
       require => [Package['openvpn']];
   }
 }
@@ -75,11 +75,11 @@ class ffnord::vpn::provider () {
 # route-noexec
 # up anonvpn-up.sh
 #
-class ffnord::vpn::provider::generic (
+class ffgt_gln_gw::vpn::provider::generic (
   $name,   # name of the vpn service
   $config, # src directory with configuration, keys etc.
 ) {
-  include ffnord::vpn::provider
+  include ffgt_gln_gw::vpn::provider
 
   file{
     "/etc/openvpn/${name}/":
@@ -103,13 +103,13 @@ class ffnord::vpn::provider::generic (
   }
 }
 
-class ffnord::vpn::provider::hideio (
+class ffgt_gln_gw::vpn::provider::hideio (
   $openvpn_server,
   $openvpn_port,
   $openvpn_user,
   $openvpn_password,
 ) {
-  include ffnord::vpn::provider
+  include ffgt_gln_gw::vpn::provider
 
   file { 
     '/etc/openvpn/anonvpn.conf': 
@@ -136,21 +136,21 @@ class ffnord::vpn::provider::hideio (
       owner => "root",
       group => "root",
       mode => "0644",
-      content => template("ffnord/etc/openvpn/hideio.conf.erb"),
+      content => template("ffgt_gln_gw/etc/openvpn/hideio.conf.erb"),
       require => [File["/etc/openvpn/hideio"],Package['openvpn']];
     '/etc/openvpn/hideio/password':
       ensure => file,
       owner => "root",
       group => "root",
       mode => "0640",
-      content => template("ffnord/etc/openvpn/password.erb"),
+      content => template("ffgt_gln_gw/etc/openvpn/password.erb"),
       require => [File['/etc/openvpn/hideio']];
     '/etc/openvpn/hideio/TrustedRoot.pem':
       ensure => file,
       owner => "root",
       group => "root",
       mode => "0644",
-      source => "puppet:///modules/ffnord/etc/openvpn/hideio.root.pem",
+      source => "puppet:///modules/ffgt_gln_gw/etc/openvpn/hideio.root.pem",
       require => [File['/etc/openvpn/hideio']];
   }
 }

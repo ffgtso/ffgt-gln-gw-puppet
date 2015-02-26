@@ -2,7 +2,7 @@
 
 shopt -s nullglob
 
-. /etc/ffnord
+. /etc/ffgt_gln_gw
 
 MAINTENANCE=${MAINTENANCE:-0}
 

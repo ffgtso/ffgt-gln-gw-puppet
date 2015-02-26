@@ -1,4 +1,4 @@
-define ffnord::mesh(
+define ffgt_gln_gw::mesh(
   $mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   $mesh_code,        # Code of your community, e.g.: ffgc
   $mesh_as,          # AS of your community
@@ -13,7 +13,9 @@ define ffnord::mesh(
   $fastd_secret,     # fastd secret
   $fastd_port,       # fastd port
   $peer_limit = -1,  # optionally set peer limit
-  $use_blacklist = "no",  # optionally use a blacklist approach; set to "yes" to enable
+  $use_blacklist = "no",        # optionally use a blacklist approach; set to "yes" to enable
+  $include_chaos_routes = "no", # do we want non-Freifunk addresses from IC-VPN?
+  $include_dn42_routes = "no",  # leave at "no", as DN42 won't work unless you actually are part of it
 
   $dhcp_ranges = [], # dhcp pool
   $dns_servers = [], # other dns servers in your network
@@ -24,9 +26,9 @@ define ffnord::mesh(
   #      a configuration class, so we can redefine sources.
   # TODO Update README
 
-  include ffnord::ntp
-  include ffnord::maintenance
-  include ffnord::firewall
+  include ffgt_gln_gw::ntp
+  include ffgt_gln_gw::maintenance
+  include ffgt_gln_gw::firewall
 
   # Determine ipv{4,6} network prefixes and ivp4 netmask
   $mesh_ipv4_prefix    = ip_prefix($mesh_ipv4)
@@ -38,8 +40,8 @@ define ffnord::mesh(
   $mesh_ipv6_prefixlen = ip_prefixlen($mesh_ipv6)
   $mesh_ipv6_address   = ip_address($mesh_ipv6)
 
-  Class['ffnord::firewall'] ->
-  ffnord::bridge { "bridge_${mesh_code}":
+  Class['ffgt_gln_gw::firewall'] ->
+  ffgt_gln_gw::bridge { "bridge_${mesh_code}":
     mesh_name            => $mesh_name,
     mesh_code            => $mesh_code,
     mesh_ipv6_address    => $mesh_ipv6_address,
@@ -50,12 +52,12 @@ define ffnord::mesh(
     mesh_ipv4_prefix     => $mesh_ipv4_prefix,
     mesh_ipv4_prefixlen  => $mesh_ipv4_prefixlen
   } ->
-  Class['ffnord::ntp'] ->
-  ffnord::ntp::allow { "${mesh_code}":
+  Class['ffgt_gln_gw::ntp'] ->
+  ffgt_gln_gw::ntp::allow { "${mesh_code}":
     ipv4_net => $mesh_ipv4,
     ipv6_net => $mesh_ipv6
   } ->
-  ffnord::dhcpd { "br-${mesh_code}":
+  ffgt_gln_gw::dhcpd { "br-${mesh_code}":
     mesh_code    => $mesh_code,
     ipv4_address => $mesh_ipv4_address,
     ipv4_network => $mesh_ipv4_prefix,
@@ -63,7 +65,7 @@ define ffnord::mesh(
     ranges       => $dhcp_ranges,
     dns_servers  => $dns_servers;
   } ->
-  ffnord::fastd { "fastd_${mesh_code}":
+  ffgt_gln_gw::fastd { "fastd_${mesh_code}":
     mesh_name => $mesh_name,
     mesh_code => $mesh_code,
     mesh_mac  => $mesh_mac,
@@ -74,16 +76,16 @@ define ffnord::mesh(
     use_blacklist => $use_blacklist,
     fastd_peers_git => $fastd_peers_git;
   } ->
-  ffnord::radvd { "br-${mesh_code}":
+  ffgt_gln_gw::radvd { "br-${mesh_code}":
     mesh_ipv6_address    => $mesh_ipv6_address,
     mesh_ipv6_prefix     => $mesh_ipv6_prefix,
     mesh_ipv6_prefixlen  => $mesh_ipv6_prefixlen;
   } ->
-  ffnord::named::listen { "${mesh_code}":
+  ffgt_gln_gw::named::listen { "${mesh_code}":
     ipv4_address => $mesh_ipv4_address,
     ipv6_address => $mesh_ipv6_address,
   } ->
-  ffnord::named::allow {
+  ffgt_gln_gw::named::allow {
     "${mesh_code}_v4":
       ip_prefix    => $mesh_ipv4_prefix,
       ip_prefixlen => $mesh_ipv4_prefixlen;
@@ -92,8 +94,8 @@ define ffnord::mesh(
       ip_prefixlen => $mesh_ipv6_prefixlen;
   }
 
-  if $ffnord::params::include_bird6 {
-    ffnord::bird6::mesh { "bird6-${mesh_code}":
+  if $ffgt_gln_gw::params::include_bird6 {
+    ffgt_gln_gw::bird6::mesh { "bird6-${mesh_code}":
       mesh_code => $mesh_code,
       mesh_ipv4_address => $mesh_ipv4_address,
       mesh_ipv6_address => $mesh_ipv6_address,
@@ -103,8 +105,8 @@ define ffnord::mesh(
       icvpn_as => $mesh_as;
     }
   }
-  if $ffnord::params::include_bird4 {
-    ffnord::bird4::mesh { "bird4-${mesh_code}":
+  if $ffgt_gln_gw::params::include_bird4 {
+    ffgt_gln_gw::bird4::mesh { "bird4-${mesh_code}":
       mesh_code => $mesh_code,
       mesh_ipv4_address => $mesh_ipv4_address,
       range_ipv4 => $range_ipv4,
@@ -112,10 +114,12 @@ define ffnord::mesh(
       mesh_peerings => $mesh_peerings,
       site_ipv4_prefix => $mesh_ipv4_prefix,
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
-      icvpn_as => $mesh_as;
+      icvpn_as => $mesh_as,
+      include_chaos_routes => $include_chaos_routes,
+      include_dn42_routes => $include_dn42_routes;
     }
   }
  
-  # ffnord::opkg::mirror
-  # ffnord::firmware mirror
+  # ffgt_gln_gw::opkg::mirror
+  # ffgt_gln_gw::firmware mirror
 }

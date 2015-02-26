@@ -6,7 +6,7 @@
 # ,restart or whatever or pull in new data and then do the upper stuff.
 # 
 
-source /etc/ffnord
+source /etc/ffgt_gln_gw
 source $1
 
 case $2 in

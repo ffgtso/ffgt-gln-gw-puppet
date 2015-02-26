@@ -1,12 +1,12 @@
-class ffnord::icvpn (
-  $router_id = $ffnord::params::router_id,
-  $icvpn_as = $ffnord::params::icvpn_as,
-) inherits ffnord::params {
+class ffgt_gln_gw::icvpn (
+  $router_id = $ffgt_gln_gw::params::router_id,
+  $icvpn_as = $ffgt_gln_gw::params::icvpn_as,
+) inherits ffgt_gln_gw::params {
   $tinc_name = $name
 
 }
 
-define ffnord::icvpn::setup (
+define ffgt_gln_gw::icvpn::setup (
   $icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
@@ -15,14 +15,14 @@ define ffnord::icvpn::setup (
   $tinc_keyfile,
   ){
 
-  include ffnord::resources::meta
+  include ffgt_gln_gw::resources::meta
 
-  ffnord::resources::ffnord::field {
+  ffgt_gln_gw::resources::ffgt_gln_gw::field {
     "ICVPN": value => '1';
     "ICVPN_EXCLUDE": value => "${icvpn_exclude_peerings}";
   }
 
-  class { 'ffnord::tinc': 
+  class { 'ffgt_gln_gw::tinc': 
     tinc_name    => $name,
     tinc_keyfile => $tinc_keyfile,
 
@@ -32,19 +32,19 @@ define ffnord::icvpn::setup (
     icvpn_peers  => $icvpn_peerings;
   }
 
-  if $ffnord::params::include_bird4 == false and $ffnord::params::include_bird6 == false {
+  if $ffgt_gln_gw::params::include_bird4 == false and $ffgt_gln_gw::params::include_bird6 == false {
     fail("At least bird4 or bird6 needs to be activated for ICVPN.")
   }
 
-  if $ffnord::params::include_bird4 {
-    ffnord::bird4::icvpn { $name:
+  if $ffgt_gln_gw::params::include_bird4 {
+    ffgt_gln_gw::bird4::icvpn { $name:
       icvpn_as => $icvpn_as,
       icvpn_ipv4_address => $icvpn_ipv4_address,
       icvpn_ipv6_address => $icvpn_ipv6_address,
       tinc_keyfile => $tinc_keyfile }
   }
-  if $ffnord::params::include_bird6 {
-    ffnord::bird6::icvpn { $name:
+  if $ffgt_gln_gw::params::include_bird6 {
+    ffgt_gln_gw::bird6::icvpn { $name:
       icvpn_as => $icvpn_as,
       icvpn_ipv4_address => $icvpn_ipv4_address,
       icvpn_ipv6_address => $icvpn_ipv6_address,

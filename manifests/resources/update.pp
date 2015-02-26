@@ -1,11 +1,11 @@
 # Common scripts for update scripts.
-class ffnord::resources::update () {
+class ffgt_gln_gw::resources::update () {
   file {
-    '/usr/local/include/ffnord-update.common':
+    '/usr/local/include/ffgt_gln_gw-update.common':
       ensure => file,
       owner => 'root',
       group => 'root',
       mode => '0644',
-      source => 'puppet:///modules/ffnord/usr/local/include/ffnord-update.common';
+      source => 'puppet:///modules/ffgt_gln_gw/usr/local/include/ffgt_gln_gw-update.common';
   }
 }

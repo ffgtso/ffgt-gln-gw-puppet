@@ -1,4 +1,4 @@
-define ffnord::bridge( $mesh_code
+define ffgt_gln_gw::bridge( $mesh_code
                     , $mesh_name
                     , $mesh_ipv6_address
                     , $mesh_ipv6_prefix
@@ -13,16 +13,16 @@ define ffnord::bridge( $mesh_code
                     , $dns_servers = []
 
                     ) {
-  include ffnord::resources::network
-  include ffnord::resources::sysctl
+  include ffgt_gln_gw::resources::network
+  include ffgt_gln_gw::resources::sysctl
 
-  ffnord::monitor::vnstat::device { "br-${mesh_code}": }
+  ffgt_gln_gw::monitor::vnstat::device { "br-${mesh_code}": }
 
-  Class['ffnord::resources::network'] ->
+  Class['ffgt_gln_gw::resources::network'] ->
   file {
     "/etc/network/interfaces.d/${mesh_code}-bridge":
       ensure => file, 
-      content => template('ffnord/etc/network/mesh-bridge.erb');
+      content => template('ffgt_gln_gw/etc/network/mesh-bridge.erb');
   } -> 
   exec {
     "start_bridge_interface_${mesh_code}":
@@ -30,13 +30,13 @@ define ffnord::bridge( $mesh_code
       unless  => "/bin/ip link show dev br-${mesh_code} 2> /dev/null",
       before  => Ffnord::Monitor::Vnstat::Device["br-${mesh_code}"],
       require => [ File_Line["/etc/iproute2/rt_tables"]
-                 , Class[ffnord::resources::sysctl] 
+                 , Class[ffgt_gln_gw::resources::sysctl] 
                  ];
   } ->
-  ffnord::firewall::device { "br-${mesh_code}":
+  ffgt_gln_gw::firewall::device { "br-${mesh_code}":
     chain => "mesh"
   } ->
-  ffnord::firewall::forward { "br-${mesh_code}":
+  ffgt_gln_gw::firewall::forward { "br-${mesh_code}":
     chain => "mesh"
   }
 }

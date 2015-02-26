@@ -1,6 +1,6 @@
-class ffnord::mosh {
+class ffgt_gln_gw::mosh {
 
-  require ffnord::resources::repos
+  require ffgt_gln_gw::resources::repos
 
   package {
     'mosh':
@@ -17,10 +17,10 @@ class ffnord::mosh {
      mode => "0644",
      owner => root,
      group => root,
-     source => "puppet:///modules/ffnord/etc/apt/preferences.d/mosh";
+     source => "puppet:///modules/ffgt_gln_gw/etc/apt/preferences.d/mosh";
   }
 
-  ffnord::firewall::service { "mosh":
+  ffgt_gln_gw::firewall::service { "mosh":
     protos => ['udp'],
     ports  => ['60000-61000'],
     chains => ['wan']

@@ -1,4 +1,4 @@
-class ffnord::resources::checkgw (
+class ffgt_gln_gw::resources::checkgw (
   $gw_control_ip     = "8.8.8.8",     # Control ip addr
   $gw_bandwidth      = 54,            # How much bandwith we should have up/down per mesh interface
 ) {
@@ -7,10 +7,10 @@ class ffnord::resources::checkgw (
     '/usr/local/bin/check-gateway':
       ensure => file,
       mode => "0755",
-      source => 'puppet:///modules/ffnord/usr/local/bin/check-gateway';
+      source => 'puppet:///modules/ffgt_gln_gw/usr/local/bin/check-gateway';
   }
 
-  ffnord::resources::ffnord::field {
+  ffgt_gln_gw::resources::ffgt_gln_gw::field {
     "GW_CONTROL_IP": value => "${gw_control_ip}";
   }
 

@@ -9,7 +9,7 @@ The idea is to implement the step-by-step guide on http://wiki.freifunk.net/Frei
 Basically this is a complete rewrite of the puppet scripts provided by the
 Freifunk Hamburg Community.
 
-The 'ffgt_gln_gw::mesh' block will setup a bridge, fastd, batman, ntp, dhcpd, dns (bind9),
+The 'ffnord::mesh' block will setup a bridge, fastd, batman, ntp, dhcpd, dns (bind9),
 radvd, bird6 and firewall rules vor IPv4 and IPv6.
 There are types for setting up monitoring, icvpn, anonymous vpn and alfred announcements.
 
@@ -49,7 +49,7 @@ downloaded manually):
 
 ```
 cd /etc/puppet/modules
-git clone https://github.com/ffgt_gln_gw/ffgt_gln_gw-puppet-gateway ffgt_gln_gw
+git clone https://github.com/ffnord/ffnord-puppet-gateway ffnord
 ```
 
 ### Parameters
@@ -70,7 +70,7 @@ Example puppet code (save e.g. as `/root/gateway.pp`):
 
 ```
 # Global parameters for this host
-class { 'ffgt_gln_gw::params':
+class { 'ffnord::params':
   router_id => "10.35.0.1", # The id of this router, probably the ipv4 address
                             # of the mesh device of the providing community
   icvpn_as => "65035",      # The as of the providing community
@@ -78,7 +78,7 @@ class { 'ffgt_gln_gw::params':
 }
 
 # You can repeat this mesh block for every community you support
-ffgt_gln_gw::mesh { 'mesh_ffgc':
+ffnord::mesh { 'mesh_ffgc':
       mesh_name    => "Freifunk Gotham City",
       mesh_code    => "ffgc",
       mesh_as      => 65035,
@@ -106,23 +106,23 @@ ffgt_gln_gw::mesh { 'mesh_ffgc':
                      ]
       }
 
-ffgt_gln_gw::named::zone {
+ffnord::named::zone {
   'ffgc': zone_git => 'git://somehost/ffgc-zone.git';
 }
 
-ffgt_gln_gw::dhcpd::static {
+ffnord::dhcpd::static {
   'ffgc': static_git => 'git://somehost/ffgc-static.git';
 }
 
 class {
-  'ffgt_gln_gw::vpn::provider::hideio':
+  'ffnord::vpn::provider::hideio':
     openvpn_server => "nl-7.hide.io",
     openvpn_port   => 3478,
     openvpn_user   => "wayne",
     openvpn_password => "brucessecretpw",
 }
 
-ffgt_gln_gw::icvpn::setup {
+ffnord::icvpn::setup {
   'gotham_city0':
     icvpn_as => 65035,
     icvpn_ipv4_address => "10.112.0.1",
@@ -132,23 +132,23 @@ ffgt_gln_gw::icvpn::setup {
 }
 
 class {
-  'ffgt_gln_gw::monitor::munin':
+  'ffnord::monitor::munin':
     host => '10.35.31.1'
 }
 
 class {
-  'ffgt_gln_gw::monitor::nrpe':
+  'ffnord::monitor::nrpe':
     allowed_hosts => '10.35.31.1'
 }
 
-class { 'ffgt_gln_gw::alfred': master => true }
+class { 'ffnord::alfred': master => true }
 
-class { 'ffgt_gln_gw::etckeeper': }
+class { 'ffnord::etckeeper': }
 ```
 
 #### Mesh Type
 ```
-ffgt_gln_gw :: mesh { '<mesh_code>':
+ffnord :: mesh { '<mesh_code>':
   mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   mesh_code,        # Code of your community, e.g.: ffgc
   mesh_as,          # AS of your community
@@ -179,7 +179,7 @@ The provided configuration should not rely on relative path but use
 the absolute path prefixed with '/etc/bind/zones/${name}/'.
 
 ```
-ffgt_gln_gw::named::zone {
+ffnord::named::zone {
   '<name>':
      zone_git; # zone file repo
 }
@@ -197,7 +197,7 @@ The name should be the same as the community the static assignments belong to.
 There has to be a file named static.conf in the repo.
 
 ```
-ffgt_gln_gw::dhcpd::static {
+ffnord::dhcpd::static {
   '<name>':
      static_git; # dhcp static file repo
 }
@@ -205,7 +205,7 @@ ffgt_gln_gw::dhcpd::static {
 
 #### ICVPN Type
 ```
-ffgt_gln_gw :: icvpn::setup {
+ffnord :: icvpn::setup {
   icvpn_as,            # AS of the community peering
   icvpn_ipv4_address,  # transfer network IPv4 address
   icvpn_ipv6_address,  # transfer network IPv6 address
@@ -218,17 +218,17 @@ ffgt_gln_gw :: icvpn::setup {
 #### IPv4 Uplink via GRE Tunnel
 This is a module for an IPv4 Uplink via GRE tunnel and BGP.
 This module and the VPN module are mutually exclusive.
-Define the ffgt_gln_gw::uplink::ip class once and ffgt_gln_gw::uplink::tunnel
+Define the ffnord::uplink::ip class once and ffnord::uplink::tunnel
 for each tunnel you want to use. See http://wiki.freifunk.net/Freifunk_Hamburg/IPv4Uplink
 for a more detailed description.
 
 ```
 class {
-  'ffgt_gln_gw::uplink::ip':
+  'ffnord::uplink::ip':
     nat_network,        # network of IPv4 addresses usable for NAT
     tunnel_network,     # network of tunnel IPs to exclude from NAT
 }
-ffgt_gln_gw::uplink::tunnel {
+ffnord::uplink::tunnel {
     '<name>':
       local_public_ip,  # local public IPv4 of this gateway
       remote_public_ip, # remote public IPv4 of the tunnel endpoint
