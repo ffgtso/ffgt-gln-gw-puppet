@@ -1,4 +1,4 @@
-define ffgt_gln_gw::mesh(
+define ff_gln_gw::mesh(
   $mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   $mesh_code,        # Code of your community, e.g.: ffgc
   $mesh_as,          # AS of your community
@@ -27,9 +27,9 @@ define ffgt_gln_gw::mesh(
   #      a configuration class, so we can redefine sources.
   # TODO Update README
 
-  include ffgt_gln_gw::ntp
-  include ffgt_gln_gw::maintenance
-  include ffgt_gln_gw::firewall
+  include ff_gln_gw::ntp
+  include ff_gln_gw::maintenance
+  include ff_gln_gw::firewall
 
   # Determine ipv{4,6} network prefixes and ivp4 netmask
   $mesh_ipv4_prefix    = ip_prefix($mesh_ipv4)
@@ -41,8 +41,8 @@ define ffgt_gln_gw::mesh(
   $mesh_ipv6_prefixlen = ip_prefixlen($mesh_ipv6)
   $mesh_ipv6_address   = ip_address($mesh_ipv6)
 
-  Class['ffgt_gln_gw::firewall'] ->
-  ffgt_gln_gw::bridge { "bridge_${mesh_code}":
+  Class['ff_gln_gw::firewall'] ->
+  ff_gln_gw::bridge { "bridge_${mesh_code}":
     mesh_name            => $mesh_name,
     mesh_code            => $mesh_code,
     mesh_ipv6_address    => $mesh_ipv6_address,
@@ -53,12 +53,12 @@ define ffgt_gln_gw::mesh(
     mesh_ipv4_prefix     => $mesh_ipv4_prefix,
     mesh_ipv4_prefixlen  => $mesh_ipv4_prefixlen
   } ->
-  Class['ffgt_gln_gw::ntp'] ->
-  ffgt_gln_gw::ntp::allow { "${mesh_code}":
+  Class['ff_gln_gw::ntp'] ->
+  ff_gln_gw::ntp::allow { "${mesh_code}":
     ipv4_net => $mesh_ipv4,
     ipv6_net => $mesh_ipv6
   } ->
-  ffgt_gln_gw::dhcpd { "br-${mesh_code}":
+  ff_gln_gw::dhcpd { "br-${mesh_code}":
     mesh_code    => $mesh_code,
     ipv4_address => $mesh_ipv4_address,
     ipv4_network => $mesh_ipv4_prefix,
@@ -66,7 +66,7 @@ define ffgt_gln_gw::mesh(
     ranges       => $dhcp_ranges,
     dns_servers  => $dns_servers;
   } ->
-  ffgt_gln_gw::fastd { "fastd_${mesh_code}":
+  ff_gln_gw::fastd { "fastd_${mesh_code}":
     mesh_name => $mesh_name,
     mesh_code => $mesh_code,
     mesh_mac  => $mesh_mac,
@@ -78,16 +78,16 @@ define ffgt_gln_gw::mesh(
     fastd_peers_git => $fastd_peers_git,
     fastd_bb_git => $fastd_bb_git;
   } ->
-  ffgt_gln_gw::radvd { "br-${mesh_code}":
+  ff_gln_gw::radvd { "br-${mesh_code}":
     mesh_ipv6_address    => $mesh_ipv6_address,
     mesh_ipv6_prefix     => $mesh_ipv6_prefix,
     mesh_ipv6_prefixlen  => $mesh_ipv6_prefixlen;
   } ->
-  ffgt_gln_gw::named::listen { "${mesh_code}":
+  ff_gln_gw::named::listen { "${mesh_code}":
     ipv4_address => $mesh_ipv4_address,
     ipv6_address => $mesh_ipv6_address,
   } ->
-  ffgt_gln_gw::named::allow {
+  ff_gln_gw::named::allow {
     "${mesh_code}_v4":
       ip_prefix    => $mesh_ipv4_prefix,
       ip_prefixlen => $mesh_ipv4_prefixlen;
@@ -96,8 +96,8 @@ define ffgt_gln_gw::mesh(
       ip_prefixlen => $mesh_ipv6_prefixlen;
   }
 
-  if $ffgt_gln_gw::params::include_bird6 {
-    ffgt_gln_gw::bird6::mesh { "bird6-${mesh_code}":
+  if $ff_gln_gw::params::include_bird6 {
+    ff_gln_gw::bird6::mesh { "bird6-${mesh_code}":
       mesh_code => $mesh_code,
       mesh_ipv4_address => $mesh_ipv4_address,
       mesh_ipv6_address => $mesh_ipv6_address,
@@ -107,8 +107,8 @@ define ffgt_gln_gw::mesh(
       icvpn_as => $mesh_as;
     }
   }
-  if $ffgt_gln_gw::params::include_bird4 {
-    ffgt_gln_gw::bird4::mesh { "bird4-${mesh_code}":
+  if $ff_gln_gw::params::include_bird4 {
+    ff_gln_gw::bird4::mesh { "bird4-${mesh_code}":
       mesh_code => $mesh_code,
       mesh_ipv4_address => $mesh_ipv4_address,
       range_ipv4 => $range_ipv4,
@@ -122,6 +122,6 @@ define ffgt_gln_gw::mesh(
     }
   }
  
-  # ffgt_gln_gw::opkg::mirror
-  # ffgt_gln_gw::firmware mirror
+  # ff_gln_gw::opkg::mirror
+  # ff_gln_gw::firmware mirror
 }

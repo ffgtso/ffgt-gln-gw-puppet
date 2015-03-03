@@ -1,4 +1,4 @@
-class ffgt_gln_gw::tinc (
+class ff_gln_gw::tinc (
   $tinc_name,
   $tinc_keyfile,
 
@@ -28,7 +28,7 @@ class ffgt_gln_gw::tinc (
       subscribe => File['/etc/tinc/icvpn/tinc.conf'];
   }
 
-  ffgt_gln_gw::monitor::nrpe::check_command  {
+  ff_gln_gw::monitor::nrpe::check_command  {
     "tinc_icvpn":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C tincd -a "-n icvpn"';
   }
@@ -36,7 +36,7 @@ class ffgt_gln_gw::tinc (
   file {
     '/etc/tinc/icvpn/tinc.conf':
       ensure  => file,
-      content => template('ffgt_gln_gw/etc/tinc/icvpn/tinc.conf.erb'),
+      content => template('ff_gln_gw/etc/tinc/icvpn/tinc.conf.erb'),
       require => Vcsrepo['/etc/tinc/icvpn/'];
     '/etc/tinc/icvpn/rsa_key.priv':
       ensure  => file,
@@ -44,12 +44,12 @@ class ffgt_gln_gw::tinc (
       require => Vcsrepo['/etc/tinc/icvpn/'];
     '/etc/tinc/icvpn/tinc-up':
       ensure  => file,
-      content => template('ffgt_gln_gw/etc/tinc/icvpn/tinc-up.erb'),
+      content => template('ff_gln_gw/etc/tinc/icvpn/tinc-up.erb'),
       require => Vcsrepo['/etc/tinc/icvpn/'],
       mode => '0755';
     '/etc/tinc/icvpn/tinc-down':
       ensure  => file,
-      content => template('ffgt_gln_gw/etc/tinc/icvpn/tinc-down.erb'),
+      content => template('ff_gln_gw/etc/tinc/icvpn/tinc-down.erb'),
       require => Vcsrepo['/etc/tinc/icvpn/'],
       mode => '0755';
     '/etc/tinc/icvpn/.git/hooks/post-merge':
@@ -62,7 +62,7 @@ class ffgt_gln_gw::tinc (
      mode => "0644",
      owner => root,
      group => root,
-     source => "puppet:///modules/ffgt_gln_gw/etc/apt/preferences.d/tinc";
+     source => "puppet:///modules/ff_gln_gw/etc/apt/preferences.d/tinc";
   }
 
   file_line {
@@ -79,7 +79,7 @@ class ffgt_gln_gw::tinc (
     require => Package['tinc']
   }
 
-  ffgt_gln_gw::etckeeper::ignore {
+  ff_gln_gw::etckeeper::ignore {
     "/etc/tinc/icvpn/":
   }
 
@@ -99,15 +99,15 @@ class ffgt_gln_gw::tinc (
     require => Vcsrepo['/etc/tinc/icvpn/'],
   }
 
-  ffgt_gln_gw::firewall::device { "icvpn":
+  ff_gln_gw::firewall::device { "icvpn":
     chain => 'mesh'
   }
 
-  ffgt_gln_gw::firewall::forward { "icvpn":
+  ff_gln_gw::firewall::forward { "icvpn":
     chain => 'mesh'
   }
 
-  ffgt_gln_gw::firewall::service { "tincd":
+  ff_gln_gw::firewall::service { "tincd":
     ports  => ['655'],
     chains => ['wan']
   }

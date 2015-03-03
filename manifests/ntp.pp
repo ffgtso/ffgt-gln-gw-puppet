@@ -1,4 +1,4 @@
-class ffgt_gln_gw::ntp () {
+class ff_gln_gw::ntp () {
 
   package {
     'ntp':
@@ -11,7 +11,7 @@ class ffgt_gln_gw::ntp () {
       mode => "0644",
       owner => "root",
       group => "root",
-      source => "puppet:///modules/ffgt_gln_gw/etc/ntp.conf",
+      source => "puppet:///modules/ff_gln_gw/etc/ntp.conf",
       require => Package['ntp'];
   }
 
@@ -26,7 +26,7 @@ class ffgt_gln_gw::ntp () {
       ]
   }
 
-  ffgt_gln_gw::firewall::service { 'ntpd':
+  ff_gln_gw::firewall::service { 'ntpd':
     ports => ['123'],
     protos => ['udp'],
     chains => ['mesh'],
@@ -36,12 +36,12 @@ class ffgt_gln_gw::ntp () {
   }
 }
 
-define ffgt_gln_gw::ntp::allow(
+define ff_gln_gw::ntp::allow(
   $ipv4_net, # ipv4 address in cidr notation, e.g. 10.35.0.1/19
   $ipv6_net, # ipv6 address in cidr notation, e.g. fd35:f308:a922::ff00/64
 ) {
 
-  include ffgt_gln_gw::ntp
+  include ff_gln_gw::ntp
 
   $ipv4_prefix    = ip_prefix($ipv4_net)
   $ipv4_prefixlen = ip_prefixlen($ipv4_net)

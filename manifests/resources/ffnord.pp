@@ -1,7 +1,7 @@
 # Ensure existence of global configuration file
 # for various scripts from this module.
-class ffgt_gln_gw::resources::ffgt_gln_gw {
-  file { '/etc/ffgt_gln_gw':
+class ff_gln_gw::resources::ff_gln_gw {
+  file { '/etc/ff_gln_gw':
     ensure => file,
     mode => "0644";
   }
@@ -13,13 +13,13 @@ class ffgt_gln_gw::resources::ffgt_gln_gw {
 # search and if not exists insert, calling
 # this value will always write the default
 # value.
-define ffgt_gln_gw::resources::ffgt_gln_gw::field(
+define ff_gln_gw::resources::ff_gln_gw::field(
   $value = ''
 ) { 
-  include ffgt_gln_gw::resources::ffgt_gln_gw
+  include ff_gln_gw::resources::ff_gln_gw
 
   file_line { "${name}":
-      path => '/etc/ffgt_gln_gw',
+      path => '/etc/ff_gln_gw',
       match => "^${name}=.*",
       line => "${name}=${value}";
   }

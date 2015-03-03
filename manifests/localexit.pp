@@ -1,26 +1,26 @@
-class ffgt_gln_gw::localexit ( 
+class ff_gln_gw::localexit ( 
   $gw_control_ip     = "8.8.8.8",     # Control ip addr 
   $gw_bandwidth      = 54,            # How much bandwith we should have up/down per mesh interface
 ) {
 
-  include ffgt_gln_gw::resources::ffgt_gln_gw
+  include ff_gln_gw::resources::ff_gln_gw
 
   class {
-    'ffgt_gln_gw::resources::checkgw':
+    'ff_gln_gw::resources::checkgw':
       gw_control_ip => $gw_control_ip,
       gw_bandwidth => $gw_bandwidth,
   }
 }
 
-class ffgt_gln_gw::localexit::ip (
+class ff_gln_gw::localexit::ip (
   $nat_network,
   $tunnel_network,
-) inherits ffgt_gln_gw::params {
+) inherits ff_gln_gw::params {
 
-  include ffgt_gln_gw::firewall
-  include ffgt_gln_gw::resources::network
-  include ffgt_gln_gw::resources::sysctl
-  include ffgt_gln_gw::bird4
+  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::bird4
 
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)
@@ -30,22 +30,22 @@ class ffgt_gln_gw::localexit::ip (
     ensure => present,
   }
 
-  Class['ffgt_gln_gw::resources::network'] ->
+  Class['ff_gln_gw::resources::network'] ->
   file {
     "/etc/network/interfaces.d/dummy0":
       ensure => file,
-      content => template("ffgt_gln_gw/etc/network/localexit-dummy.erb");
+      content => template("ff_gln_gw/etc/network/localexit-dummy.erb");
   } ->
   exec {
     "start_dummy_interface_0":
       command => "/sbin/ifup dummy0",
       unless  => "/bin/ip link show dev dummy0 | grep 'DOWN|dummy0' 2> /dev/null",
       require => [ File_Line["/etc/iproute2/rt_tables"]
-                 , Class[ffgt_gln_gw::resources::sysctl]
+                 , Class[ff_gln_gw::resources::sysctl]
                  ];
   }
 
-  class { 'ffgt_gln_gw::localexit': }
+  class { 'ff_gln_gw::localexit': }
  
   # Define Firewall rule for masquerade
   file {
@@ -74,7 +74,7 @@ class ffgt_gln_gw::localexit::ip (
 
   file { "/etc/bird/bird.conf.d/uplink.conf":
     mode => "0644",
-    content => template("ffgt_gln_gw/etc/bird/bird.uplink.conf.erb"),
+    content => template("ff_gln_gw/etc/bird/bird.uplink.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird-uplink-include"],
@@ -83,7 +83,7 @@ class ffgt_gln_gw::localexit::ip (
   }
 }
 
-define ffgt_gln_gw::localexit::tunnel (
+define ff_gln_gw::localexit::tunnel (
   $local_public_ip,
   $remote_public_ip,
   $local_ipv4,
@@ -92,27 +92,27 @@ define ffgt_gln_gw::localexit::tunnel (
   $remote_as,
 ) {
 
-  include ffgt_gln_gw::resources::network
-  include ffgt_gln_gw::resources::sysctl
-  include ffgt_gln_gw::firewall
-  include ffgt_gln_gw::bird4
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::firewall
+  include ff_gln_gw::bird4
 
   $endpoint_name = $name
   $local_ip = ip_address($local_ipv4)
   $local_netmask = ip_netmask($local_ipv4)
 
-  Class['ffgt_gln_gw::resources::network'] ->
+  Class['ff_gln_gw::resources::network'] ->
   file {
     "/etc/network/interfaces.d/uplink-${endpoint_name}":
       ensure => file,
-      content => template("ffgt_gln_gw/etc/network/uplink-gre.erb");
+      content => template("ff_gln_gw/etc/network/uplink-gre.erb");
   } ->
   exec {
     "start_uplink_${endpoint_name}_interface":
       command => "/sbin/ifup uplink-${endpoint_name}",
       unless  => "/bin/ip link show dev uplink-${endpoint_name}' 2> /dev/null",
       require => [ File_Line["/etc/iproute2/rt_tables"]
-                 , Class[ffgt_gln_gw::resources::sysctl]
+                 , Class[ff_gln_gw::resources::sysctl]
                  ];
   }
 
@@ -125,7 +125,7 @@ define ffgt_gln_gw::localexit::tunnel (
 
   file { "/etc/bird/bird.conf.d/uplink.${endpoint_name}.conf":
     mode => "0644",
-    content => template("ffgt_gln_gw/etc/bird/bird.uplink.peer.conf.erb"),
+    content => template("ff_gln_gw/etc/bird/bird.uplink.peer.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird-uplink-include"],
@@ -133,7 +133,7 @@ define ffgt_gln_gw::localexit::tunnel (
     ]
   }
 
-  ffgt_gln_gw::firewall::forward { "uplink-${name}":
+  ff_gln_gw::firewall::forward { "uplink-${name}":
     chain => 'mesh'
   }
 }

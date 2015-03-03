@@ -1,6 +1,6 @@
-class ffgt_gln_gw::resources::repos (
-  $debian_mirror = $ffgt_gln_gw::params::debian_mirror
-) inherits ffgt_gln_gw::params {
+class ff_gln_gw::resources::repos (
+  $debian_mirror = $ff_gln_gw::params::debian_mirror
+) inherits ff_gln_gw::params {
   apt::source { 'repo.universe-factory':
     location   => 'http://repo.universe-factory.net/debian/',
     release    => 'sid',

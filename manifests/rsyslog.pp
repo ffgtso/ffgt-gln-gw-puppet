@@ -1,4 +1,4 @@
-class ffgt_gln_gw::rsyslog {
+class ff_gln_gw::rsyslog {
   package {
     'rsyslog':
       ensure => installed;
@@ -25,35 +25,35 @@ class ffgt_gln_gw::rsyslog {
       mode => '0644',
       owner => 'root',
       group => 'root',
-      source => 'puppet:///modules/ffgt_gln_gw/etc/rsyslog.d/local0.conf',
+      source => 'puppet:///modules/ff_gln_gw/etc/rsyslog.d/local0.conf',
       notify => Service['rsyslog'];
     '/etc/rsyslog.d/local7.conf':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
-      source => 'puppet:///modules/ffgt_gln_gw/etc/rsyslog.d/local7.conf',
+      source => 'puppet:///modules/ff_gln_gw/etc/rsyslog.d/local7.conf',
       notify => Service['rsyslog'];
     '/etc/rsyslog.d/dhcp.conf':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
-      source => 'puppet:///modules/ffgt_gln_gw/etc/rsyslog.d/dhcp.conf',
+      source => 'puppet:///modules/ff_gln_gw/etc/rsyslog.d/dhcp.conf',
       notify => Service['rsyslog'];
     '/etc/rsyslog.d/fastd.conf':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
-      source => 'puppet:///modules/ffgt_gln_gw/etc/rsyslog.d/fastd.conf',
+      source => 'puppet:///modules/ff_gln_gw/etc/rsyslog.d/fastd.conf',
       notify => Service['rsyslog'];
     '/etc/logrotate.d/fastd':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
-      source => 'puppet:///modules/ffgt_gln_gw/etc/logrotate.d/fastd';
+      source => 'puppet:///modules/ff_gln_gw/etc/logrotate.d/fastd';
    '/var/log/fastd/':
       ensure => directory,
       mode => '0755',

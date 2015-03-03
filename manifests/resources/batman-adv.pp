@@ -1,7 +1,7 @@
-class ffgt_gln_gw::resources::batman-adv () {
-  include ffgt_gln_gw::resources::repos
+class ff_gln_gw::resources::batman-adv () {
+  include ff_gln_gw::resources::repos
 
-  Class[ffgt_gln_gw::resources::repos]
+  Class[ff_gln_gw::resources::repos]
   -> 
   package { 
     'batctl': ensure => installed;

@@ -1,8 +1,8 @@
-class ffgt_gln_gw::named () {
+class ff_gln_gw::named () {
 
-  include ffgt_gln_gw::resources::meta
+  include ff_gln_gw::resources::meta
 
-  ffgt_gln_gw::monitor::nrpe::check_command {
+  ff_gln_gw::monitor::nrpe::check_command {
     "named":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C named';
   }
@@ -22,14 +22,14 @@ class ffgt_gln_gw::named () {
         Package['bind9'],
         File['/etc/bind/named.conf.options'],
         File_line['icvpn-meta'],
-        Class['ffgt_gln_gw::resources::meta']
+        Class['ff_gln_gw::resources::meta']
       ]
   }
 
   file {
     '/etc/bind/named.conf.options':
       ensure  => file,
-      source  => "puppet:///modules/ffgt_gln_gw/etc/bind/named.conf.options",
+      source  => "puppet:///modules/ff_gln_gw/etc/bind/named.conf.options",
       require => [Package['bind9']],
       notify  => [Service['bind9']];
   }
@@ -38,29 +38,29 @@ class ffgt_gln_gw::named () {
     'icvpn-meta':
        path => '/etc/bind/named.conf',
        line => 'include "/etc/bind/named.conf.icvpn-meta";',
-       before => Class['ffgt_gln_gw::resources::meta'],
+       before => Class['ff_gln_gw::resources::meta'],
        require => [
          Package['bind9']
        ];
   }
 
-  ffgt_gln_gw::firewall::service { 'named':
+  ff_gln_gw::firewall::service { 'named':
     chains => ['mesh'],
     ports  => ['53'],
     protos => ['udp','tcp'];
   }
 }
 
-## ffgt_gln_gw::named::zone
+## ff_gln_gw::named::zone
 # Define a custom zone and receive the zone file from a git repository.
 #
 # The here defined resource is assuming that the configuration file
 # is named '${zone_name}.conf'.
-define ffgt_gln_gw::named::zone (
+define ff_gln_gw::named::zone (
   $zone_git, # git repo with zone files
   $exclude_meta = '' # optinal exclude zone from icvpn-meta
 ) {
-  include ffgt_gln_gw::named
+  include ff_gln_gw::named
 
   $zone_name = $name
 
@@ -107,7 +107,7 @@ define ffgt_gln_gw::named::zone (
      owner => 'root',
      group => 'root',
      mode => '0755',
-     source => 'puppet:///modules/ffgt_gln_gw/usr/local/bin/update-zones',
+     source => 'puppet:///modules/ff_gln_gw/usr/local/bin/update-zones',
      require =>  Vcsrepo["/etc/bind/zones/${zone_name}/"];
   }
 
@@ -120,34 +120,34 @@ define ffgt_gln_gw::named::zone (
   }
 
   if $exclude_meta != '' {
-    ffgt_gln_gw::resources::meta::dns_zone_exclude { 
+    ff_gln_gw::resources::meta::dns_zone_exclude { 
       "${exclude_meta}": 
         before => Exec['update-meta'];
     }
   }
 }
 
-define ffgt_gln_gw::named::listen (
+define ff_gln_gw::named::listen (
   $ipv4_address,
   $ipv6_address,
 ) {
 
-  include ffgt_gln_gw::named
+  include ff_gln_gw::named
 
-  ffgt_gln_gw::named::listen_v4 { "${name}":
+  ff_gln_gw::named::listen_v4 { "${name}":
     ipv4_address => $ipv4_address,
   }
 
-  ffgt_gln_gw::named::listen_v6 { "${name}":
+  ff_gln_gw::named::listen_v6 { "${name}":
     ipv6_address => $ipv6_address,
   }
 }
 
-define ffgt_gln_gw::named::listen_v4 (
+define ff_gln_gw::named::listen_v4 (
   $ipv4_address,
 ) {
 
-  include ffgt_gln_gw::named
+  include ff_gln_gw::named
 
   exec { "${name}_listen-on":
     command => "/bin/sed -i -r 's/(listen-on .*)\\}/\\1 ${ipv4_address};}/' /etc/bind/named.conf.options",
@@ -155,11 +155,11 @@ define ffgt_gln_gw::named::listen_v4 (
   }
 }
 
-define ffgt_gln_gw::named::listen_v6 (
+define ff_gln_gw::named::listen_v6 (
   $ipv6_address,
 ) {
 
-  include ffgt_gln_gw::named
+  include ff_gln_gw::named
 
   exec { "${name}_listen-on-v6":
     command => "/bin/sed -i -r 's/(listen-on-v6 .*)\\}/\\1 ${ipv6_address};}/' /etc/bind/named.conf.options",
@@ -167,12 +167,12 @@ define ffgt_gln_gw::named::listen_v6 (
   }
 }
 
-define ffgt_gln_gw::named::allow (
+define ff_gln_gw::named::allow (
   $ip_prefix,
   $ip_prefixlen,
 ) {
 
-  include ffgt_gln_gw::named
+  include ff_gln_gw::named
 
   exec { "${name}_allow":
     command => "/bin/sed -i -r 's/(allow-query .*)\\}/\\1 ${ip_prefix}\\/${ip_prefixlen};}/' /etc/bind/named.conf.options",

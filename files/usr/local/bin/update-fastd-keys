@@ -1,4 +1,4 @@
-#!/bin/bash /usr/local/include/ffgt_gln_gw-update.common 
+#!/bin/bash /usr/local/include/ff_gln_gw-update.common 
 
 # CONFIGURE THIS TO YOUR PEER DIRECTORY
 FASTD_ROOT=/etc/fastd/

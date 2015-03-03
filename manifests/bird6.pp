@@ -1,11 +1,11 @@
-class ffgt_gln_gw::bird6 (
-  $router_id = $ffgt_gln_gw::params::router_id,
-  $icvpn_as  = $ffgt_gln_gw::params::icvpn_as
-) inherits ffgt_gln_gw::params {
+class ff_gln_gw::bird6 (
+  $router_id = $ff_gln_gw::params::router_id,
+  $icvpn_as  = $ff_gln_gw::params::icvpn_as
+) inherits ff_gln_gw::params {
 
-  require ffgt_gln_gw::resources::repos
+  require ff_gln_gw::resources::repos
  
-  ffgt_gln_gw::monitor::nrpe::check_command {
+  ff_gln_gw::monitor::nrpe::check_command {
     "bird6":
       command => '/usr/lib/nagios/plugins/check_procs -w 1:1 -c 1:1 -C bird6';
   }
@@ -29,7 +29,7 @@ class ffgt_gln_gw::bird6 (
     '/etc/bird/bird6.conf':
       ensure => file,
       mode => "0644",
-      content => template("ffgt_gln_gw/etc/bird/bird6.conf.erb"),
+      content => template("ff_gln_gw/etc/bird/bird6.conf.erb"),
       require => [Package['bird6'],File['/etc/bird/']];
     '/etc/bird6.conf':
       ensure => link,
@@ -48,10 +48,10 @@ class ffgt_gln_gw::bird6 (
       subscribe => File['/etc/bird/bird6.conf'];
   }
 
-  include ffgt_gln_gw::resources::bird
+  include ff_gln_gw::resources::bird
 }
 
-define ffgt_gln_gw::bird6::mesh (
+define ff_gln_gw::bird6::mesh (
   $mesh_code,
 
   $mesh_ipv4_address,
@@ -64,7 +64,7 @@ define ffgt_gln_gw::bird6::mesh (
   $site_ipv6_prefixlen,
 ) {
 
-  include ffgt_gln_gw::bird6
+  include ff_gln_gw::bird6
 
   file_line { "bird6-${mesh_code}-include":
     path => '/etc/bird/bird6.conf',
@@ -75,7 +75,7 @@ define ffgt_gln_gw::bird6::mesh (
 
   file { "/etc/bird/bird6.conf.d/${mesh_code}.conf":
     mode => "0644",
-    content => template("ffgt_gln_gw/etc/bird/bird6.interface.conf.erb"),
+    content => template("ff_gln_gw/etc/bird/bird6.interface.conf.erb"),
     require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
     notify  => [
       File_line["bird6-${mesh_code}-include"],
@@ -84,7 +84,7 @@ define ffgt_gln_gw::bird6::mesh (
   }
 }
 
-define ffgt_gln_gw::bird6::icvpn (
+define ff_gln_gw::bird6::icvpn (
   $icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
@@ -93,12 +93,12 @@ define ffgt_gln_gw::bird6::icvpn (
   $tinc_keyfile,
   ){
 
-  include ffgt_gln_gw::bird6
-  include ffgt_gln_gw::resources::meta
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
 
   $icvpn_name = $name
 
-  include ffgt_gln_gw::icvpn
+  include ff_gln_gw::icvpn
 
   file_line { 
     "icvpn-template6":
@@ -113,7 +113,7 @@ define ffgt_gln_gw::bird6::icvpn (
       line => 'include "/etc/bird/bird6.conf.d/icvpn-peers.conf";',
       require => [
         File['/etc/bird/bird6.conf'],
-        Class['ffgt_gln_gw::resources::meta']
+        Class['ff_gln_gw::resources::meta']
       ],
       notify  => Service['bird6'];
   } 
@@ -121,11 +121,11 @@ define ffgt_gln_gw::bird6::icvpn (
   # Process meta data from tinc directory
   file { "/etc/bird/bird6.conf.d/icvpn-template.conf":
     mode => "0644",
-    content => template("ffgt_gln_gw/etc/bird/bird6.icvpn-template.conf.erb"),
+    content => template("ff_gln_gw/etc/bird/bird6.icvpn-template.conf.erb"),
     require => [ 
       File['/etc/bird/bird6.conf.d/'],
       Package['bird6'],
-      Class['ffgt_gln_gw::tinc'],
+      Class['ff_gln_gw::tinc'],
     ],
     notify  => [
       Service['bird6'],

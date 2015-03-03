@@ -1,6 +1,6 @@
-class ffgt_gln_gw::monitor::vnstat () {
+class ff_gln_gw::monitor::vnstat () {
 
-  ffgt_gln_gw::monitor::nrpe::check_command {
+  ff_gln_gw::monitor::nrpe::check_command {
     "vnstatd":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C vnstatd';
   }
@@ -19,8 +19,8 @@ class ffgt_gln_gw::monitor::vnstat () {
   }
 }
 
-define ffgt_gln_gw::monitor::vnstat::device() {
-  include ffgt_gln_gw::monitor::vnstat
+define ff_gln_gw::monitor::vnstat::device() {
+  include ff_gln_gw::monitor::vnstat
  
   exec { "vnstat device ${name}":
     command => "/usr/bin/vnstat -u -i ${name}",

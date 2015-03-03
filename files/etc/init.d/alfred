@@ -11,7 +11,7 @@
 ### END INIT INFO
 
 . /lib/lsb/init-functions
-. /etc/ffgt_gln_gw
+. /etc/ff_gln_gw
 
 test $DEBIAN_SCRIPT_DEBUG && set -v -x
 

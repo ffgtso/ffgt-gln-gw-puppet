@@ -1,4 +1,4 @@
-class ffgt_gln_gw::alfred (
+class ff_gln_gw::alfred (
   $master = false
 ) { 
   vcsrepo { '/opt/alfred':
@@ -10,13 +10,13 @@ class ffgt_gln_gw::alfred (
   file { '/etc/init.d/alfred':
     ensure => file,
     mode => "0755",
-    source => "puppet:///modules/ffgt_gln_gw/etc/init.d/alfred";
+    source => "puppet:///modules/ff_gln_gw/etc/init.d/alfred";
   }
 
   file { '/usr/local/bin/alfred-announce':
     ensure => file,
     mode => "0755",
-    source => "puppet:///modules/ffgt_gln_gw/usr/local/bin/alfred-announce";
+    source => "puppet:///modules/ff_gln_gw/usr/local/bin/alfred-announce";
   }
 
   package { 
@@ -48,7 +48,7 @@ class ffgt_gln_gw::alfred (
   vcsrepo { '/opt/alfred-announce':
     ensure => present,
     provider => git,
-    source => "https://github.com/ffgt_gln_gw/ffgt_gln_gw-gateway-alfred.git",
+    source => "https://github.com/ff_gln_gw/ff_gln_gw-gateway-alfred.git",
     require => [Package['python3'],Package['ethtool']];
   }
 
@@ -60,15 +60,15 @@ class ffgt_gln_gw::alfred (
      require => [Vcsrepo['/opt/alfred-announce'], Vcsrepo['/opt/alfred'],File['/usr/local/bin/alfred-announce']];
   }
   
-  ffgt_gln_gw::firewall::service { 'alfred':
+  ff_gln_gw::firewall::service { 'alfred':
     protos => ["udp"],
     chains => ["mesh","bat"],
     ports => ['16962'],
   }
 
   if $master {
-    ffgt_gln_gw::resources::ffgt_gln_gw::field { "ALFRED_OPTS": value => '-m'; }
+    ff_gln_gw::resources::ff_gln_gw::field { "ALFRED_OPTS": value => '-m'; }
   } else {
-    ffgt_gln_gw::resources::ffgt_gln_gw::field { "ALFRED_OPTS": value => ''; }
+    ff_gln_gw::resources::ff_gln_gw::field { "ALFRED_OPTS": value => ''; }
   }
 }

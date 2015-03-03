@@ -26,7 +26,7 @@ of the puppet scripts provided by the Freifunk Hamburg Community".
 
 
 
-The 'ffgt_gln_gw::mesh' block will setup a bridge, fastd, batman,
+The 'ff_gln_gw::mesh' block will setup a bridge, fastd, batman,
 ntp, dhcpd, dns (bind9), radvd, bird, bird6 and firewall rules for
 IPv4 and IPv6.
 There are types for setting up monitoring, icvpn, anonymous vpn,
@@ -68,7 +68,7 @@ downloaded manually):
 
 ```
 cd /etc/puppet/modules
-git clone https://github.com/ffgtso/ffgt-gln-gw-puppet.git ffgt_gln_gw
+git clone https://github.com/ffgtso/ffgt-gln-gw-puppet.git ff_gln_gw
 ```
 
 ### Parameters
@@ -89,7 +89,7 @@ Example puppet code (save e.g. as `/root/gateway.pp`):
 
 ```
 # Global parameters for this host
-class { 'ffgt_gln_gw::params':
+class { 'ff_gln_gw::params':
   router_id => "192.0.0.1", # The id of this router, probably the ipv4 address
                             # of the mesh device of the providing community
   icvpn_as => "64496",      # The as of the providing community (public or private)
@@ -97,7 +97,7 @@ class { 'ffgt_gln_gw::params':
 }
 
 # You can repeat this mesh block for every community you support
-ffgt_gln_gw::mesh { 'mesh_ffgc':
+ff_gln_gw::mesh { 'mesh_ffgc':
       mesh_name    => "Freifunk Gotham City",
       mesh_code    => "ffgc",
       mesh_as      => 64496,
@@ -113,6 +113,7 @@ ffgt_gln_gw::mesh { 'mesh_ffgc':
       fastd_secret => "/root/fastd_secret.key",
       fastd_port   => 10000,
       fastd_peers_git => 'git://somehost/peers.git',
+      fastd_bb_git => 'git://somehost/thisgwsbackbone.git',
 
       dhcp_ranges => [ '10.35.0.2 10.35.0.254'
                      , '10.35.1.1 10.35.1.254'
@@ -127,23 +128,23 @@ ffgt_gln_gw::mesh { 'mesh_ffgc':
                      ]
       }
 
-ffgt_gln_gw::named::zone {
+ff_gln_gw::named::zone {
   'ffgc': zone_git => 'git://somehost/ffgc-zone.git';
 }
 
-ffgt_gln_gw::dhcpd::static {
+ff_gln_gw::dhcpd::static {
   'ffgc': static_git => 'git://somehost/ffgc-static.git';
 }
 
 class {
-  'ffgt_gln_gw::vpn::provider::hideio':
+  'ff_gln_gw::vpn::provider::hideio':
     openvpn_server => "nl-7.hide.io",
     openvpn_port   => 3478,
     openvpn_user   => "wayne",
     openvpn_password => "brucessecretpw",
 }
 
-ffgt_gln_gw::icvpn::setup {
+ff_gln_gw::icvpn::setup {
   'gotham_city0':
     icvpn_as => 65035,
     icvpn_ipv4_address => "10.112.0.1",
@@ -153,23 +154,23 @@ ffgt_gln_gw::icvpn::setup {
 }
 
 class {
-  'ffgt_gln_gw::monitor::munin':
+  'ff_gln_gw::monitor::munin':
     host => '10.35.31.1'
 }
 
 class {
-  'ffgt_gln_gw::monitor::nrpe':
+  'ff_gln_gw::monitor::nrpe':
     allowed_hosts => '10.35.31.1'
 }
 
-class { 'ffgt_gln_gw::alfred': master => true }
+class { 'ff_gln_gw::alfred': master => true }
 
-class { 'ffgt_gln_gw::etckeeper': }
+class { 'ff_gln_gw::etckeeper': }
 ```
 
 #### Mesh Type
 ```
-ffgt_gln_gw :: mesh { '<mesh_code>':
+ff_gln_gw :: mesh { '<mesh_code>':
   mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   mesh_code,        # Code of your community, e.g.: ffgc
   mesh_as,          # AS of your community
@@ -200,7 +201,7 @@ The provided configuration should not rely on relative path but use
 the absolute path prefixed with '/etc/bind/zones/${name}/'.
 
 ```
-ffgt_gln_gw::named::zone {
+ff_gln_gw::named::zone {
   '<name>':
      zone_git; # zone file repo
 }
@@ -218,7 +219,7 @@ The name should be the same as the community the static assignments belong to.
 There has to be a file named static.conf in the repo.
 
 ```
-ffgt_gln_gw::dhcpd::static {
+ff_gln_gw::dhcpd::static {
   '<name>':
      static_git; # dhcp static file repo
 }
@@ -229,7 +230,7 @@ ffgt_gln_gw::dhcpd::static {
 This sets up conenctivity to the IC-VPN with the provided information.
 
 ```
-ffgt_gln_gw :: icvpn::setup {
+ff_gln_gw :: icvpn::setup {
   icvpn_as,            # AS of the community peering
   icvpn_ipv4_address,  # transfer network IPv4 address
   icvpn_ipv6_address,  # transfer network IPv6 address
@@ -243,17 +244,17 @@ ffgt_gln_gw :: icvpn::setup {
 
 This is a module for an IPv4 Uplink via GRE tunnel and BGP.
 This module and the VPN module are mutually exclusive.
-Define the ffgt_gln_gw::uplink::ip class once and ffgt_gln_gw::uplink::tunnel
+Define the ff_gln_gw::uplink::ip class once and ff_gln_gw::uplink::tunnel
 for each tunnel you want to use. See http://wiki.freifunk.net/Freifunk_Hamburg/IPv4Uplink
 for a more detailed description.
 
 ```
 class {
-  'ffgt_gln_gw::uplink::ip':
+  'ff_gln_gw::uplink::ip':
     nat_network,        # network of IPv4 addresses usable for NAT
     tunnel_network,     # network of tunnel IPs to exclude from NAT
 }
-ffgt_gln_gw::uplink::tunnel {
+ff_gln_gw::uplink::tunnel {
     '<name>':
       local_public_ip,  # local public IPv4 of this gateway
       remote_public_ip, # remote public IPv4 of the tunnel endpoint
@@ -269,10 +270,10 @@ This is a module for terminating IPv4 locally. Be sure you know what you are
 doing, e. g. run this only outside of Germany or with IPs that are properly
 registered to an ISP, or the Störerhaftung will bite you badly.
 This module and the VPN and uplink::tunnel modules are mutually exclusive.
-Define the ffgt_gln_gw::uplink::local once well.
+Define the ff_gln_gw::uplink::local once well.
 
 ```
-ffgt_gln_gw::uplink::local {
+ff_gln_gw::uplink::local {
     'localexit':
       local_public_ip,  # local public IPv4 of this gateway
       local_net_to_nat  # local network to be NATted to local_public_ip

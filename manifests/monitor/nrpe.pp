@@ -1,4 +1,4 @@
-class ffgt_gln_gw::monitor::nrpe ( $allowed_hosts
+class ff_gln_gw::monitor::nrpe ( $allowed_hosts
                             ) {
   package { 
     'nagios-nrpe-server': 
@@ -29,7 +29,7 @@ class ffgt_gln_gw::monitor::nrpe ( $allowed_hosts
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
-      content => template('ffgt_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb');
+      content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb');
   }
 
   file { 
@@ -39,19 +39,19 @@ class ffgt_gln_gw::monitor::nrpe ( $allowed_hosts
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
-      source => "puppet:///modules/ffgt_gln_gw/etc/nagios/nrpe.d/check_apt.cfg";
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_apt.cfg";
   }
 
-  ffgt_gln_gw::firewall::service { 'nrpe':
+  ff_gln_gw::firewall::service { 'nrpe':
     ports => ['5666'],
     chains => ['wan'];
   }
 }
 
-define ffgt_gln_gw::monitor::nrpe::check_command (
+define ff_gln_gw::monitor::nrpe::check_command (
   $command
 ) {
-  if defined(Class['ffgt_gln_gw::monitor::nrpe']) {
+  if defined(Class['ff_gln_gw::monitor::nrpe']) {
     file {
       "/etc/nagios/nrpe.d/check_${name}.cfg":
         ensure => file,
