@@ -117,8 +117,8 @@ define ff_gln_gw::mesh(
       site_ipv4_prefix => $mesh_ipv4_prefix,
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
       icvpn_as => $mesh_as,
-      include_chaos_routes => $include_chaos_routes,
-      include_dn42_routes => $include_dn42_routes;
+      include_chaos => $include_chaos_routes,
+      include_dn42 => $include_dn42_routes;
     }
   }
  
