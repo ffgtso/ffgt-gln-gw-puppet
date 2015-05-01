@@ -48,7 +48,7 @@ class ff_gln_gw::alfred (
   vcsrepo { '/opt/alfred-announce':
     ensure => present,
     provider => git,
-    source => "https://github.com/ff_gln_gw/ff_gln_gw-gateway-alfred.git",
+    source => "https://github.com/ffnord/ffnord-gateway-alfred.git",
     require => [Package['python3'],Package['ethtool']];
   }
 
