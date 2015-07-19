@@ -6,6 +6,8 @@ class ff_gln_gw::params (
   $debian_mirror = 'http://ftp.de.debian.org/debian/',
   $include_bird4 = true, # support bird
   $include_bird6 = true, # support bird6
+  $include_chaos_routes = true,
+  $include_dn42_routes = true,
 
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
