@@ -15,8 +15,6 @@ define ff_gln_gw::mesh(
   $fastd_port,       # fastd port
   $peer_limit = -1,  # optionally set peer limit
   $use_blacklist = "no",        # optionally use a blacklist approach; set to "yes" to enable
-  $include_chaos_routes = "no", # do we want non-Freifunk addresses from IC-VPN?
-  $include_dn42_routes = "no",  # leave at "no", as DN42 won't work unless you actually are part of it
 
   $dhcp_ranges = [], # dhcp pool
   $dns_servers = [], # other dns servers in your network
@@ -116,9 +114,7 @@ define ff_gln_gw::mesh(
       mesh_peerings => $mesh_peerings,
       site_ipv4_prefix => $mesh_ipv4_prefix,
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
-      icvpn_as => $mesh_as,
-      include_chaos => $include_chaos_routes,
-      include_dn42 => $include_dn42_routes;
+      icvpn_as => $mesh_as;
     }
   }
  

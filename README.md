@@ -94,6 +94,8 @@ class { 'ff_gln_gw::params':
                             # of the mesh device of the providing community
   icvpn_as => "64496",      # The as of the providing community (public or private)
   wan_devices => ['eth0']   # A array of devices which should be in the wan zone
+  include_dn42_routes => "no",  # yes/no(default) to include routes from DN42
+  include_chaos_routes => "no"  # yes/no(default) to include routes from ChaosVPN
 }
 
 # You can repeat this mesh block for every community you support
@@ -106,13 +108,12 @@ ff_gln_gw::mesh { 'mesh_ffgc':
       mesh_ipv4    => "10.35.0.1/19",
       mesh_mtu     => "1426",
       range_ipv4   => "10.35.0.0/16",
-      include_dn42_routes => "no",  # yes/to to include routes from DN42
-      include_chaos_routes => "no", # yes/no to include routes from ChaosVPN
       mesh_peerings => "/root/mesh_peerings.yaml",
 
       fastd_secret => "/root/fastd_secret.key",
       fastd_port   => 10000,
       fastd_peers_git => 'git://somehost/peers.git',
+      use_blacklist => "no", # "yes" to use a blacklist approach instead of peer repo
       fastd_bb_git => 'git://somehost/thisgwsbackbone.git',
 
       dhcp_ranges => [ '10.35.0.2 10.35.0.254'

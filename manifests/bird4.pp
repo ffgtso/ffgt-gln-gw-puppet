@@ -94,6 +94,8 @@ define ff_gln_gw::bird4::icvpn (
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
+  $include_chaos = $ff_gln_gw::params::include_chaos_routes,
+  $include_dn42  = $ff_gln_gw::params::include_dn42_routes,
 
   $tinc_keyfile,
   ){
