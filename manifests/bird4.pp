@@ -65,8 +65,8 @@ define ff_gln_gw::bird4::mesh (
 
   $site_ipv4_prefix,
   $site_ipv4_prefixlen,
-  $include_chaos,
-  $include_dn42,
+  $include_chaos = $ff_gln_gw::params::include_chaos_routes,
+  $include_dn42  = $ff_gln_gw::params::include_dn42_routes
 ) {
 
   include ff_gln_gw::bird4
