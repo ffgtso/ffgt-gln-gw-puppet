@@ -26,9 +26,9 @@ class ff_gln_gw::uplink::ip (
   $nat_netmask = ip_netmask($nat_network)
 
   Exec { path => [ "/bin" ] }
-  kmod::load { 'dummy':
-    ensure => present,
-  }
+  #kmod::load { 'dummy':
+  #  ensure => present,
+  #}
 
   Class['ff_gln_gw::resources::network'] ->
   file {
