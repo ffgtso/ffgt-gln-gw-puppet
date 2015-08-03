@@ -93,7 +93,7 @@ class { 'ff_gln_gw::params':
   router_id => "192.0.0.1", # The id of this router, probably the ipv4 address
                             # of the mesh device of the providing community
   icvpn_as => "64496",      # The as of the providing community (public or private)
-  wan_devices => ['eth0']   # A array of devices which should be in the wan zone
+  wan_devices => ['eth0'],  # A array of devices which should be in the wan zone
   include_dn42_routes => "no",  # yes/no(default) to include routes from DN42
   include_chaos_routes => "no"  # yes/no(default) to include routes from ChaosVPN
 }
