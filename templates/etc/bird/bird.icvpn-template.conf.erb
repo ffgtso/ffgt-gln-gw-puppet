@@ -8,9 +8,9 @@ protocol static icvpn_static {
   route 10.207.0.0/16 via "icvpn";
 
   # wusel, 2015-08-05: add a route to the RFC 1918 supernets, we don't want to sent them upstream.
-  route 10.0.0.0/16 reject;
-  route 172.16.0.0/12 reject;
-  route 192.168.0.0/16 reject;
+  route 10.0.0.0/16 unreachable;
+  route 172.16.0.0/12 unreachable;
+  route 192.168.0.0/16 unreachable;
 }
 
 # template for icvpn route exchange via bgp
