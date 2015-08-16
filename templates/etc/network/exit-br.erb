@@ -1,0 +1,14 @@
+auto br-<%=@exit_provider%>-exit
+iface br-<%=@exit_provider%>-exit inet static
+  bridge-ports none
+  address <%=@exit_ip%>
+  netmask 255.255.255.255
+  post-up /sbin/ip -6 addr add <%=@exit_prefix6%> dev $IFACE
+  post-up /sbin/ip rule add from <%=@exit_ip%>/32 lookup 42
+  post-up /sbin/ip rule add from <%=@exit_v4src%> lookup 42
+  post-up /sbin/iptables -t nat -I POSTROUTING -s <%=@exit_v4src%> -d 0/0 -o <%=@exit_provider%>-+ -j SNAT --to <%=@exit_ip%>
+  post-up /sbin/iptables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+  pre-down /sbin/iptables -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+  pre-down /sbin/iptables -t nat -D POSTROUTING -s <%=@exit_v4src%> -d 0/0 -o <%=@exit_provider%>-+ -j SNAT --to <%=@exit_ip%>
+  pre-down /sbin/ip rule del from <%=@exit_v4src%> lookup 42
+  pre-down /sbin/ip rule del from <%=@exit_ip%>/32 lookup 42
