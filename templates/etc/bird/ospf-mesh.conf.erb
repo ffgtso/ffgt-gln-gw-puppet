@@ -18,8 +18,8 @@ protocol ospf uplink_<%= @mesh_code %> {
     networks {
       <%= @range_ipv4 %>;
     };
-<% ospfpeerings = YAML.load_file(@ospf_peerings); -%>
-<% ospfpeerings.each_pair do |name,node| -%>
+<% peerings = YAML.load_file(@ospf_peerings); -%>
+<% peerings.each_pair do |name,node| -%>
     interface "ospf-<%=name%>" {
       cost 200;
       type pointopoint;
@@ -32,8 +32,8 @@ protocol ospf uplink_<%= @mesh_code %> {
   };
 
   area 10 {
-<% ospflinks = YAML.load_file(@ospf_link); -%>
-<% ospflinks.each_pair do |name,node| -%>
+<% peerings = YAML.load_file(@ospf_links); -%>
+<% peerings.each_pair do |name,node| -%>
     interface "ospf-<%=name%>" {
       cost node['cost'];
       type pointopoint;
