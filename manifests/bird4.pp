@@ -89,6 +89,46 @@ define ff_gln_gw::bird4::mesh (
   }
 }
 
+define ff_gln_gw::bird4::ospf (
+  $mesh_code,
+  $range_ipv4,
+  $ospf_peerings, # YAML data file for local backbone peerings
+  $ospf_links,    # YAML data file for local interconnects
+  $icvpn_as,
+  $site_ipv4_prefix,
+  $site_ipv4_prefixlen
+) {
+
+  include ff_gln_gw::bird4
+
+  file_line { "bird-ospf-${mesh_code}-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/ospf-${mesh_code}.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/ospf-${mesh_code}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/ospf-mesh.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-ospf-${mesh_code}-include"],
+      Service['bird']
+    ]
+  }
+
+  file { "/tmp/prepare-gre-tunnels-${mesh_code}.sh":
+    mode => "0755",
+    content => template("ff_gln_gw/etc/network/prepare-gre-tunnels.erb")
+  } ->
+  exec { "prepare-gre-tunnels-${mesh_code}":
+    command => "/tmp/prepare-gre-tunnels-${mesh_code}.sh",
+    cwd => "/tmp"
+  }
+}
+
+
 define ff_gln_gw::bird4::icvpn (
   $icvpn_as,
   $icvpn_ipv4_address,
