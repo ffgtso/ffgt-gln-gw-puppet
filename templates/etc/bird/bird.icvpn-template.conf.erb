@@ -6,10 +6,6 @@ protocol static icvpn_static {
   import all;
   table mesh;
   route 10.207.0.0/16 via "icvpn";
-
-  # wusel, 2015-08-05: add a route to the RFC 1918 supernets used in Freifunk/Chaosnet, we don't want to sent them upstream.
-  route 10.0.0.0/16 unreachable;
-  route 172.16.0.0/12 unreachable;
 }
 
 # template for icvpn route exchange via bgp
