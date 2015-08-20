@@ -1,0 +1,16 @@
+auto ospf-<%= @endpoint_name %>
+iface ospf-<%= @endpoint_name %> inet static
+ address <%= @local_ip %>
+ netmask 255.255.255.254
+ pre-up iptunnel add $IFACE mode gre local <%= @local_public_ip %> remote <%= @remote_public_ip %> ttl 255
+ up ifconfig $IFACE multicast
+ pointopoint <%= @remote_ip %>
+ post-up ip link set $IFACE mtu 1400
+ post-up sysctl -w net.ipv4.conf.$IFACE.rp_filter=0
+ post-up ip rule add pref 31000 iif $IFACE table 42
+ post-up ip rule add pref 31000 iif $IFACE unreachable
+ post-up ip route replace <%= @remote_ip %> dev $IFACE src <%= @local_ip %> table 42
+ pre-down ip route del <%= @remote_ip %> dev $IFACE src <%= @local_ip %> table 42
+ pre-down ip rule del pref 31000 iif $IFACE unreachable
+ pre-down ip rule del pref 31000 iif $IFACE table 42
+ post-down iptunnel del $IFACE mode gre
