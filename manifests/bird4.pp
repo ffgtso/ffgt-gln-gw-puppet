@@ -94,7 +94,6 @@ define ff_gln_gw::bird4::ospf (
   $range_ipv4,
   $ospf_peerings, # YAML data file for local backbone peerings
   $ospf_links,    # YAML data file for local interconnects
-  $icvpn_as,
   $site_ipv4_prefix,
   $site_ipv4_prefixlen
 ) {
