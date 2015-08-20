@@ -265,6 +265,23 @@ ff_gln_gw::uplink::tunnel {
 }
 ```
 
+#### GRE Tunnel for OSPF & Routing
+
+This is a module creates an GRE tunnel via IPv4 for use in OSPF.
+This module and the VPN module are mutually exclusive.
+Define the ff_gln_gw::ospfgre::tunnel for each tunnel you want to
+use. See (TODO) for a more detailed description.
+
+```
+ff_gln_gw::ospfgre::tunnel {
+    '<name>':
+      local_public_ip,  # local public IPv4 of this gateway
+      remote_public_ip, # remote public IPv4 of the tunnel endpoint
+      local_ipv4,       # tunnel IPv4 on our side
+      remote_ipv4,      # tunnel IPv4 on the remote side
+}
+```
+
 #### IPv4 Uplink via local exit
 
 This is a module for terminating IPv4 locally. Be sure you know what you are
