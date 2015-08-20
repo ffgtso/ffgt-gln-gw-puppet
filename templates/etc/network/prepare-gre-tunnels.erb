@@ -36,7 +36,20 @@ sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 fi
 <% end -%>
+<% peerings = YAML.load_file(@ospf_links); -%>
+<% peerings.each_pair do |name,node| -%>
+# Skip dummy entries
+echo "<%=name%>" | grep >/dev/null dummy
+if [ \$? -eq 1 ]; then
+sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
+ -e 's/##endpoint_name##/<%=name%>/g' \\
+ -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
+ -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
+ -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
+ -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
+fi
+<% end -%>
 EOF
 
 /bin/sh /tmp/puppet-$$.sh
-#/bin/rm /tmp/puppet-$$.sh /tmp/puppet-$$.txt
+/bin/rm /tmp/puppet-$$.sh /tmp/puppet-$$.txt
