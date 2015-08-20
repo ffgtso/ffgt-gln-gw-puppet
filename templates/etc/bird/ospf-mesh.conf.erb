@@ -35,7 +35,7 @@ protocol ospf uplink_<%= @mesh_code %> {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "ospf-<%=name%>" {
-      cost node['cost'];
+      cost <%= node['cost'] %>;
       type pointopoint;
       hello 5; retransmit 2; wait 10; dead 20;
       check link;
