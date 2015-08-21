@@ -135,7 +135,7 @@ define ff_gln_gw::bird4::icvpn (
   $icvpn_exclude_peerings = [],
   $include_chaos = $ff_gln_gw::params::include_chaos_routes,
   $include_dn42  = $ff_gln_gw::params::include_dn42_routes,
-  $mesh_code     = $ff_gln_gw::params::mesh_code,
+  $mesh_code,
   $tinc_keyfile,
   ){
 
