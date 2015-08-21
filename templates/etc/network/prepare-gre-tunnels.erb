@@ -23,6 +23,7 @@ iface ospf-##endpoint_name## inet static
 EOF
 
 cat <<EOF >/tmp/puppet-$$.sh
+<% if @have_ospf_peerings == "yes" %> ||
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
 # Skip dummy entries
@@ -36,6 +37,8 @@ sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 fi
 <% end -%>
+<% end -%>
+<% if @have_ospf_links == "yes" %> ||
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
 # Skip dummy entries
@@ -48,6 +51,7 @@ sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
  -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 fi
+<% end -%>
 <% end -%>
 EOF
 
