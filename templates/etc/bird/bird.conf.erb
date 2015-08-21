@@ -54,11 +54,6 @@ function is_default() {
   return (net ~ [0.0.0.0/0, 0.0.0.0/1, 128.0.0.0/1]);
 }
 
-# Check if net is part of own prefix
-function is_in_own_prefix() {
-  return (net ~ [ <%= @range_ipv4 %>+ ]);
-};
-
 # don't use kernel's routes for bird, but export bird's
 # routes to kernel table 42. 
 #
