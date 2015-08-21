@@ -13,7 +13,7 @@ protocol ospf uplink_<%= @mesh_code %> {
     reject;
   };
 
-<% if @have_ospf_peerings == "yes" %> ||
+<% if @have_ospf_peerings == "yes" %>
   # Backbone
   area 0 {
     networks {
@@ -33,7 +33,7 @@ protocol ospf uplink_<%= @mesh_code %> {
   };
 <% end %>
 
-<% if @have_ospf_links == "yes" %> ||
+<% if @have_ospf_links == "yes" %>
   area 10 {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>

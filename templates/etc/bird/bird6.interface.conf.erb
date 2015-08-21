@@ -36,7 +36,7 @@ template bgp 'local_mesh_<%=@mesh_code%>' from local_mesh {
   source address <%=@mesh_ipv6_address%>;
   local as <%=@icvpn_as%>;
 };
-<% if @have_mesh_peerings == "yes" %> ||
+<% if @have_mesh_peerings == "yes" %>
 <% peerings = YAML.load_file(@mesh_peerings); -%>
 <% peerings.each_pair do |name,node| %>
 
