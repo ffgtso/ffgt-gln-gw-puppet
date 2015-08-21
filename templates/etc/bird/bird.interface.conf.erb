@@ -2,7 +2,7 @@
 
 # bird community configuration
 
-table 'mesh_<%= @mesh_code %>';
+table mesh_<%= @mesh_code %>;
 
 #protocol static static_<%= @mesh_code %> {
 #  table 'mesh_<%= @mesh_code %>';
@@ -25,17 +25,17 @@ function is_in_<%= @mesh_code %>_prefix() {
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import only if not in own network.
-protocol pipe 'pipe_mesh_<%=@mesh_code%>' {
+protocol pipe pipe_mesh_<%=@mesh_code%> {
   table mesh;
-  peer table 'mesh_<%= @mesh_code %>';
-  import all; # where ! 'is_self_<%=@mesh_code %>'();
+  peer table mesh_<%= @mesh_code %>;
+  import all; # where ! is_self_<%=@mesh_code %>();
   export where source = RTS_BGP || source = RTS_STATIC;
 };
 
 # template for local mesh connections
 # extend local_mesh template
-template bgp 'local_mesh_<%=@mesh_code%>' from local_mesh {
-  table 'mesh_<%=@mesh_code%>';
+template bgp local_mesh_<%=@mesh_code%> from local_mesh {
+  table mesh_<%=@mesh_code%>;
   source address <%=@mesh_ipv4_address%>;
   local as <%=@icvpn_as%>;
 };
@@ -43,7 +43,7 @@ template bgp 'local_mesh_<%=@mesh_code%>' from local_mesh {
 <% peerings = YAML.load_file(@mesh_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
 
-protocol bgp 'local_<%=@mesh_code%>_<%=name%>' from 'local_mesh_<%= @mesh_code %>' {
+protocol bgp local_<%=@mesh_code%>_<%=name%> from local_mesh_<%= @mesh_code %> {
   neighbor <%= node['ipv4'] %> as <%= @icvpn_as %>; 
 };
 <% end -%>

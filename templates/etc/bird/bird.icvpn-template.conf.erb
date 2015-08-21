@@ -8,10 +8,6 @@ protocol static icvpn_static {
   route 10.207.0.0/16 via "icvpn";
 }
 
-function is_self_<%= @mesh_code %>() {
-  return (net ~ [ <%= @range_ipv4 %> ]);
-};
-
 # template for icvpn route exchange via bgp
 # we exchange freifunk and dn42 routes with peers
 # chaosvpn should not be exchanged because chaosvpn misses a route to not
@@ -24,7 +20,7 @@ template bgp icvpn {
   #export where ((source = RTS_BGP) || (source = RTS_STATIC)) && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>);
   # wusel, 2015-08-20: Do not re-export stuff learned from BGP.
   export filter {
-    if is_self_<%= @mesh_code %>() then accept;
+    if is_in_<%= @mesh_code %>() then accept;
     if (proto = "icvpn_static") then reject;
     if (((source = RTS_BGP) || (source = RTS_STATIC)) && (is_freifunk())) then accept;
     reject;

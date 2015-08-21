@@ -57,6 +57,7 @@ define ff_gln_gw::bird6::mesh (
   $mesh_ipv4_address,
   $mesh_ipv6_address,
   $mesh_peerings, # YAML data file for local peerings
+  $have_mesh_peerings = "no", # Actually require & use $mesh_peerings
 
   $icvpn_as,
 
