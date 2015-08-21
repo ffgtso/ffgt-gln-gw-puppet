@@ -11,7 +11,7 @@ define ff_gln_gw::icvpn::setup (
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
-
+  $mesh_code,
   $tinc_keyfile,
   ){
 
@@ -41,13 +41,15 @@ define ff_gln_gw::icvpn::setup (
       icvpn_as => $icvpn_as,
       icvpn_ipv4_address => $icvpn_ipv4_address,
       icvpn_ipv6_address => $icvpn_ipv6_address,
-      tinc_keyfile => $tinc_keyfile }
+      tinc_keyfile => $tinc_keyfile,
+      mesh_code => $mesh_code }
   }
   if $ff_gln_gw::params::include_bird6 {
     ff_gln_gw::bird6::icvpn { $name:
       icvpn_as => $icvpn_as,
       icvpn_ipv4_address => $icvpn_ipv4_address,
       icvpn_ipv6_address => $icvpn_ipv6_address,
-      tinc_keyfile => $tinc_keyfile }
+      tinc_keyfile => $tinc_keyfile,
+      mesh_code => $mesh_code }
   }
 }
