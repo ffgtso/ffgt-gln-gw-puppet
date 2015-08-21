@@ -60,7 +60,7 @@ define ff_gln_gw::bird4::mesh (
   $range_ipv4,
   $mesh_ipv6_address,
   $mesh_peerings, # YAML data file for local peerings
-
+  $have_mesh_peerings = "no", # Actually require & use $mesh_peerings
   $icvpn_as,
 
   $site_ipv4_prefix,
