@@ -90,7 +90,7 @@ define ff_gln_gw::bird6::icvpn (
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
-
+  $mesh_code     = $ff_gln_gw::params::mesh_code,
   $tinc_keyfile,
   ){
 
