@@ -7,7 +7,7 @@ class ff_gln_gw::alfred (
     source => "http://git.open-mesh.org/alfred.git";
   } ->
   exec { 'patch-makefile':
-    command => "sed -i -e s/CONFIG_ALFRED_CAPABILITIES=y/CONFIG_ALFRED_CAPABILITIES=n/g Makefile",
+    command => "/bin/sed -i -e 's/export CONFIG_ALFRED_CAPABILITIES=y/export CONFIG_ALFRED_CAPABILITIES=n/g' Makefile",
     cwd => "/opt/alfred/",
     require => [Package['build-essential'],Package['pkg-config'],Package['libgps-dev']];
   }
