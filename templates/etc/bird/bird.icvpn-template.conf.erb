@@ -22,9 +22,10 @@ template bgp icvpn {
   export filter {
     if is_in_<%= @mesh_code %>_prefix() then accept;
     if (proto = "icvpn_static") then reject;
+    if is_default() then reject;
     if (source = RTS_BGP && bgp_path.len < 3 && is_freifunk()) then accept;
-    if (source != RTS_BGP && is_freifunk()) then accept;
-    if (source = RTS_STATIC && is_freifunk()) then accept;
+    if (source != RTS_BGP && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
+    if (source = RTS_STATIC && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
     reject;
   };
 };
