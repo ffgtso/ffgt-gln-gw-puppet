@@ -4,12 +4,12 @@
 
 table mesh_<%= @mesh_code %>;
 
-#protocol static static_<%= @mesh_code %> {
-#  table 'mesh_<%= @mesh_code %>';
-#  # reject route if announced from external
-#  route <%= @range_ipv4 %> via "lo";
-#  };
-#
+protocol static static_<%= @mesh_code %> {
+  table 'mesh_<%= @mesh_code %>';
+  # reject route if announced from external
+  route <%= @range_ipv4 %> via "lo";
+};
+
 #function is_self_<%= @mesh_code %> () {
 #  return (proto = "static_<%= @mesh_code %>");
 #};
