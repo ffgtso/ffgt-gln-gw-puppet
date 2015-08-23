@@ -126,14 +126,11 @@ define ff_gln_gw::mesh(
 define ff_gln_gw::gateway(
   $mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   $mesh_code,        # Code of your community, e.g.: ffgc
-  $mesh_as,          # AS of your community
-  $mesh_mac,         # mac address mesh device: 52:54:00:bd:e6:d4
   $range_ipv4,       # ipv4 range allocated to community in cidr notation, e.g. 10.35.0.1/16
-  $mesh_ipv4,        # ipv4 address in cidr notation, e.g. 10.35.0.1/19
-  $mesh_ipv6,        # ipv6 address in cidr notation, e.g. fd35:f308:a922::ff00/64
+  $range_ipv6,       # ipv6 range allocated to community (public v6 prefferred)
   $mesh_peerings,    # path to the local peerings description yaml file
   $have_mesh_peerings,
-)  {
+)  inherits ff_gln_gw::params {
 
   # TODO We should handle parameters in a param class pattern.
   # TODO Handle all git repos and other external sources in
@@ -145,22 +142,22 @@ define ff_gln_gw::gateway(
   include ff_gln_gw::firewall
 
   # Determine ipv{4,6} network prefixes and ivp4 netmask
-  $mesh_ipv4_prefix    = ip_prefix($mesh_ipv4)
-  $mesh_ipv4_prefixlen = ip_prefixlen($mesh_ipv4)
-  $mesh_ipv4_netmask   = ip_netmask($mesh_ipv4)
-  $mesh_ipv4_address   = ip_address($mesh_ipv4)
+  $mesh_ipv4_prefix    = ip_prefix($range_ipv4)
+  $mesh_ipv4_prefixlen = ip_prefixlen($range_ipv4)
+  $mesh_ipv4_netmask   = ip_netmask($range_ipv4)
+  $mesh_ipv4_address   = ip_address($range_ipv4)
 
-  $mesh_ipv6_prefix    = ip_prefix($mesh_ipv6)
-  $mesh_ipv6_prefixlen = ip_prefixlen($mesh_ipv6)
-  $mesh_ipv6_address   = ip_address($mesh_ipv6)
+  $mesh_ipv6_prefix    = ip_prefix($range_ipv6)
+  $mesh_ipv6_prefixlen = ip_prefixlen($range_ipv6)
+  $mesh_ipv6_address   = ip_address($range_ipv6)
 
   Class['ff_gln_gw::ntp'] ->
   ff_gln_gw::ntp::allow { "${mesh_code}":
-    ipv4_net => $mesh_ipv4,
-    ipv6_net => $mesh_ipv6
+    ipv4_net => $range_ipv4,
+    ipv6_net => $range_ipv6
   } ->
   ff_gln_gw::named::listen { "${mesh_code}":
-    ipv4_address => $mesh_ipv4_address,
+    ipv4_address => $ff_gln_gw::params::router_id,
     ipv6_address => $mesh_ipv6_address,
   } ->
   ff_gln_gw::named::allow {
@@ -178,9 +175,10 @@ define ff_gln_gw::gateway(
       mesh_ipv4_address => $mesh_ipv4_address,
       mesh_ipv6_address => $mesh_ipv6_address,
       mesh_peerings => $mesh_peerings,
+      have_mesh_peerings => $have_mesh_peerings,
       site_ipv6_prefix => $mesh_ipv6_prefix,
       site_ipv6_prefixlen => $mesh_ipv6_prefixlen,
-      icvpn_as => $mesh_as;
+      icvpn_as => $ff_gln_gw::params::icvpn_as;
     }
   }
   if $ff_gln_gw::params::include_bird4 {
@@ -190,9 +188,10 @@ define ff_gln_gw::gateway(
       range_ipv4 => $range_ipv4,
       mesh_ipv6_address => $mesh_ipv6_address,
       mesh_peerings => $mesh_peerings,
+      have_mesh_peerings => $have_mesh_peerings,
       site_ipv4_prefix => $mesh_ipv4_prefix,
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
-      icvpn_as => $mesh_as;
+      icvpn_as => $ff_gln_gw::params::icvpn_as;
     }
   }
 
