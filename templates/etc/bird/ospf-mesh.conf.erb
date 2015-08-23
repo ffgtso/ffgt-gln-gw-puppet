@@ -2,18 +2,28 @@
 
 # bird OSPF configuration
 
-table ospfmesh_<%= @mesh_code %>;
+table ospf_<%= @mesh_code %>;
 
-protocol ospf uplink_<%= @mesh_code %> {
+# pipe between mesh and ospfmesh_<%= @mesh_code %> table
+# import only if not in own network.
+protocol pipe pipe_ospf_<%=@mesh_code%> {
   table mesh;
-  import all;
-  #import where !is_default();
+  peer table ospf_<%= @mesh_code %>;
+  import all; # where ! is_self_<%=@mesh_code %>();
+  export all; # where source = RTS_BGP || source = RTS_STATIC;
+};
+
+<% if @have_ospf_peerings == "yes" %>
+protocol ospf bb_<%= @mesh_code %> {
+  table mesh;
+#  table ospf_<%= @mesh_code %>;
+  #import all;
+  import where !is_default();
   export filter {
     if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
     reject;
   };
 
-<% if @have_ospf_peerings == "yes" %>
   # Backbone
   area 0 {
     networks {
@@ -31,9 +41,22 @@ protocol ospf uplink_<%= @mesh_code %> {
 
 <% end -%>
   };
+}
 <% end %>
 
 <% if @have_ospf_links == "yes" %>
+protocol ospf int_<%= @mesh_code %> {
+  table mesh;
+#  table ospf_<%= @mesh_code %>;
+  import all;
+  #import where !is_default();
+  export all;
+#  export filter {
+#    if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
+#    reject;
+#  };
+
+  # Links between bgp? & gw??
   area 10 {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
@@ -46,10 +69,10 @@ protocol ospf uplink_<%= @mesh_code %> {
     };
 
 <% end -%>
-<% end %>
     interface "br-<%= @mesh_code %>" {
       cost 70;
       stub;
     };
   };
 }
+<% end %>
