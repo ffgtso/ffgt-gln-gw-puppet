@@ -50,11 +50,11 @@ protocol ospf int_<%= @mesh_code %> {
 #  table ospf_<%= @mesh_code %>;
   import all;
   #import where !is_default();
-  export all;
-#  export filter {
-#    if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
-#    reject;
-#  };
+#  export all;
+  export filter {
+    if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
+    reject;
+  };
 
   # Links between bgp? & gw??
   area 10 {
