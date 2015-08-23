@@ -129,6 +129,7 @@ define ff_gln_gw::gateway(
   $mesh_as = $ff_gln_gw::params::icvpn_as,
   $range_ipv4,       # ipv4 range allocated to community in cidr notation, e.g. 10.35.0.1/16
   $range_ipv6,       # ipv6 range allocated to community (public v6 prefferred)
+  $local_ipv6,
   $mesh_peerings,    # path to the local peerings description yaml file
   $have_mesh_peerings,
 ) {
@@ -159,7 +160,7 @@ define ff_gln_gw::gateway(
   } ->
   ff_gln_gw::named::listen { "${mesh_code}":
     ipv4_address => $ff_gln_gw::params::router_id,
-    ipv6_address => $mesh_ipv6_address,
+    ipv6_address => $local_ipv6,
   } ->
   ff_gln_gw::named::allow {
     "${mesh_code}_v4":
@@ -173,8 +174,8 @@ define ff_gln_gw::gateway(
   if $ff_gln_gw::params::include_bird6 {
     ff_gln_gw::bird6::mesh { "bird6-${mesh_code}":
       mesh_code => $mesh_code,
-      mesh_ipv4_address => $mesh_ipv4_address,
-      mesh_ipv6_address => $mesh_ipv6_address,
+      mesh_ipv4_address => $ff_gln_gw::params::router_id,
+      mesh_ipv6_address => $local_ipv6,
       mesh_peerings => $mesh_peerings,
       have_mesh_peerings => $have_mesh_peerings,
       site_ipv6_prefix => $mesh_ipv6_prefix,
@@ -185,9 +186,9 @@ define ff_gln_gw::gateway(
   if $ff_gln_gw::params::include_bird4 {
     ff_gln_gw::bird4::mesh { "bird4-${mesh_code}":
       mesh_code => $mesh_code,
-      mesh_ipv4_address => $mesh_ipv4_address,
+      mesh_ipv4_address => $ff_gln_gw::params::router_id,
       range_ipv4 => $range_ipv4,
-      mesh_ipv6_address => $mesh_ipv6_address,
+      mesh_ipv6_address => $local_ipv6,
       mesh_peerings => $mesh_peerings,
       have_mesh_peerings => $have_mesh_peerings,
       site_ipv4_prefix => $mesh_ipv4_prefix,
