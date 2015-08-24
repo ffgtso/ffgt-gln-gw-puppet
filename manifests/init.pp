@@ -8,7 +8,7 @@ define ff_gln_gw::mesh(
   $mesh_ipv4,        # ipv4 address in cidr notation, e.g. 10.35.0.1/19
   $mesh_ipv6,        # ipv6 address in cidr notation, e.g. fd35:f308:a922::ff00/64
   $mesh_peerings,    # path to the local peerings description yaml file
-
+  $have_mesh_peerings = "yes"
   $fastd_peers_git,  # fastd peers
   $fastd_bb_git,     # fastd backbone peers
   $fastd_secret,     # fastd secret
