@@ -139,24 +139,20 @@ define ff_gln_gw::uplink::tunnel (
 }
 
 
-class ff_gln_gw::uplink::static (
+define ff_gln_gw::uplink::static (
   $endpoint_ip,
   $do_nat = "no",
   $nat_network = "127.0.0.0/8",
   $nat_ip = "127.0.0.1"
-) inherits ff_gln_gw::params {
+) {
 
-  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::firewall
   include ff_gln_gw::bird4
 
   $endpoint_name = $name
   $nat_netmask = ip_netmask($nat_network)
-
-  Exec { path => [ "/bin" ] }
-  kmod::load { 'dummy':
-    ensure => present,
-  }
 
   if $do_nat == "yes" {
     # Define Firewall rule for masquerade
