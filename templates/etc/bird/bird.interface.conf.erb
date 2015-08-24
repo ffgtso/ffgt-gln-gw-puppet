@@ -4,11 +4,13 @@
 
 table mesh_<%= @mesh_code %>;
 
+<% if @have_ospf_peerings == "yes" %>
 protocol static static_<%= @mesh_code %> {
   table mesh_<%= @mesh_code %>;
   # reject route if announced from external
   route <%= @range_ipv4 %> via "lo";
 };
+<% end %>
 
 #function is_self_<%= @mesh_code %> () {
 #  return (proto = "static_<%= @mesh_code %>");
