@@ -26,7 +26,9 @@ cat <<EOF >/tmp/puppet-$$.sh
 if [ ! -d /etc/network/interfaces.d ]; then
   mkdir /etc/network/interfaces.d
   echo >>/etc/network/interfaces
-  echo "source /etc/network/interfaces.d/\*.cfg" >>/etc/network/interfaces
+  echo "source /etc/network/interfaces.d/*" >>/etc/network/interfaces
+else
+  sed -i -e 's%^source /etc/network/interfaces.d/\*\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
 fi
 <% if @have_ospf_peerings == "yes" %>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
@@ -34,7 +36,10 @@ fi
 # Skip dummy entries
 echo "<%=name%>" | grep >/dev/null dummy
 if [ \$? -eq 1 ]; then
-sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
+if [ -e /etc/network/interfaces.d/ospf-<%=name%>.cfg ]; then
+  /bin/rm /etc/network/interfaces.d/ospf-<%=name%>.cfg
+fi
+sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
  -e 's/##endpoint_name##/<%=name%>/g' \\
  -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
  -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
@@ -49,7 +54,10 @@ fi
 # Skip dummy entries
 echo "<%=name%>" | grep >/dev/null dummy
 if [ \$? -eq 1 ]; then
-sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%>.cfg \\
+if [ -e /etc/network/interfaces.d/ospf-<%=name%>.cfg ]; then
+  /bin/rm /etc/network/interfaces.d/ospf-<%=name%>.cfg
+fi
+sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
  -e 's/##endpoint_name##/<%=name%>/g' \\
  -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
  -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
