@@ -149,6 +149,7 @@ class ff_gln_gw::uplink::static (
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird4
 
+  $endpoint_name = $name
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)
 
