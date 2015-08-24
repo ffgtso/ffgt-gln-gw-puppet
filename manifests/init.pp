@@ -100,6 +100,7 @@ define ff_gln_gw::mesh(
       mesh_ipv4_address => $mesh_ipv4_address,
       mesh_ipv6_address => $mesh_ipv6_address,
       mesh_peerings => $mesh_peerings,
+      have_mesh_peerings => $have_mesh_peerings,
       site_ipv6_prefix => $mesh_ipv6_prefix,
       site_ipv6_prefixlen => $mesh_ipv6_prefixlen,
       icvpn_as => $mesh_as;
@@ -112,6 +113,7 @@ define ff_gln_gw::mesh(
       range_ipv4 => $range_ipv4,
       mesh_ipv6_address => $mesh_ipv6_address,
       mesh_peerings => $mesh_peerings,
+      have_mesh_peerings => $have_mesh_peerings,
       site_ipv4_prefix => $mesh_ipv4_prefix,
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
       icvpn_as => $mesh_as;
