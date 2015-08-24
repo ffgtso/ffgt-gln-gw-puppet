@@ -161,21 +161,22 @@ class ff_gln_gw::uplink::static (
 
   if $do_nat == "yes" {
     # Define Firewall rule for masquerade
-  file {
-    '/etc/iptables.d/910-Masquerade-uplink':
-       ensure => file,
-       owner => 'root',
-       group => 'root',
-       mode => '0644',
-       content => inline_template("ip4tables -t nat -A POSTROUTING -s <%=@nat_network%> -j SNAT --to <%=@nat_ip%>"),
-       require => [File['/etc/iptables.d/']];
-     '/etc/iptables.d/910-Clamp-mss':
-       ensure => file,
-       owner => 'root',
-       group => 'root',
-       mode => '0644',
-       content => 'ip4tables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu',
-       require => [File['/etc/iptables.d/']];
+    file {
+      '/etc/iptables.d/910-Masquerade-uplink':
+         ensure => file,
+         owner => 'root',
+         group => 'root',
+         mode => '0644',
+         content => inline_template("ip4tables -t nat -A POSTROUTING -s <%=@nat_network%> -j SNAT --to <%=@nat_ip%>"),
+         require => [File['/etc/iptables.d/']];
+       '/etc/iptables.d/910-Clamp-mss':
+         ensure => file,
+         owner => 'root',
+         group => 'root',
+         mode => '0644',
+         content => 'ip4tables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu',
+         require => [File['/etc/iptables.d/']];
+    }
   }
 
   file_line { "bird-uplink-include":
