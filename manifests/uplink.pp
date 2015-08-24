@@ -21,7 +21,6 @@ class ff_gln_gw::uplink::ip (
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird4
-  include stdlib
 
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)
