@@ -14,7 +14,7 @@ class ff_gln_gw::uplink (
 
 class ff_gln_gw::uplink::ip (
   $nat_network,
-  $tunnel_network,
+  $tunnel_network = "127.0.0.0/8",
 ) inherits ff_gln_gw::params {
 
   include ff_gln_gw::firewall
@@ -135,5 +135,63 @@ define ff_gln_gw::uplink::tunnel (
 
   ff_gln_gw::firewall::forward { "uplink-${name}":
     chain => 'mesh'
+  }
+}
+
+
+class ff_gln_gw::uplink::static (
+  $endpoint_ip,
+  $do_nat = "no",
+  $nat_ip = "127.0.0.1"
+) inherits ff_gln_gw::params {
+
+  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::bird4
+
+  $nat_ip = ip_address($nat_network)
+  $nat_netmask = ip_netmask($nat_network)
+
+  Exec { path => [ "/bin" ] }
+  kmod::load { 'dummy':
+    ensure => present,
+  }
+
+  class { 'ff_gln_gw::uplink': }
+
+  if $do_nat == "yes" {
+    # Define Firewall rule for masquerade
+  file {
+    '/etc/iptables.d/910-Masquerade-uplink':
+       ensure => file,
+       owner => 'root',
+       group => 'root',
+       mode => '0644',
+       content => inline_template("ip4tables -t nat -A POSTROUTING -s <%=@nat_network%> -j SNAT --to <%=@nat_ip%>"),
+       require => [File['/etc/iptables.d/']];
+     '/etc/iptables.d/910-Clamp-mss':
+       ensure => file,
+       owner => 'root',
+       group => 'root',
+       mode => '0644',
+       content => 'ip4tables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu',
+       require => [File['/etc/iptables.d/']];
+  }
+
+  file_line { "bird-uplink-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/static-uplink.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/static-uplink.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.static-uplink.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-uplink-include"],
+      Service['bird']
+    ]
   }
 }

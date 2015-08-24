@@ -183,13 +183,52 @@ ff_gln_gw :: mesh { '<mesh_code>':
                     # the one used in the mesh in cidr notation, e.g. 10.35.0.1/19
   mesh_ipv4,        # ipv4 address of mesh device in cidr notation, e.g. fd35:f308:a922::ff00/64
   mesh_peerings,    # path to the local peerings description yaml file
-
+  have_mesh_peerings, # "yes" to enable the use of mesh_peerings.yaml above.
   fastd_secret,     # fastd secret
   fastd_port,       # fastd port
   fastd_peers_git,  # fastd peers repository
 
   dhcp_ranges = [], # dhcp pool
   dns_servers = [], # other dns servers in your network
+}
+```
+#### Peering description
+
+Be aware that currently the own system mesh address will not be filtered.
+(This is the mesh_peerings file looked for above.) This would create the
+proper configuration to do iBGP between your gateways. That kind of setup is
+the simple one, when you only have a few mesh gateways, maybe each one with
+an VPN exit. For using OSPF instead of BGP, see below (
+
+```
+gc-gw1:
+  ipv4: "10.35.5.1"
+  ipv6: "fd35:f308:a922::ff01"
+gc-gw2:
+  ipv4: "10.35.10.1"
+  ipv6: "fd35:f308:a922::ff02"
+gc-gw3:
+  ipv4: "10.35.15.1"
+  ipv6: "fd35:f308:a922::ff03"
+gc-gw4:
+  ipv4: "10.35.20.1"
+  ipv6: "fd35:f308:a922::ff04"
+```
+
+#### Simple routing/service gateway, not participating in the mesh
+
+This sets up a basic server to act as e. g. a routing gateway or central nameserver or whatever;
+intended to be used together with ff_gln_gw::bird4::ospf & ff_gln_gw::bird6::ospf.
+
+```
+ff_gln_gw::gateway { 'mesh_ffgc':
+      mesh_name    => "Freifunk Gotham City",
+      mesh_code    => "ffgc",
+      range_ipv6   => "fd35:f308:a922::/48",
+      range_ipv4   => "10.35.0.0/16",
+      local_ipv6   => "fd35:f308:a922:8000::1", # local v6 IP
+      mesh_peerings => "/root/mesh-peerings_ffgt.yaml",
+      have_mesh_peerings => "no",
 }
 ```
 
@@ -266,57 +305,132 @@ ff_gln_gw::uplink::tunnel {
 }
 ```
 
-#### GRE Tunnel for OSPF & Routing
+#### GRE Tunnels for OSPF & Routing
 
-This is a module creates an GRE tunnel via IPv4 for use in OSPF.
-This module and the VPN module are mutually exclusive.
-Define the ff_gln_gw::ospfgre::tunnel for each tunnel you want to
-use. See (TODO) for a more detailed description.
+This module creates the GRE tunnels and BIRD configs to use
+OSPF as an interior routing protocol between "Exit gateways",
+which have external connectivity (like ICVPN, real BGP uplinks),
+and pure "Gluon gateways", which are setup via ff_gln_gw :: mesh.
+
+See (TODO) for a more detailed description.
 
 ```
-ff_gln_gw::ospfgre::tunnel {
-    '<name>':
-      local_public_ip,  # local public IPv4 of this gateway
-      remote_public_ip, # remote public IPv4 of the tunnel endpoint
-      local_ipv4,       # tunnel IPv4 on our side
-      remote_ipv4,      # tunnel IPv4 on the remote side
+ff_gln_gw::bird4::ospf {
+  'ospf-ffgt':
+    mesh_code => "ffgc",
+    range_ipv4 => "10.35.0.0/16",
+    ospf_peerings => "/root/ospf-peerings_ffgc.yaml",
+    have_ospf_peerings => "yes",
+    ospf_links    => "/root/ospf-links_ffgc.yaml",
+    have_ospf_links => "yes"
+}
+
+ff_gln_gw::bird6::ospf { # TODO
+  'ospf-ffgt':
+    mesh_code => "ffgc",
+    range_ipv6 => "fd35:f308:a922::/64",
+    ospf_peerings => "/root/ospf-peerings_ffgc.yaml",
+    have_ospf_peerings => "yes",
+    ospf_links    => "/root/ospf-links_ffgc.yaml",
+    have_ospf_links => "yes"
 }
 ```
 
-#### IPv4 Uplink via local exit
+Format of the yaml files:
 
-This is a module for terminating IPv4 locally. Be sure you know what you are
-doing, e. g. run this only outside of Germany or with IPs that are properly
-registered to an ISP, or the Störerhaftung will bite you badly.
+```
+root@gw01:~# cat ospf-links_ffgc.yaml
+bgp3:
+  ipv4src: "10.35.145.19"
+  ipv4dst: "10.35.145.18"
+  ipv6src: "fd35:f308:a922:4000::1" # Netmask will be set to /64 as per RFC/convention
+  ipv6dst: "fd35:f308:a922:4000::0" # You might want to set aside a /56 for these
+  pub4src: "203.0.113.11"
+  pub4dst: "198.18.167.218"
+  cost: 190
+
+bgp4:
+  ipv4src: "10.35.145.39"
+  ipv4dst: "10.35.145.38"
+  ipv6src: "fd35:f308:a922:4001::1"
+  ipv6dst: "fd35:f308:a922:4001::0"
+  pub4src: "203.0.113.11"
+  pub4dst: "198.19.104.56"
+  cost: 200
+
+```
+
+This would setup gw01 as an OSPF peer to bgp3 and bgp4, creating opsf-bgp3 and ospf-bgp4 GRE tunnel interfaces (/etc/network/interfaces.d).
+
+On bgp3 and bgp4, ospf-peerings_ffgc.yaml should exist as well, containing on bgp3:
+
+```
+root@bgp3:~# cat ospf-peerings_ffgc.yaml
+bgp4:
+  ipv4src: "10.35.145.29"
+  ipv4dst: "10.35.145.28"
+  ipv6src: "fd35:f308:a922:4002::1"
+  ipv6dst: "fd35:f308:a922:4002::0"
+  pub4src: "198.18.167.218"
+  pub4dst: "198.19.104.56"
+  cost: 190
+
+root@bgp3:~# cat ospf-links_ffgc.yaml
+gw01:
+  ipv4src: "10.35.145.18"
+  ipv4dst: "10.35.145.19"
+  ipv6src: "fd35:f308:a922:4000::0"
+  ipv6dst: "fd35:f308:a922:4002::1"
+  pub4src: "198.18.167.218"
+  pub4dst: "203.0.113.11"
+  cost: 190
+```
+
+And finally bgp4:
+
+```
+root@bgp4:~# cat ospf-peerings_ffgc.yaml
+bgp3:
+  ipv4src: "10.35.145.28"
+  ipv4dst: "10.35.145.29"
+  ipv6src: "fd35:f308:a922:4002::0"
+  ipv6dst: "fd35:f308:a922:4002::1"
+  pub4src: "198.19.104.56"
+  pub4dst: "198.18.167.218"
+  cost: 190
+
+root@bgp4:~# cat ospf-links_ffgc.yaml
+gw01:
+  ipv4src: "10.35.145.38"
+  ipv4dst: "10.35.145.39"
+  ipv6src: "fd35:f308:a922:4001::0"
+  ipv6dst: "fd35:f308:a922:4001::1"
+  pub4src: "198.19.104.56"
+  pub4dst: "203.0.113.11"
+  cost: 200
+```
+
+The difference is because of routing information; via peerings, all routing information is exchanged, via links, only default and local routes.
+
+#### IPv4 Uplink via "static" exit
+
+This is a module for terminating IPv4 via an already established link.
+Be sure you know what you are doing, e. g. run this only outside of Germany
+or with IPs that are properly registered to be an ISP, or the Störerhaftung
+will bite you badly.
 This module and the VPN and uplink::tunnel modules are mutually exclusive.
-Define the ff_gln_gw::uplink::local once well.
+Define the ff_gln_gw::uplink::static as follows:
 
 ```
-ff_gln_gw::uplink::local {
-    'localexit':
-      local_public_ip,  # local public IPv4 of this gateway
-      local_net_to_nat  # local network to be NATted to local_public_ip
+class {
+  'ff_gln_gw::uplink::ip':
+    nat_network => "10.35.0.0/16",   # network of IPv4 addresses usable for NAT
 }
-```
-
-#### Peering description
-
-Be aware that currently the own system mesh address will not be filtered.
-(This is the mesh_peerings file looked for above.)
-
-```
-gc-gw1:
-  ipv4: "10.35.5.1"
-  ipv6: "fd35:f308:a922::ff01"
-gc-gw2:
-  ipv4: "10.35.10.1"
-  ipv6: "fd35:f308:a922::ff02"
-gc-gw3:
-  ipv4: "10.35.15.1"
-  ipv6: "fd35:f308:a922::ff03"
-gc-gw4:
-  ipv4: "10.35.20.1"
-  ipv6: "fd35:f308:a922::ff04"
+ff_gln_gw::uplink::static (
+  endpoint_ip => "203.0.113.222",    # IP to route default to, MUST BE DIRECTLY REACHABLE
+  do_nat => "no",                    # Control whether we need to NAT locally or not
+  nat_ip => "203.0.113.11"           # IPv4 address we should NAT to, if do_nat is "yes"
+}
 ```
 
 ### Firewall
