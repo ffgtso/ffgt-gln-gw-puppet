@@ -149,16 +149,15 @@ class ff_gln_gw::uplink::static (
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird4
 
+  class { 'ff_gln_gw::uplink::ip': }
+
   $endpoint_name = $name
-  $nat_ip = ip_address($nat_network)
-  $nat_netmask = ip_netmask($nat_network)
+  $nat_netmask = ip_netmask($ff_gln_gw::uplink::ip::nat_network)
 
   Exec { path => [ "/bin" ] }
   kmod::load { 'dummy':
     ensure => present,
   }
-
-  class { 'ff_gln_gw::uplink': }
 
   if $do_nat == "yes" {
     # Define Firewall rule for masquerade
