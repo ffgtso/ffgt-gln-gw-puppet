@@ -1,6 +1,6 @@
 class ff_gln_gw::uplink ( 
   $gw_control_ip     = "8.8.8.8",     # Control ip addr 
-  $gw_bandwidth      = 54,            # How much bandwith we should have up/down per mesh interface
+  $gw_bandwidth      = 100,           # How much bandwith we should have up/down per mesh interface
 ) {
 
   include ff_gln_gw::resources::ff_gln_gw
@@ -26,9 +26,9 @@ class ff_gln_gw::uplink::ip (
   $nat_netmask = ip_netmask($nat_network)
 
   Exec { path => [ "/bin" ] }
-  #kmod::load { 'dummy':
-  #  ensure => present,
-  #}
+  kmod::load { 'dummy':
+    ensure => present,
+  }
 
   Class['ff_gln_gw::resources::network'] ->
   file {
