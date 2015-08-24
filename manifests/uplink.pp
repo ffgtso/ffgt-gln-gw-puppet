@@ -142,6 +142,7 @@ define ff_gln_gw::uplink::tunnel (
 class ff_gln_gw::uplink::static (
   $endpoint_ip,
   $do_nat = "no",
+  $nat_network = "127.0.0.0/8",
   $nat_ip = "127.0.0.1"
 ) inherits ff_gln_gw::params {
 
@@ -149,10 +150,8 @@ class ff_gln_gw::uplink::static (
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird4
 
-  class { 'ff_gln_gw::uplink::ip': }
-
   $endpoint_name = $name
-  $nat_netmask = ip_netmask($ff_gln_gw::uplink::ip::nat_network)
+  $nat_netmask = ip_netmask($nat_network)
 
   Exec { path => [ "/bin" ] }
   kmod::load { 'dummy':
