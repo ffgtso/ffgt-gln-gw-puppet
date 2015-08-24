@@ -17,8 +17,8 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
 protocol ospf bb_<%= @mesh_code %> {
   table mesh;
 #  table ospf_<%= @mesh_code %>;
-  #import all;
-  import where !is_default();
+  import all;
+  #import where !is_default();
   export filter {
     if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
     reject;
