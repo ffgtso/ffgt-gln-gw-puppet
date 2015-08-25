@@ -59,7 +59,8 @@ protocol ospf bb_<%= @mesh_code %> {
 protocol static ospf_<%=name%> {
   import all;
   table mesh;
-  route <%= node['ipv4src'] %> via "ospf-<%=name%>";
+  <% $ipv4_prefix    = ip_prefix(node['ipv4src'] + '/31') %>
+  route <%= ipv4_prefix %>/31 via "ospf-<%=name%>";
 }
 <% end -%>
 
