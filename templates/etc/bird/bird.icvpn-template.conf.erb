@@ -10,11 +10,6 @@ protocol static icvpn_static {
   route 10.207.0.0/16 via "icvpn";
 }
 
-# Check if net is part of own prefix within exportable range: /16 to /21
-function <%= @mesh_code %>_export_prefix() {
-  return (net ~ [ <%= @range_ipv4 %> ]{16,21});
-};
-
 # pipe between mesh and icvpn_<%= @mesh_code %> table
 protocol pipe pipe_bgp_<%=@mesh_code%> {
   table mesh;

@@ -25,6 +25,11 @@ function is_in_<%= @mesh_code %>_prefix() {
   return (net ~ [ <%= @range_ipv4 %>+ ]);
 };
 
+# Check if net is part of own prefix within exportable range: /16 to /21
+function <%= @mesh_code %>_export_prefix() {
+  return (net ~ [ <%= @range_ipv4 %> ]{16,21});
+};
+
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import only if not in own network.
 protocol pipe pipe_mesh_<%=@mesh_code%> {
