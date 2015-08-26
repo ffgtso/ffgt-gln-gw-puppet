@@ -4,7 +4,7 @@
 
 table mesh_<%= @mesh_code %>;
 
-<% if @have_ospf_peerings == "yes" %>
+<% if @have_mesh_peerings == "yes" %>
 protocol static static_<%= @mesh_code %> {
   table mesh_<%= @mesh_code %>;
   # reject route if announced from external
