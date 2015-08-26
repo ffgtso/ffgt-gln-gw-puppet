@@ -15,7 +15,7 @@ protocol pipe pipe_bgp_<%=@mesh_code%> {
   table mesh;
   peer table icvpn_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
-  export all; # where source = RTS_BGP || source = RTS_STATIC;
+  export where <%= @mesh_code %>_export_prefix(); # where source = RTS_BGP || source = RTS_STATIC;
 };
 
 # template for icvpn route exchange via bgp
