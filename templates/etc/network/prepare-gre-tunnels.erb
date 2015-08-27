@@ -26,9 +26,9 @@ cat <<EOF >/tmp/puppet-$$.sh
 if [ ! -d /etc/network/interfaces.d ]; then
   mkdir /etc/network/interfaces.d
   echo >>/etc/network/interfaces
-  echo "source /etc/network/interfaces.d/*" >>/etc/network/interfaces
+  grep "^source /etc/network/interfaces.d/\\*\$" /etc/network/interfaces || echo "source /etc/network/interfaces.d/*" >>/etc/network/interfaces
 else
-  sed -i -e 's%^source /etc/network/interfaces.d/\*\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
+  sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
 fi
 <% if @have_ospf_peerings == "yes" %>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
