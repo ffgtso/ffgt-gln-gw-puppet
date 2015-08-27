@@ -11,9 +11,9 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
   peer table ospf_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
   export filter {
-    if is_self_<%=@mesh_code %>() then accept;<% if @have_ospf_peerings == "yes" %>
-    if (is_default() && (source = RTS_OSPF && ospf_tag = 0)) then accept;
-<% end -%>  };
+    if is_self_ffgt() || is_default() then accept;
+    reject;
+  };
 }
 
 <% if @have_ospf_peerings == "yes" %>
@@ -32,7 +32,9 @@ protocol ospf bb_<%= @mesh_code %> {
   import all;
   #import where !is_default();
   export filter {
-    if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
+    if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
+    if is_default() then accept;
+    if source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() then accept;
     reject;
   };
 
@@ -77,8 +79,10 @@ protocol ospf int_<%= @mesh_code %> {
   #import where !is_default();
 #  export all;
   export filter {
+    if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     ospf_tag = 10;
-    if (source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() || is_default()) then accept;
+    if is_default() then accept;
+    if source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() then accept;
     reject;
   };
 
