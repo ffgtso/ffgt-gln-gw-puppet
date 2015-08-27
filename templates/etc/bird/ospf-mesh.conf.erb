@@ -5,13 +5,12 @@
 table ospf_<%= @mesh_code %>;
 
 # pipe between mesh and ospfmesh_<%= @mesh_code %> table
-# import only if not in own network.
+# import all from mesh, export from ospf_xxxx to mesh own network and default route(s)
 protocol pipe pipe_ospf_<%=@mesh_code%> {
   table mesh;
   peer table ospf_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
-  export where is_self_<%=@mesh_code %>();
-  #export all; # where source = RTS_BGP || source = RTS_STATIC;
+  export where is_self_<%=@mesh_code %>() || is_default();
 };
 
 <% if @have_ospf_peerings == "yes" %>
