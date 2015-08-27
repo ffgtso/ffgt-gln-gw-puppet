@@ -83,6 +83,83 @@ class ff_gln_gw::uplink::ip (
   }
 }
 
+class ff_gln_gw::uplink::bgp (
+  $nat_network = "127.0.0.1/32",
+  $tunnel_network = "127.0.0.0/8",
+  $do_nat = "yes"
+) inherits ff_gln_gw::params {
+
+  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::bird4
+
+  if $do_nat == "yes" {
+    $nat_ip = ip_address($nat_network)
+    $nat_netmask = ip_netmask($nat_network)
+
+    Exec { path => [ "/bin" ] }
+    kmod::load { 'dummy':
+      ensure => present,
+    }
+
+    Class['ff_gln_gw::resources::network'] ->
+    file {
+      "/etc/network/interfaces.d/dummy0":
+        ensure => file,
+        content => template("ff_gln_gw/etc/network/uplink-dummy.erb");
+    } ->
+    exec {
+      "start_dummy_interface_0":
+        command => "/sbin/ifup dummy0",
+        unless  => "/bin/ip link show dev dummy0 | grep 'DOWN|dummy0' 2> /dev/null",
+        require => [ File_Line["/etc/iproute2/rt_tables"]
+                   , Class[ff_gln_gw::resources::sysctl]
+                   ];
+    }
+  }
+
+  class { 'ff_gln_gw::uplink': }
+
+  if $do_nat == "yes" {
+    # Define Firewall rule for masquerade
+    file {
+      '/etc/iptables.d/910-Masquerade-uplink':
+         ensure => file,
+         owner => 'root',
+         group => 'root',
+         mode => '0644',
+         content => inline_template("ip4tables -t nat -A POSTROUTING -o uplink-+ ! -d <%=@tunnel_network%> -j SNAT --to <%=@nat_ip%>"),
+         require => [File['/etc/iptables.d/']];
+       '/etc/iptables.d/910-Clamp-mss':
+         ensure => file,
+         owner => 'root',
+         group => 'root',
+         mode => '0644',
+         content => 'ip4tables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu',
+         require => [File['/etc/iptables.d/']];
+    }
+  }
+
+  file_line { "bird-uplink-include-bgp":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/uplink.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.uplink.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-uplink-include-bgp"],
+      Service['bird']
+    ]
+  }
+}
+
+
 define ff_gln_gw::uplink::tunnel (
   $local_public_ip,
   $remote_public_ip,
