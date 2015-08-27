@@ -153,7 +153,7 @@ class ff_gln_gw::uplink::bgp (
     content => template("ff_gln_gw/etc/bird/bird.uplink.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
     notify  => [
-      File_line["bird-uplink-include-bgp"],
+      File_line["bird-uplink-include"],
       Service['bird']
     ]
   }
