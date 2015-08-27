@@ -1,4 +1,5 @@
 protocol static 'def_<%= @endpoint_name %>' {
-  table mesh;
+  table ospf_<%= @mesh_code %>;
+#  table mesh;
   route 0.0.0.0/0 via <%= @endpoint_ip %>; # Default route
 }
