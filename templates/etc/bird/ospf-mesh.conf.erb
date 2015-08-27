@@ -14,8 +14,7 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
     if is_self_<%=@mesh_code %>() then accept;<% if @have_ospf_peerings == "yes" %>
     if (is_default() && (source = RTS_OSPF && ospf_tag = 0)) then accept;<% end -%>
   };
-  }
-};
+}
 
 <% if @have_ospf_peerings == "yes" %>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
