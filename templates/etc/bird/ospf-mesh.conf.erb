@@ -10,7 +10,7 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
   table mesh;
   peer table ospf_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
-  export where is_self_<%=@mesh_code %>() || is_default();
+  export where is_self_<%=@mesh_code %>()<% if @have_ospf_peerings == "yes" %> || is_default()<% end -%>;
 };
 
 <% if @have_ospf_peerings == "yes" %>
