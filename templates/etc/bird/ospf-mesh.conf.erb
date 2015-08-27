@@ -11,8 +11,8 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
   peer table ospf_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
   export filter {
-    if is_self_<%=@mesh_code %>() then accept;
-    <% if @have_ospf_peerings == "yes" %>if is_default() && (source == RTS_OSPF && ospf_tag == 0) then accept;<% end -%>;
+    if is_self_<%=@mesh_code %>() then accept;<% if @have_ospf_peerings == "yes" %>
+    if (is_default() && (source = RTS_OSPF && ospf_tag = 0)) then accept;<% end -%>
   };
   }
 };
