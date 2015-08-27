@@ -141,7 +141,7 @@ class ff_gln_gw::uplink::bgp (
     }
   }
 
-  file_line { "bird-uplink-include-bgp":
+  file_line { "bird-uplink-include":
     path => '/etc/bird/bird.conf',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
     require => File['/etc/bird/bird.conf'],
