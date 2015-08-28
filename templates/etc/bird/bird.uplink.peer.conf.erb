@@ -1,4 +1,4 @@
 protocol bgp 'uplink_<%= @endpoint_name %>' from uplink {
   source address <%= @local_ip %>;
-  neighbor <%= @remote_ip %> as <%= @remote_as %>;
+  neighbor <%= @rem_ip %> as <%= @remote_as %>;
 }
