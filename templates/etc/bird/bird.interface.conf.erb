@@ -4,7 +4,7 @@
 
 table mesh_<%= @mesh_code %>;
 
-<% if @have_mesh_peerings == "yes" %>
+<% if @have_mesh_peerings == "yes" or have_ospf_peerings == "yes" %>
 protocol static static_<%= @mesh_code %> {
   table mesh_<%= @mesh_code %>;
   # reject route if announced from external
@@ -27,7 +27,7 @@ function is_in_<%= @mesh_code %>_prefix() {
 
 # Check if net is part of own prefix within exportable range: /16 to /21
 function <%= @mesh_code %>_export_prefix() {
-  return (net ~ [ <%= @range_ipv4 %>{16,21} ]);
+  return (net ~ [ <%= @range_ipv4 %>{16,24} ]);
 };
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
