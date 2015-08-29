@@ -1,0 +1,21 @@
+table uplink;
+
+protocol direct {
+  table uplink;
+  interface "uplink-*";
+}
+
+protocol static uplink_hostroute {
+  import all;
+  table uplink;
+  route <%= @nat_network %> reject;
+}
+
+template bgp uplink {
+  table uplink;
+  local as <%= @uplink_as %>;
+  import none;
+  export where is_default();
+  next hop self;
+  multihop 64;
+}

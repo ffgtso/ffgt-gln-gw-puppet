@@ -83,6 +83,41 @@ class ff_gln_gw::uplink::ip (
   }
 }
 
+
+class ff_gln_gw::uplink::provide (
+  $nat_network,
+  $tunnel_network,
+  $uplink_as,
+) inherits ff_gln_gw::params {
+
+  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::bird4
+
+  $nat_ip = ip_address($nat_network)
+  $nat_netmask = ip_netmask($nat_network)
+
+  class { 'ff_gln_gw::uplink': }
+
+  file_line { "bird-uplink-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/uplink.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.uplink-provide.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-uplink-include"],
+      Service['bird']
+    ]
+  }
+}
+
 class ff_gln_gw::uplink::bgp (
   $nat_network = "127.0.0.1/32",
   $tunnel_network = "127.0.0.0/8",
