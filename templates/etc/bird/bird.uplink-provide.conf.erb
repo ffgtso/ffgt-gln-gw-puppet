@@ -5,12 +5,6 @@ protocol direct {
   interface "uplink-*";
 }
 
-protocol static uplink_hostroute {
-  import all;
-  table uplink;
-  route <%= @nat_network %> reject;
-}
-
 template bgp uplink {
   table uplink;
   local as <%= @uplink_as %>;
