@@ -213,7 +213,8 @@ define ff_gln_gw::uplink::tunnel (
   $local_ip = ip_address($local_ipv4)
   $local_netmask = ip_netmask($local_ipv4)
   $rem_ip = ip_address($remote_ip)
-  $rem_prefix = ip_prefixlen($remote_ip)
+  $rem_prefix = ip_prefix($remote_ip)
+  $rem_prefixlen = ip_prefixlen($remote_ip)
 
   Class['ff_gln_gw::resources::network'] ->
   file {
