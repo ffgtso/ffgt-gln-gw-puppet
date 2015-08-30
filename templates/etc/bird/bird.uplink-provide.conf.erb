@@ -5,6 +5,15 @@ protocol direct {
   interface "uplink-*";
 }
 
+# pipe between uplnk table and kernel table
+# Import nothing from uplnk table into kernel
+# table, export default route
+protocol pipe pipe_kernel_mesh {
+  peer table uplnk;
+  import none;
+  export where is_default();
+};
+
 template bgp uplink {
   table uplnk;
   local as <%= @uplink_as %>;
