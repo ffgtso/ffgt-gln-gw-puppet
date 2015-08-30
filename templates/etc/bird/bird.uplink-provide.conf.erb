@@ -1,12 +1,12 @@
-table uplink;
+table uplnk;
 
 protocol direct {
-  table uplink;
+  table uplnk;
   interface "uplink-*";
 }
 
 template bgp uplink {
-  table uplink;
+  table uplnk;
   local as <%= @uplink_as %>;
   import none;
   export where is_default();
