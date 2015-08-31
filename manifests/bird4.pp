@@ -179,3 +179,35 @@ define ff_gln_gw::bird4::icvpn (
     ];
   } 
 }
+
+define ff_gln_gw::bird4::dn42 (
+  $icvpn_as,
+  $dn42_peerings,
+){
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+  include ff_gln_gw::icvpn
+
+  $icvpn_name = $name
+
+  file_line {
+    "dn42-template":
+      path => '/etc/bird/bird.conf',
+      line => 'include "/etc/bird/bird.conf.d/dn42-template.conf";',
+      require => File['/etc/bird/bird.conf'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/dn42-template.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.dn42-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird'],
+    ],
+    notify  => [
+      Service['bird'],
+      File_line['dn42-include'],
+    ];
+  }
+}
