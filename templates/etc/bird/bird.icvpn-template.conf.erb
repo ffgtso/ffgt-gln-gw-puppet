@@ -15,11 +15,12 @@ protocol pipe pipe_bgp_<%=@mesh_code%> {
   table mesh;
   peer table icvpn_<%= @mesh_code %>;
   import all; # where ! is_self_<%=@mesh_code %>();
-  export where <%= @mesh_code %>_export_prefix(); # where source = RTS_BGP || source = RTS_STATIC;
+  #export where <%= @mesh_code %>_export_prefix(); # where source = RTS_BGP || source = RTS_STATIC;
+  export where source = RTS_BGP || source = RTS_STATIC;
 };
 
 # template for icvpn route exchange via bgp
-# we exchange freifunk and dn42 routes with peers
+# we exchange freifunk and, maybe, dn42 routes with peers
 # chaosvpn should not be exchanged because chaosvpn misses a route to not
 # directly connected communities in the usual setup
 template bgp icvpn {
@@ -27,16 +28,9 @@ template bgp icvpn {
   local as <%= @icvpn_as %>;
   source address <%= @icvpn_ipv4_address %>;
   import where is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>;
-  export where <%= @mesh_code %>_export_prefix();
-  #export where ((source = RTS_BGP) || (source = RTS_STATIC)) && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>);
-  # wusel, 2015-08-20: Do not re-export all stuff learned from BGP.
-  #export filter {
-  #  if <%= @mesh_code %>_export_prefix() then accept;
-  #  if (proto = "icvpn_static") then reject;
-  #  if is_default() then reject;
-  #  if (source = RTS_BGP && bgp_path.len < 3 && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
-  #  if (source != RTS_BGP && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
-  #  if (source = RTS_STATIC && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
-  #  reject;
-  #};
+  export filter {
+    if <%= @mesh_code %>_export_prefix() then accept;
+    if ((source = RTS_BGP) || (source = RTS_STATIC)) && (is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>) then accept;
+    reject;
+  }
 };
