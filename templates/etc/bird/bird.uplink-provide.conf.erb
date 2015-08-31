@@ -5,12 +5,17 @@ protocol direct {
   interface "uplink-*";
 }
 
+# Check if net is part of uplink prefix
+function is_in_uplink_range() {
+  return (net ~ [ <%= @nat_prefix %>/<%= @nat_prefixlen %>+ ]);
+};
+
 # pipe between uplnk table and kernel table
 # Import nothing from uplnk table into kernel
 # table, export default route
 protocol pipe pipe_kernel_mesh {
   peer table uplnk;
-  import none;
+  import where is_in_uplink_range();
   export where is_default();
 };
 

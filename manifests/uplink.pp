@@ -96,6 +96,8 @@ class ff_gln_gw::uplink::provide (
   include ff_gln_gw::bird4
 
   $nat_ip = ip_address($nat_network)
+  $nat_prefix = ip_prefix($nat_network)
+  $nat_prefixlen = ip_prefixlen($nat_network)
   $nat_netmask = ip_netmask($nat_network)
 
   class { 'ff_gln_gw::uplink': }
