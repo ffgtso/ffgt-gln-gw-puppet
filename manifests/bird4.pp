@@ -140,7 +140,7 @@ define ff_gln_gw::bird4::local (
   }
 
   exec { "touch-local-conf":
-    command => "touch -a local.conf",
+    command => "/usr/bin/touch -a local.conf",
     cwd => "/etc/bird/bird.conf.d/",
     require => File['/etc/bird/bird.conf'],
   }
