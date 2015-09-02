@@ -127,6 +127,41 @@ define ff_gln_gw::bird4::ospf (
   }
 }
 
+# Allow local additions via local.conf
+define ff_gln_gw::bird4::local (
+) {
+  include ff_gln_gw::bird4
+
+  file_line { "bird-local-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/local.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => [ Exec['touch-local-conf'], Service['bird'] ];
+  }
+
+  exec { "touch-local-conf":
+    command => "touch -a local.conf",
+    cwd => "/etc/bird/bird.conf.d/",
+    require => File['/etc/bird/bird.conf'],
+  }
+
+  file { "/etc/bird/bird.conf.d/local.conf":
+    mode => "0644",
+    notify  => [
+      File_line["bird-local-include"],
+      Service['bird']
+    ]
+  }
+
+  file { "/tmp/prepare-gre-tunnels-${mesh_code}.sh":
+    mode => "0755",
+    content => template("ff_gln_gw/etc/network/prepare-gre-tunnels.erb")
+  } ->
+  exec { "prepare-gre-tunnels-${mesh_code}":
+    command => "/tmp/prepare-gre-tunnels-${mesh_code}.sh",
+    cwd => "/tmp"
+  }
+}
 
 define ff_gln_gw::bird4::icvpn (
   $icvpn_as,
