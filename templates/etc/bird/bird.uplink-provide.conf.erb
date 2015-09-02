@@ -14,15 +14,16 @@ function is_in_uplink_range() {
 # Import nothing from uplnk table into kernel
 # table, export default route
 protocol pipe pipe_kernel_uplink {
-  peer table uplnk;
-  import where is_in_uplink_range();
+  table uplnk;
+  peer table mesh;
+  import all;
   export where is_default();
 };
 
 template bgp uplink {
   table uplnk;
   local as <%= @uplink_as %>;
-  import none;
+  import where is_in_uplink_range();
   export where is_default();
   next hop self;
   multihop 64;
