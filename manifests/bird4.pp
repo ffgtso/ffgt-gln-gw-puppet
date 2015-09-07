@@ -116,15 +116,6 @@ define ff_gln_gw::bird4::ospf (
       Service['bird']
     ]
   }
-
-  file { "/tmp/prepare-gre-tunnels-${mesh_code}.sh":
-    mode => "0755",
-    content => template("ff_gln_gw/etc/network/prepare-gre-tunnels.erb")
-  } ->
-  exec { "prepare-gre-tunnels-${mesh_code}":
-    command => "/tmp/prepare-gre-tunnels-${mesh_code}.sh",
-    cwd => "/tmp"
-  }
 }
 
 # Allow local additions via local.conf
@@ -151,15 +142,6 @@ define ff_gln_gw::bird4::local (
       File_line["bird-local-include"],
       Service['bird']
     ]
-  }
-
-  file { "/tmp/prepare-gre-tunnels-${mesh_code}.sh":
-    mode => "0755",
-    content => template("ff_gln_gw/etc/network/prepare-gre-tunnels.erb")
-  } ->
-  exec { "prepare-gre-tunnels-${mesh_code}":
-    command => "/tmp/prepare-gre-tunnels-${mesh_code}.sh",
-    cwd => "/tmp"
   }
 }
 
