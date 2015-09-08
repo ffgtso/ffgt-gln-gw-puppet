@@ -41,7 +41,6 @@ protocol pipe pipe_mesh_<%=@mesh_code%> {
 # extend local_mesh template
 template bgp local_mesh_<%=@mesh_code%> from local_mesh {
   table mesh_<%=@mesh_code%>;
-  source address <%=@mesh_ipv4_address%>;
   local as <%=@icvpn_as%>;
 };
 <% if @have_mesh_peerings == "yes" %>
@@ -49,7 +48,8 @@ template bgp local_mesh_<%=@mesh_code%> from local_mesh {
 <% peerings.each_pair do |name,node| -%>
 
 protocol bgp local_<%=@mesh_code%>_<%=name%> from local_mesh_<%= @mesh_code %> {
-  neighbor <%= node['ipv4'] %> as <%= @icvpn_as %>; 
+  source address <%= node['ipv4src'] %>;
+  neighbor <%= node['ipv4dst'] %> as <%= @icvpn_as %>;
 };
 <% end -%>
 <% end -%>
