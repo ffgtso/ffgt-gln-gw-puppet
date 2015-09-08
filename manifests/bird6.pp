@@ -85,6 +85,34 @@ define ff_gln_gw::bird6::mesh (
   }
 }
 
+define ff_gln_gw::bird6::ospf (
+  $mesh_code,
+  $ospf_peerings, # YAML data file for local backbone peerings
+  $ospf_links,    # YAML data file for local interconnects
+  $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
+  $have_ospf_links = "no"     # Actually require & use $ospf_links
+) {
+
+  include ff_gln_gw::bird6
+
+  file_line { "bird6-ospf-${mesh_code}-include":
+    path => '/etc/bird/bird6.conf',
+    line => "include \"/etc/bird/bird.conf.d/ospf6-${mesh_code}.conf\";",
+    require => File['/etc/bird/bird6.conf'],
+    notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird.conf.d/ospf6-${mesh_code}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/ospf-mesh6.conf.erb"),
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    notify  => [
+      File_line["bird6-ospf-${mesh_code}-include"],
+      Service['bird']
+    ]
+  }
+}
+
 define ff_gln_gw::bird6::icvpn (
   $icvpn_as,
   $icvpn_ipv4_address,
