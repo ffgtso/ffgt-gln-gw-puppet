@@ -33,8 +33,7 @@ if [ ! -d /etc/network/interfaces.d ]; then
 else
   sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
 fi
-<% if @have_ospf_peerings == "yes" %>
-<% peerings = YAML.load_file(@ospf_peerings); -%>
+<% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
 # Skip dummy entries
 echo "<%=name%>" | grep >/dev/null dummy
@@ -51,25 +50,6 @@ sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
  -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 fi
-<% end -%>
-<% end -%>
-<% if @have_ospf_links == "yes" %>
-<% peerings = YAML.load_file(@ospf_links); -%>
-<% peerings.each_pair do |name,node| -%>
-# Skip dummy entries
-echo "<%=name%>" | grep >/dev/null dummy
-if [ \$? -eq 1 ]; then
-if [ -e /etc/network/interfaces.d/ospf-<%=name%>.cfg ]; then
-  /bin/rm /etc/network/interfaces.d/ospf-<%=name%>.cfg
-fi
-sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
- -e 's/##endpoint_name##/<%=name%>/g' \\
- -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
- -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
- -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
- -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
-<% end -%>
 <% end -%>
 EOF
 
