@@ -100,6 +100,24 @@ define ff_gln_gw::bird4::ospf (
 
   include ff_gln_gw::bird4
 
+  Exec { path => [ "/bin" ] }
+  kmod::load { 'dummy':
+    ensure => present,
+  }
+
+  # Make sure we have our Router ID configured on this host.
+  Class['ff_gln_gw::resources::network'] ->
+  file {
+    "/etc/network/interfaces.d/dummyRID":
+      ensure => file,
+      content => template("ff_gln_gw/etc/network/rid-dummy.erb");
+  } ->
+  exec {
+    "start_dummy_interface_RID":
+      command => "/sbin/ifup dummyRID",
+      unless  => "/bin/ip link show dev dummyRID | grep 'DOWN|dummyRID' 2> /dev/null";
+  }
+
   file_line { "bird-ospf-${mesh_code}-include":
     path => '/etc/bird/bird.conf',
     line => "include \"/etc/bird/bird.conf.d/ospf-${mesh_code}.conf\";",

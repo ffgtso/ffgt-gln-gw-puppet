@@ -4,6 +4,12 @@
 
 table ospf_<%= @mesh_code %>;
 
+protocol static ospf_router_id {
+  import all;
+  table ospf_<%= @mesh_code %>;
+  route <%=@router_id%>/32 via "dummyRID";
+}
+
 # pipe between mesh and ospfmesh_<%= @mesh_code %> table
 # import all from mesh, export from ospf_xxxx to mesh own network and default route(s)
 protocol pipe pipe_ospf_<%=@mesh_code%> {
