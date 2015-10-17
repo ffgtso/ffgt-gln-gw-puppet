@@ -4,10 +4,10 @@
 
 table ospf_<%= @mesh_code %>;
 
-protocol static ospf_router_id {
+protocol static ospf_routerid {
   import all;
   table ospf_<%= @mesh_code %>;
-  route <%=@router_id%>/32 via "dummyRID";
+  route <%=@router_id%>/32 via "br-rid";
 }
 
 # pipe between mesh and ospfmesh_<%= @mesh_code %> table
@@ -90,7 +90,7 @@ protocol ospf int_<%= @mesh_code %> {
   import filter {
     if (is_default() && (source = RTS_OSPF<% if @have_ospf_peerings != "yes" %> && ospf_tag = 10<% end %>)) then reject;
     accept;
-  }
+  };
   #export all;
   export filter {
     if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX

@@ -1,5 +1,8 @@
 # Dummy interface for Router ID
-auto dummyRID
-iface dummyRID inet static
+auto br-rid
+iface br-rid inet static
   address <%=@router_id%>
   netmask 255.255.255.255
+  bridge-ports none
+  post-up /sbin/ip rule add from <%=@router_id%>/32 lookup 42
+  pre-down /sbin/ip rule del from <%=@router_id%> lookup 42

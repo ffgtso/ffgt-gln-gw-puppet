@@ -109,14 +109,14 @@ define ff_gln_gw::bird4::ospf (
   # Make sure we have our Router ID configured on this host.
   Class['ff_gln_gw::resources::network'] ->
   file {
-    "/etc/network/interfaces.d/dummyRID":
+    "/etc/network/interfaces.d/br-rid":
       ensure => file,
       content => template("ff_gln_gw/etc/network/rid-dummy.erb");
   } ->
   exec {
     "start_dummy_interface_RID":
-      command => "/sbin/ifup dummyRID",
-      unless  => "/bin/ip link show dev dummyRID | grep 'DOWN|dummyRID' 2> /dev/null";
+      command => "/sbin/ifup br-rid",
+      unless  => "/bin/ip link show dev br-rid | grep 'DOWN|br-rid' 2> /dev/null";
   }
 
   file_line { "bird-ospf-${mesh_code}-include":
