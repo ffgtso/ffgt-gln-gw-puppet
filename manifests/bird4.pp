@@ -92,6 +92,7 @@ define ff_gln_gw::bird4::mesh (
 define ff_gln_gw::bird4::ospf (
   $mesh_code,
   $range_ipv4,
+  $router_id = $ff_gln_gw::params::router_id,
   $ospf_peerings, # YAML data file for local backbone peerings
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
