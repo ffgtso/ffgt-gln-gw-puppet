@@ -35,7 +35,15 @@ function is_ula() {
 # a Freifunk range.
 function is_freifunk() {
   return net ~ [ 2001:0bf7::/32+,   # Foerderverein freie Netzwerke e.V.
-                 2a03:2260::/29+ ]; # Freifunk Rheinland e.V.
+                 2a03:2260::/29+,   # Freifunk Rheinland e.V.
+                 2001:470:70e2::/48+ # HE FFGT
+               ];
+}
+
+# default route
+# be careful with importing default routes from arbitrary peers
+function is_default() {
+  return net ~ [ ::/0 ];
 }
 
 # don't use kernel's routes for bird, but export bird's 

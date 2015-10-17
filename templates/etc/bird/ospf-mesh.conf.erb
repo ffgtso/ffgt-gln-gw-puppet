@@ -29,8 +29,12 @@ protocol static ospf_<%=name%> {
 
 protocol ospf bb_<%= @mesh_code %> {
   table ospf_<%= @mesh_code %>;
-  import all;
-  #import where !is_default();
+  #import all;
+  import where !is_default();
+  #import filter {
+  #  if (is_default() && source = RTS_OSPF) then reject; # Don't learn default via OSPF
+  #  accept;
+  #}
   export filter {
     if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     if is_default() then accept;
@@ -75,9 +79,13 @@ protocol static ospf_<%=name%> {
 
 protocol ospf int_<%= @mesh_code %> {
   table ospf_<%= @mesh_code %>;
-  import all;
+  #import all;
   #import where !is_default();
-#  export all;
+  import filter {
+    if (is_default() && (source = RTS_OSPF<% if @have_ospf_peerings != "yes" %> && ospf_tag = 10<% end %>)) then reject;
+    accept;
+  }
+  #export all;
   export filter {
     if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     ospf_tag = 10;
