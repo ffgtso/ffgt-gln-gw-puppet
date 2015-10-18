@@ -107,7 +107,6 @@ define ff_gln_gw::bird4::ospf (
   }
 
   # Make sure we have our Router ID configured on this host.
-  Class['ff_gln_gw::resources::network'] ->
   file {
     "/etc/network/interfaces.d/br-rid":
       ensure => file,
