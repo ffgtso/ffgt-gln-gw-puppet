@@ -31,6 +31,17 @@ define ff_gln_gw::dhcpd (
   if $dhcp_relays != [] {
     include ff_gln_gw::dhcpd::relaybase
     include ff_gln_gw::dhcpd::relayservice
+
+    file {
+      "/etc/default/isc-dhcp-relay":
+        ensure => file,
+        mode   => '0644',
+        owner  => 'root',
+        group  => 'root',
+        content => template("ff_gln_gw/etc/default/isc-dhcp-relay.erb"),
+        require => [Package['isc-dhcp-relay']],
+        notify => [Service['isc-dhcp-relay']];
+    }
   }
 }
 
@@ -82,17 +93,6 @@ class ff_gln_gw::dhcpd::relaybase {
   package {
     'isc-dhcp-relay':
       ensure => installed;
-  }
-
-  file {
-    "/etc/default/isc-dhcp-relay":
-      ensure => file,
-      mode   => '0644',
-      owner  => 'root',
-      group  => 'root',
-      content => template("ff_gln_gw/etc/default/isc-dhcp-relay.erb"),
-      require => [Package['isc-dhcp-relay']],
-      notify => [Service['isc-dhcp-relay']];
   }
 
   ff_gln_gw::firewall::service { 'dhcpd':
