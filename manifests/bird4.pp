@@ -243,3 +243,35 @@ define ff_gln_gw::bird4::dn42 (
     ];
   }
 }
+
+
+define ff_gln_gw::bird4::anycast (
+  $mesh_code,
+  $anycast_ipv4,
+  $anycast_if,
+){
+  include ff_gln_gw::bird4
+
+  $anycastsrv = $name
+
+  file_line {
+    "anycast-template":
+      path => '/etc/bird/bird.conf',
+      line => 'include "/etc/bird/bird.conf.d/anycast-$name.conf";',
+      require => File['/etc/bird/bird.conf'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/anycast-$name.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/ospf-anycast-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird'],
+    ],
+    notify  => [
+      Service['bird'],
+      File_line['anycast-template'],
+    ];
+  }
+}

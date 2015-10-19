@@ -1,0 +1,4 @@
+protocol static ospf_anycast_$anycastsrv {
+  table ospf_<%= @mesh_code %>;
+  route <%=@anycast_ipv4%>/32 via "<%=@anycast_if%>";
+}
