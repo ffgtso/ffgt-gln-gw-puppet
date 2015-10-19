@@ -4,8 +4,8 @@
 # tunnel interfaces.
 
 cat <<EOF >/tmp/puppet-$$.txt
-auto ospf-##endpoint_name##
-iface ospf-##endpoint_name## inet static
+auto ##endpoint_name##
+iface ##endpoint_name## inet static
  address ##local_ip##
  netmask 255.255.255.254
  pre-up iptunnel add \$IFACE mode gre local ##local_public_ip## remote ##remote_public_ip## ttl 255
@@ -38,10 +38,10 @@ fi
 # Skip dummy entries
 echo "<%=name%>" | grep >/dev/null dummy
 if [ \$? -eq 1 ]; then
-if [ -e /etc/network/interfaces.d/ospf-<%=name%>.cfg ]; then
-  /bin/rm /etc/network/interfaces.d/ospf-<%=name%>.cfg
+if [ -e /etc/network/interfaces.d/<%=name%>.cfg ]; then
+  /bin/rm /etc/network/interfaces.d/<%=name%>.cfg
 fi
-sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
+sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/<%=name%> \\
  -e 's/##endpoint_name##/<%=name%>/g' \\
  -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
  -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
@@ -50,6 +50,7 @@ sed </tmp/puppet-$$.txt >/etc/network/interfaces.d/ospf-<%=name%> \\
  -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 fi
+(/sbin/ifup <%=name%> ; exit 0)
 <% end -%>
 EOF
 
