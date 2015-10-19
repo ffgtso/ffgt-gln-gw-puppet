@@ -7,12 +7,12 @@ define ff_gln_gw::dhcpd (
 
   $ranges = [],
   $dns_servers = [],
+  $dhcp_relays = []
   ) {
 
-  include ff_gln_gw::dhcpd::base
-  include ff_gln_gw::dhcpd::service
-
   if $ranges != [] {
+    include ff_gln_gw::dhcpd::base
+    include ff_gln_gw::dhcpd::service
 
     file { "/etc/dhcp/interface-${name}.conf":
       ensure => file,
@@ -27,6 +27,10 @@ define ff_gln_gw::dhcpd (
       require => [File['/etc/dhcp/dhcpd.conf']],
       notify => [Service['isc-dhcp-server']];
     }
+  }
+  if $dhcp_relays != [] {
+    include ff_gln_gw::dhcpd::relaybase
+    include ff_gln_gw::dhcpd::relayservice
   }
 }
 
@@ -63,6 +67,44 @@ class ff_gln_gw::dhcpd::base {
 class ff_gln_gw::dhcpd::service {
   service { 
     'isc-dhcp-server': 
+      ensure => running,
+      hasrestart => true,
+      enable => true;
+  }
+}
+
+class ff_gln_gw::dhcpd::relaybase {
+  ff_gln_gw::monitor::nrpe::check_command {
+    "dhcprelay":
+      command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C dhcrelay';
+  }
+
+  package {
+    'isc-dhcp-relay':
+      ensure => installed;
+  }
+
+  file {
+    "/etc/default/isc-dhcp-relay":
+      ensure => file,
+      mode   => '0644',
+      owner  => 'root',
+      group  => 'root',
+      content => template("ff_gln_gw/etc/default/isc-dhcp-relay.erb"),
+      require => [Package['isc-dhcp-relay']],
+      notify => [Service['isc-dhcp-relay']];
+  }
+
+  ff_gln_gw::firewall::service { 'dhcpd':
+    chains => ['mesh'],
+    ports  => ['67','68'],
+    protos => ['udp'];
+  }
+}
+
+class ff_gln_gw::dhcpd::relayservice {
+  service {
+    'isc-dhcp-relay':
       ensure => running,
       hasrestart => true,
       enable => true;
