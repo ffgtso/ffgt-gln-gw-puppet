@@ -16,9 +16,9 @@ peer group "nodes" {
   include peers from "peers";
 <% if @peer_limit.to_i > 0 %>  peer limit <%= @peer_limit %>;
 <% end %>}
-peer group "backbone" {
-  include peers from "backbone";
-}
+#peer group "backbone" {
+#  include peers from "backbone";
+#}
 <% if @use_blacklist == "yes" %>
 on verify "
   /etc/fastd/<%= @mesh_code %>-mesh-vpn/fastd-blacklist.sh
