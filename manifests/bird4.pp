@@ -252,17 +252,17 @@ define ff_gln_gw::bird4::anycast (
 ){
   include ff_gln_gw::bird4
 
-  $anycastsrv = $name
+  $anycast_srv = $name
 
   file_line {
-    "anycast-template":
+    "anycast-${$name}-template":
       path => '/etc/bird/bird.conf',
-      line => 'include "/etc/bird/bird.conf.d/anycast-$name.conf";',
+      line => 'include "/etc/bird/bird.conf.d/anycast-${$name}.conf";',
       require => File['/etc/bird/bird.conf'],
       notify  => Service['bird'];
   }
 
-  file { "/etc/bird/bird.conf.d/anycast-$name.conf":
+  file { "/etc/bird/bird.conf.d/anycast-${name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-anycast-template.conf.erb"),
     require => [
@@ -271,6 +271,7 @@ define ff_gln_gw::bird4::anycast (
     ],
     notify  => [
       Service['bird'],
+      File_line['anycast-${$name}-template']
     ];
   }
 }
