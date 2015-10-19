@@ -110,7 +110,8 @@ define ff_gln_gw::bird4::ospf (
   file {
     "/etc/network/interfaces.d/br-rid":
       ensure => file,
-      content => template("ff_gln_gw/etc/network/rid-dummy.erb");
+      content => template("ff_gln_gw/etc/network/rid-dummy.erb"),
+      require => Package['bridge-utils'];
   } ->
   exec {
     "start_dummy_interface_RID":
