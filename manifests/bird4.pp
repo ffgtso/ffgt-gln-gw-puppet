@@ -255,9 +255,9 @@ define ff_gln_gw::bird4::anycast (
   $anycast_srv = $name
 
   file_line {
-    "anycast-${$name}-template":
+    "anycast-${name}-template":
       path => '/etc/bird/bird.conf',
-      line => 'include "/etc/bird/bird.conf.d/anycast-${$name}.conf";',
+      line => 'include "/etc/bird/bird.conf.d/anycast-${name}.conf";',
       require => File['/etc/bird/bird.conf'],
       notify  => Service['bird'];
   }
@@ -271,7 +271,7 @@ define ff_gln_gw::bird4::anycast (
     ],
     notify  => [
       Service['bird'],
-      File_line['anycast-${$name}-template']
+      File_line['anycast-${name}-template']
     ];
   }
 }
