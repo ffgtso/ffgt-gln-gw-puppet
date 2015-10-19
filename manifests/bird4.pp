@@ -101,11 +101,6 @@ define ff_gln_gw::bird4::ospf (
 
   include ff_gln_gw::bird4
 
-  Exec { path => [ "/bin" ] }
-  kmod::load { 'dummy':
-    ensure => present,
-  }
-
   package {
     'bridge-utils':
       ensure => installed;
