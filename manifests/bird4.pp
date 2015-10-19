@@ -257,7 +257,7 @@ define ff_gln_gw::bird4::anycast (
   file_line {
     "anycast-${name}-template":
       path => '/etc/bird/bird.conf',
-      line => 'include "/etc/bird/bird.conf.d/anycast-${name}.conf";',
+      line => "include \"/etc/bird/bird.conf.d/anycast-${name}.conf\";",
       require => File['/etc/bird/bird.conf'],
       notify  => Service['bird'];
   }
