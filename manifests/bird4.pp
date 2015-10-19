@@ -271,7 +271,6 @@ define ff_gln_gw::bird4::anycast (
     ],
     notify  => [
       Service['bird'],
-      File_line['anycast-template'],
     ];
   }
 }
