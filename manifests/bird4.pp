@@ -106,6 +106,11 @@ define ff_gln_gw::bird4::ospf (
     ensure => present,
   }
 
+  package {
+    'bridge-utils':
+      ensure => installed;
+  }
+
   # Make sure we have our Router ID configured on this host.
   file {
     "/etc/network/interfaces.d/br-rid":
