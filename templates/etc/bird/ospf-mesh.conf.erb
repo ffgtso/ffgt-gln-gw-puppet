@@ -26,7 +26,6 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
 protocol static ospf_<%=name%> {
-  import all;
   table ospf_<%= @mesh_code %>;
   route <%= node['ipv4src'] %>/32 via "ospf-<%=name%>";
   route <%= node['ipv4dst'] %>/32 via "ospf-<%=name%>";
@@ -77,7 +76,6 @@ protocol ospf bb_<%= @mesh_code %> {
 <% peerings.each_pair do |name,node| -%>
 protocol static ospf_<%=name%> {
   table ospf_<%= @mesh_code %>;
-  import all;
   route <%= node['ipv4src'] %>/32 via "ospf-<%=name%>";
   route <%= node['ipv4dst'] %>/32 via "ospf-<%=name%>";
 }
