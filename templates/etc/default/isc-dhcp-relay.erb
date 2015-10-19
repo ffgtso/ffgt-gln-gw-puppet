@@ -12,7 +12,7 @@
 SERVERS="<% @dhcp_relays.each do |dhcp_relay| %><%= dhcp_relay %> <% end %>"
 
 # On what interfaces should the DHCP relay (dhrelay) serve DHCP requests?
-INTERFACES="br-<%=mesh_code%>"
+INTERFACES="br-<%=@mesh_code%>"
 
 # Additional options that are passed to the DHCP relay daemon?
 OPTIONS="-a"
