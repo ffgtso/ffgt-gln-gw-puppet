@@ -1,7 +1,7 @@
 table uplnk;
 
 protocol direct {
-  table uplnk;
+#  table uplnk;
   interface "uplink-*";
 }
 
@@ -13,15 +13,15 @@ function is_in_uplink_range() {
 # pipe between uplnk table and kernel table
 # Import nothing from uplnk table into kernel
 # table, export default route
-protocol pipe pipe_kernel_uplink {
-  table uplnk;
-  peer table mesh;
-  import all;
-  export where is_default();
-};
+#protocol pipe pipe_kernel_uplink {
+#  table uplnk;
+#  peer table mesh;
+#  import all;
+#  export where is_default();
+#};
 
 template bgp uplink {
-  table uplnk;
+#  table uplnk;
   local as <%= @uplink_as %>;
   import where is_in_uplink_range();
   export where is_default();
