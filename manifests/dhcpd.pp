@@ -7,9 +7,12 @@ define ff_gln_gw::dhcpd (
 
   $ranges = [],
   $dns_servers = [],
-  $dhcp_relays = []
+  $dhcp_relays = [],
+  $interface = ""
   ) {
-
+  if $interface = "" {
+    $interface = "br-${mesh_code}"
+  }
   if $ranges != [] {
     include ff_gln_gw::dhcpd::base
     include ff_gln_gw::dhcpd::service
