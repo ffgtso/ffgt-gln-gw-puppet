@@ -45,8 +45,8 @@ define ff_gln_gw::dhcpd (
   }
 }
 
-class ff_gln_gw::dhcpd::base {
 
+class ff_gln_gw::dhcpd::base {
   ff_gln_gw::monitor::nrpe::check_command {
     "dhcpd":
       command => '/usr/lib/nagios/plugins/check_procs -c 1:1 -w 1:1 -C dhcpd';
@@ -55,6 +55,8 @@ class ff_gln_gw::dhcpd::base {
   package { 
     'isc-dhcp-server': 
       ensure => installed;
+    'isc-dhcp-relay':
+      ensure => absent;
   }
 
   file {
@@ -93,6 +95,8 @@ class ff_gln_gw::dhcpd::relaybase {
   package {
     'isc-dhcp-relay':
       ensure => installed;
+    'isc-dhcp-server':
+      ensure => absent;
   }
 
   ff_gln_gw::firewall::service { 'dhcpd':
