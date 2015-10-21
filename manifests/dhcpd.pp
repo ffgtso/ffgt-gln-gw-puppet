@@ -8,27 +8,45 @@ define ff_gln_gw::dhcpd (
   $ranges = [],
   $dns_servers = [],
   $dhcp_relays = [],
-  $interface = ""
+  $supply_own_file = ''
   ) {
-  if $interface = "" {
-    $interface = "br-${mesh_code}"
-  }
   if $ranges != [] {
     include ff_gln_gw::dhcpd::base
     include ff_gln_gw::dhcpd::service
 
-    file { "/etc/dhcp/interface-${name}.conf":
-      ensure => file,
-      content => template("ff_gln_gw/etc/dhcp/interface.erb"),
-      require => [Package['isc-dhcp-server']],
-      notify => [Service['isc-dhcp-server']];
-    } 
+    if $supply_own_file != '' {
+      exec { "${name}_dhcp_copy":
+        command => "/bin/cp ${supply_own_file} /etc/dhcp/user-supplied-${name}.conf";
+      }
 
-    file_line { "ff_gln_gw::dhcpd::${name}-rule":
-      path => '/etc/dhcp/dhcpd.conf',
-      line => "include \"/etc/dhcp/interface-${name}.conf\";",
-      require => [File['/etc/dhcp/dhcpd.conf']],
-      notify => [Service['isc-dhcp-server']];
+      file {
+      "/etc/dhcp/user-supplied-${name}.conf":
+        ensure => file,
+        mode   => '0644',
+        owner  => 'root',
+        group  => 'root';
+      }
+
+      file_line { "ff_gln_gw::dhcpd::${name}-own-file":
+        path => '/etc/dhcp/dhcpd.conf',
+        line => "include \"/etc/dhcp/user-supplied-${name}.conf\";",
+        require => [File['/etc/dhcp/dhcpd.conf']],
+        notify => [Service['isc-dhcp-server']];
+      }
+    } else {
+      file { "/etc/dhcp/interface-${name}.conf":
+        ensure => file,
+        content => template("ff_gln_gw/etc/dhcp/interface.erb"),
+        require => [Package['isc-dhcp-server']],
+        notify => [Service['isc-dhcp-server']];
+      }
+
+      file_line { "ff_gln_gw::dhcpd::${name}-rule":
+        path => '/etc/dhcp/dhcpd.conf',
+        line => "include \"/etc/dhcp/interface-${name}.conf\";",
+        require => [File['/etc/dhcp/dhcpd.conf']],
+        notify => [Service['isc-dhcp-server']];
+      }
     }
   }
   if $dhcp_relays != [] {
