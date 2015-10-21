@@ -18,6 +18,7 @@ define ff_gln_gw::mesh(
 
   $dhcp_ranges = [], # dhcp pool
   $dhcp_relays = [], # dhcp relays if set
+  $dhcp_relay_if = '', # add. interfaces for the relay to listen on
   $dns_servers = [], # other dns servers in your network
 ) {
 
@@ -64,6 +65,7 @@ define ff_gln_gw::mesh(
     ipv4_netmask => $mesh_ipv4_netmask,
     ranges       => $dhcp_ranges,
     dhcp_relays  => $dhcp_relays,
+    dhcp_relay_if => $dhcp_relay_if,
     dns_servers  => $dns_servers;
   } ->
   ff_gln_gw::fastd { "fastd_${mesh_code}":
