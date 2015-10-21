@@ -8,6 +8,7 @@ define ff_gln_gw::dhcpd (
   $ranges = [],
   $dns_servers = [],
   $dhcp_relays = [],
+  $dhcp_relay_if = '',
   $supply_own_file = ''
   ) {
   if $ranges != [] {
