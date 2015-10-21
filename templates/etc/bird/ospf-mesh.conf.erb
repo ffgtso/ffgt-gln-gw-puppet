@@ -87,7 +87,7 @@ protocol ospf int_<%= @mesh_code %> {
   #import where !is_default();
   import filter {
     #if (is_default() && (source = RTS_OSPF<% if @have_ospf_peerings != "yes" %> && ospf_tag = 10<% end %>)) then reject;
-    if (is_default() && (source = RTS_OSPF && ospf_tag = 10) then reject;
+    if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject;
     accept;
   };
   #export all;
