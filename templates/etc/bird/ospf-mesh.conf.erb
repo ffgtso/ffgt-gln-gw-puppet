@@ -94,6 +94,7 @@ protocol ospf int_<%= @mesh_code %> {
   };
   #export all;
   export filter {
+    if (is_default() && (source = RTS_BGP)) then accept;
     if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     ospf_tag = 10;
     if is_default() then accept;
