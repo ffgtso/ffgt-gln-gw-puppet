@@ -103,7 +103,7 @@ define ff_gln_gw::bird4::ospf (
   include ff_gln_gw::bird4
   include ff_gln_gw::resources::network
 
-  if $announce_rid = "yes" {
+  if $announce_rid == "yes" {
     # Make sure we have our Router ID configured on this host.
     file {
       "/etc/network/interfaces.d/br-rid":
