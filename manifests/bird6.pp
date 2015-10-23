@@ -85,6 +85,32 @@ define ff_gln_gw::bird6::mesh (
   }
 }
 
+define ff_gln_gw::bird6::srv (
+  $mesh_code,
+  $mesh_ipv4_address,
+  $mesh_ipv6_address,
+  $icvpn_as,
+) {
+  include ff_gln_gw::bird6
+
+  file_line { "bird6-${mesh_code}-srv-include":
+    path => '/etc/bird/bird6.conf',
+    line => "include \"/etc/bird/bird6.conf.d/srv-${mesh_code}.conf\";",
+    require => File['/etc/bird/bird6.conf'],
+    notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/srv-${mesh_code}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.srv-interface.conf.erb"),
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    notify  => [
+      File_line["bird6-${mesh_code}-srv-include"],
+      Service['bird6']
+    ]
+  }
+}
+
 define ff_gln_gw::bird6::ospf (
   $mesh_code,
   $ospf_peerings, # YAML data file for local backbone peerings

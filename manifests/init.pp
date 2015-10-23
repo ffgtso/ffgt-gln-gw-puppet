@@ -206,3 +206,45 @@ define ff_gln_gw::gateway(
   # ff_gln_gw::opkg::mirror
   # ff_gln_gw::firmware mirror
 }
+
+define ff_gln_gw::server(
+  $mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
+  $mesh_code,        # Code of your community, e.g.: ffgc
+  $mesh_as = $ff_gln_gw::params::icvpn_as,
+  $local_ipv6,
+) {
+
+  # TODO We should handle parameters in a param class pattern.
+  # TODO Handle all git repos and other external sources in
+  #      a configuration class, so we can redefine sources.
+  # TODO Update README
+
+  include ff_gln_gw::ntp
+  include ff_gln_gw::maintenance
+  include ff_gln_gw::firewall
+
+  ff_gln_gw::named::listen { "${mesh_code}":
+    ipv4_address => $ff_gln_gw::params::router_id,
+    ipv6_address => $local_ipv6,
+  }
+
+  if $ff_gln_gw::params::include_bird6 {
+    ff_gln_gw::bird6::srv { "bird6-${mesh_code}":
+      mesh_code => $mesh_code,
+      srv_ipv4_address => $ff_gln_gw::params::router_id,
+      srv_ipv6_address => $local_ipv6,
+      icvpn_as => $ff_gln_gw::params::icvpn_as;
+    }
+  }
+  if $ff_gln_gw::params::include_bird4 {
+    ff_gln_gw::bird4::srv { "bird4-${mesh_code}":
+      mesh_code => $mesh_code,
+      srv_ipv4_address => $ff_gln_gw::params::router_id,
+      srv_ipv6_address => $local_ipv6,
+      icvpn_as => $ff_gln_gw::params::icvpn_as;
+    }
+  }
+
+  # ff_gln_gw::opkg::mirror
+  # ff_gln_gw::firmware mirror
+}

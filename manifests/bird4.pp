@@ -89,6 +89,32 @@ define ff_gln_gw::bird4::mesh (
   }
 }
 
+define ff_gln_gw::bird4::srv (
+  $mesh_code,
+  $srv_ipv4_address,
+  $srv_ipv6_address,
+  $icvpn_as,
+) {
+  include ff_gln_gw::bird4
+
+  file_line { "bird-${mesh_code}-srv-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.d/srv-${mesh_code}.conf\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/srv-${mesh_code}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.srv-interface.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-${mesh_code}-srv-include"],
+      Service['bird']
+    ]
+  }
+}
+
 define ff_gln_gw::bird4::ospf (
   $mesh_code,
   $range_ipv4,
