@@ -87,8 +87,8 @@ define ff_gln_gw::bird6::mesh (
 
 define ff_gln_gw::bird6::srv (
   $mesh_code,
-  $mesh_ipv4_address,
-  $mesh_ipv6_address,
+  $srv_ipv4_address,
+  $srv_ipv6_address,
   $icvpn_as,
 ) {
   include ff_gln_gw::bird6
