@@ -3,12 +3,12 @@
 # bird OSPF configuration
 
 table ospf_<%= @mesh_code %>;
-
+<% if @announce_rid == "yes" %>
 protocol static ospf_routerid {
   import all;
   table ospf_<%= @mesh_code %>;
   route <%=@router_id%>/32 via "br-rid";
-}
+}<% end -%>
 
 # pipe between mesh and ospfmesh_<%= @mesh_code %> table
 # import all from mesh, export from ospf_xxxx to mesh own network and default route(s)
