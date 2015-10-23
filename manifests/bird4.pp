@@ -96,7 +96,7 @@ define ff_gln_gw::bird4::ospf (
   $ospf_peerings, # YAML data file for local backbone peerings
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
-  $have_ospf_links = "no"     # Actually require & use $ospf_links
+  $have_ospf_links = "no",    # Actually require & use $ospf_links
   $announce_rid = "yes"       # Shall we announce the RID (set to no if part of mesh)?
 ) {
 
