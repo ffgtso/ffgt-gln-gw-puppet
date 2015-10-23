@@ -97,22 +97,25 @@ define ff_gln_gw::bird4::ospf (
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
   $have_ospf_links = "no"     # Actually require & use $ospf_links
+  $announce_rid = "yes"       # Shall we announce the RID (set to no if part of mesh)?
 ) {
 
   include ff_gln_gw::bird4
   include ff_gln_gw::resources::network
 
-  # Make sure we have our Router ID configured on this host.
-  file {
-    "/etc/network/interfaces.d/br-rid":
-      ensure => file,
-      content => template("ff_gln_gw/etc/network/rid-dummy.erb"),
-      require => Package['bridge-utils'];
-  } ->
-  exec {
-    "start_dummy_interface_RID":
-      command => "/sbin/ifup br-rid",
-      unless  => "/bin/ip link show dev br-rid | grep 'DOWN|br-rid' 2> /dev/null";
+  if $announce_rid = "yes" {
+    # Make sure we have our Router ID configured on this host.
+    file {
+      "/etc/network/interfaces.d/br-rid":
+        ensure => file,
+        content => template("ff_gln_gw/etc/network/rid-dummy.erb"),
+        require => Package['bridge-utils'];
+    } ->
+    exec {
+      "start_dummy_interface_RID":
+        command => "/sbin/ifup br-rid",
+        unless  => "/bin/ip link show dev br-rid | grep 'DOWN|br-rid' 2> /dev/null";
+    }
   }
 
   file_line { "bird-ospf-${mesh_code}-include":
