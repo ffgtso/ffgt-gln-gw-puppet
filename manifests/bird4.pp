@@ -123,6 +123,7 @@ define ff_gln_gw::bird4::ospf (
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
   $have_ospf_links = "no",    # Actually require & use $ospf_links
+  $ospf_type = "root",        # root/leaf: root reexports routes, leaf only exports statics.
   $announce_rid = "yes"       # Shall we announce the RID (set to no if part of mesh)?
 ) {
 
