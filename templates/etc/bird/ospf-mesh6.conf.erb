@@ -77,11 +77,12 @@ protocol ospf int_<%= @mesh_code %> {
   #import where !is_default();
 #  export all;
   export filter {
-    if (is_default() && (source = RTS_OSPF<% if @have_ospf_peerings != "yes" %> && ospf_tag = 10<% end %>)) then reject;
+    <% if @have_ospf_links == "root" %>if (is_default() && (source = RTS_OSPF<% if @have_ospf_peerings != "yes" %> && ospf_tag = 10<% end %>)) then reject;
     ospf_tag = 10;
     if is_default() then accept;
     if source = RTS_STATIC || is_in_<%= @mesh_code %>_prefix() then accept;
-    reject;
+    <% else %>if source = RTS_STATIC then accept;
+    <% end %>reject;
   };
 
   # Links between bgp? & gw??
