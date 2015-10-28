@@ -28,10 +28,10 @@ function is_default() {
 # We do not import any routes here, therefore we can be sure
 # that no funny routes jump into our waggon.
 protocol kernel {
-  scan time 20;    # Scan kernel routing table every 20 seconds
-#  kernel table 42; # routing table for mesh networks
-  import where !is_default();     # Import no false defaults!
-  export all;                     # Export all routes
+  learn;            # Learn all alien routes from the kernel
+  scan time 20;     # Scan kernel routing table every 20 seconds
+  import all;       # Import all
+  export where !is_default();
 };
 
 # This pseudo-protocol watches all interface up/down events.
