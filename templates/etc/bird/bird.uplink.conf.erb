@@ -7,6 +7,7 @@ template bgp uplink {
   table mesh;
   local as <%= @icvpn_as %>;
   export where is_default();
+  import keep filtered;
   import where net ~ [ <%=@nat_prefix%>/<%=@nat_prefixlen%>+ ]";
   next hop self;
   multihop 64;
