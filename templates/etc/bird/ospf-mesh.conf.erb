@@ -85,14 +85,11 @@ protocol static ospf_<%=name%> {
 protocol ospf int_<%= @mesh_code %> {
   table ospf_<%= @mesh_code %>;
   import keep filtered;
-  import all;
+  import <% if @ospf_type == "root" %>where !is_default()<% else %>all<% end %>;
   export filter {
-    <% if @ospf_type == "root" %>if (is_default() && (source = RTS_BGP)) then accept;
-    if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     ospf_tag = 10;
-    #if is_default() then accept;
-    <% else %>if (is_default() && (source = RTS_BGP)) then accept;
-    <% end %>if source = RTS_STATIC then accept;
+    if (is_default() && (source = RTS_BGP)) then accept;
+    if source = RTS_STATIC then accept;
     if is_in_<%= @mesh_code %>_prefix() then accept;
     reject;
   };
