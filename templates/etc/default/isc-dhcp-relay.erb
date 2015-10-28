@@ -15,4 +15,4 @@ SERVERS="<% @dhcp_relays.each do |dhcp_relay| %><%= dhcp_relay %> <% end %>"
 INTERFACES="br-<%=@mesh_code%> <%=@dhcp_relay_if%>"
 
 # Additional options that are passed to the DHCP relay daemon?
-OPTIONS="-a<% if @dhcp_relay_id != '' %> -r @dhcp_relay_id<% end %>"
+OPTIONS="-a<% if @dhcp_relay_id != '' %> -r <%=dhcp_relay_id%><% end %>"
