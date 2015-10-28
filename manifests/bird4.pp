@@ -2,7 +2,8 @@ class ff_gln_gw::bird4 (
   $router_id = $ff_gln_gw::params::router_id,
   $icvpn_as  = $ff_gln_gw::params::icvpn_as,
   $include_chaos = $ff_gln_gw::params::include_chaos_routes,
-  $include_dn42  = $ff_gln_gw::params::include_dn42_routes
+  $include_dn42  = $ff_gln_gw::params::include_dn42_routes,
+  $provides_uplink = $ff_gln_gw::params::provides_uplink
 ) inherits ff_gln_gw::params {
 
   require ff_gln_gw::resources::repos
@@ -20,25 +21,46 @@ class ff_gln_gw::bird4 (
         Apt::Source['debian-backports']
       ];
   }
- 
-  file {
-    '/etc/bird/bird.conf.d/':
-      ensure => directory,
-      mode => "0755",
-      owner => root,
-      group => root,
-      require => File['/etc/bird/bird.conf'];
-    '/etc/bird/bird.conf':
-      ensure => file,
-      mode => "0644",
-      content => template("ff_gln_gw/etc/bird/bird.conf.erb"),
-      require => [Package['bird'],File['/etc/bird/']];
-    '/etc/bird.conf':
-      ensure => link,
-      target => '/etc/bird/bird.conf',
-      require => File['/etc/bird/bird.conf'],
-      notify => Service['bird'];
-  } 
+
+  if $provides_uplink == "yes" {
+    file {
+      '/etc/bird/bird.conf.d/':
+        ensure => directory,
+        mode => "0755",
+        owner => root,
+        group => root,
+        require => File['/etc/bird/bird.conf'];
+      '/etc/bird/bird.conf':
+        ensure => file,
+        mode => "0644",
+        content => template("ff_gln_gw/etc/bird/bird-provide.conf.erb"),
+        require => [Package['bird'],File['/etc/bird/']];
+      '/etc/bird.conf':
+        ensure => link,
+        target => '/etc/bird/bird.conf',
+        require => File['/etc/bird/bird.conf'],
+        notify => Service['bird'];
+    }
+  } else {
+    file {
+      '/etc/bird/bird.conf.d/':
+        ensure => directory,
+        mode => "0755",
+        owner => root,
+        group => root,
+        require => File['/etc/bird/bird.conf'];
+      '/etc/bird/bird.conf':
+        ensure => file,
+        mode => "0644",
+        content => template("ff_gln_gw/etc/bird/bird.conf.erb"),
+        require => [Package['bird'],File['/etc/bird/']];
+      '/etc/bird.conf':
+        ensure => link,
+        target => '/etc/bird/bird.conf',
+        require => File['/etc/bird/bird.conf'],
+        notify => Service['bird'];
+    }
+  }
 
   service {
     'bird':
