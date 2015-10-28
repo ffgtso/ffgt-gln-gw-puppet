@@ -1,7 +1,4 @@
-table uplnk;
-
 protocol direct {
-#  table uplnk;
   interface "uplink-*";
 }
 
@@ -21,8 +18,9 @@ function is_in_uplink_range() {
 #};
 
 template bgp uplink {
-#  table uplnk;
+  table mesh;
   local as <%= @uplink_as %>;
+  import keep filtered;
   import where is_in_uplink_range();
   export where is_default();
   next hop self;
