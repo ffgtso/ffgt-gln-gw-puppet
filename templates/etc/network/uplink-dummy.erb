@@ -3,3 +3,4 @@ auto dummy0
 iface dummy0 inet static
   address <%=@nat_ip%>
   netmask <%=@nat_netmask%>
+  post-up echo 1 > /proc/sys/net/ipv4/conf/$IFACE/arp_ignore
