@@ -205,11 +205,12 @@ define ff_gln_gw::uplink::tunnel (
   $remote_ip,
   $remote_as,
 ) {
-
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::firewall
   include ff_gln_gw::bird4
+
+  $provides_uplink = $ff_gln_gw::params::provides_uplink
 
   $endpoint_name = $name
   $local_ip = ip_address($local_ipv4)
