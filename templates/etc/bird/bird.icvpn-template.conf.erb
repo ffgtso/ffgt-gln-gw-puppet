@@ -14,7 +14,7 @@ protocol static icvpn_static {
 protocol pipe pipe_bgp_<%=@mesh_code%> {
   table mesh;
   peer table icvpn_<%= @mesh_code %>;
-  import where all;
+  import all;
   export where source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC;
 };
 
