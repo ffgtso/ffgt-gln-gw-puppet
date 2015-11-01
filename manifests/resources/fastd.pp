@@ -28,7 +28,7 @@ class ff_gln_gw::resources::fastd {
     'check_fastd_connections':
       command => '/usr/local/bin/calculate_fastd_threshold.sh',
       user => root,
-      minute => [*],
+      minute => '*',
       require => File['/usr/local/bin/calculate_fastd_threshold.sh'];
   }
 
