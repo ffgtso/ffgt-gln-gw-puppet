@@ -17,6 +17,21 @@ class ff_gln_gw::resources::fastd {
       source => 'puppet:///modules/ff_gln_gw/usr/local/bin/fastd-query';
   }
 
+  file {
+    '/usr/local/bin/calculate_fastd_threshold.sh':
+      ensure => file,
+      mode => '0766',
+      content => template('ff_gln_gw/etc/fastd/calculate_fastd_threshold.sh.erb');
+  }
+
+  cron {
+    'check_fastd_connections':
+      command => '/usr/local/bin/calculate_fastd_threshold.sh',
+      user => root,
+      minute => [0,15,30,45],
+      require => File['/usr/local/bin/calculate_fastd_threshold.sh'];
+  }
+
   package { ['jq','socat']:
     ensure => installed,
     require => Class[ff_gln_gw::resources::repos];
