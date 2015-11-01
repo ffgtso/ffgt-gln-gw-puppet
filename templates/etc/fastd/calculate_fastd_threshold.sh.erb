@@ -6,11 +6,11 @@
 # We use "batctl gwl" as current number of GWs (NUMGATEWAYS)
 # We add 50 to NETWORKSIZE, then do MAXPEERS=NETWORKSIZE/NUMGATEWAYS.
 # Finally we check the number of current fastd connections against MAXPEERS.
-# If we have more connections, we'll just touch /run/shm/FASTD-<%= @mesh_code %>_FULL,
+# If we have more connections, we'll just touch /var/run/FASTD-<%= @mesh_code %>_FULL,
 # otherwise, we delete it.
 #
 # /etc/fastd/<%= @mesh_code %>-mesh-vpn/fastd-blacklist.sh should check for the existence
-# of /run/shm/FASTD_FULL and reject new connections if it's there ...
+# of /var/run//FASTD-<%= @mesh_code %>_FULL and reject new connections if it's there ...
 
 NETWORKSIZE="`/usr/sbin/batctl -m bat-<%= @mesh_code %> o | /usr/bin/wc -l`"
 NUMGATEWAYS="`/usr/sbin/batctl -m bat-<%= @mesh_code %> gwl | /usr/bin/wc -l`"
@@ -22,10 +22,10 @@ MAXPEERS="`/usr/bin/expr ${NETWORKSIZE} / ${NUMGATEWAYS}`"
 CURPEERS="`FASTD_SOCKET=/var/run/fastd-status.<%= @mesh_code %>.sock fastd-query connections`"
 
 if [ ${CURPEERS} -ge ${MAXPEERS} ]; then
-    echo "TOO FULL: Current: ${CURPEERS} Max: ${MAXPEERS}" > /run/shm/FASTD-<%= @mesh_code %>_FULL
+    echo "TOO FULL: Current: ${CURPEERS} Max: ${MAXPEERS}" > /var/run/FASTD-<%= @mesh_code %>_FULL
     /usr/bin/logger "$0: halting new <%= @mesh_code %> fastd connections (${CURPEERS} >= ${MAXPEERS})"
 else
-    /bin/rm -f /run/shm/FASTD-<%= @mesh_code %>_FULL
+    /bin/rm -f /var/run/FASTD-<%= @mesh_code %>_FULL
     /usr/bin/logger "$0: <%= @mesh_code %> fastd to accept new connections again (${CURPEERS} < ${MAXPEERS})"
 fi
 

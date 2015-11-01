@@ -1,7 +1,7 @@
 #!/bin/bash
 # PEER_KEY should be set, see http://fastd.readthedocs.org/en/v15/manual/config.html
 
-if [ -e /run/shm/FASTD-<%= @mesh_code %>_FULL ] ; then
+if [ -e /var/run/FASTD-<%= @mesh_code %>_FULL ] ; then
     /usr/bin/logger "$0: <%= @mesh_code %> fastd rejects $PEER_KEY due to too many connections."
     exit 1
 fi
