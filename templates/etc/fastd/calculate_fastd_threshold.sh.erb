@@ -19,14 +19,22 @@ if [ ${NUMGATEWAYS} -eq 0 ]; then
     NUMGATEWAYS=1
 fi
 MAXPEERS="`/usr/bin/expr ${NETWORKSIZE} / ${NUMGATEWAYS}`"
-CURPEERS="`FASTD_SOCKET=/var/run/fastd-status.<%= @mesh_code %>.sock fastd-query connections`"
+CURPEERS="`FASTD_SOCKET=/var/run/fastd-status.<%= @mesh_code %>.sock /usr/local/bin/fastd-query connections`"
+if [ "X${CURPEERS}" = "X" ]; then
+    /usr/bin/logger "$0: WARNING: empty string reading <%= @mesh_code %> fastd connections"
+    CURPEERS=0
+fi
 
 if [ ${CURPEERS} -ge ${MAXPEERS} ]; then
-    echo "TOO FULL: Current: ${CURPEERS} Max: ${MAXPEERS}" > /var/run/FASTD-<%= @mesh_code %>_FULL
-    /usr/bin/logger "$0: halting new <%= @mesh_code %> fastd connections (${CURPEERS} >= ${MAXPEERS})"
+    if [ ! -e /var/run/FASTD-<%= @mesh_code %>_FULL ]; then
+        echo "TOO FULL: Current: ${CURPEERS} Max: ${MAXPEERS}" > /var/run/FASTD-<%= @mesh_code %>_FULL
+        /usr/bin/logger "$0: halting new <%= @mesh_code %> fastd connections (${CURPEERS} >= ${MAXPEERS})"
+    fi
 else
-    /bin/rm -f /var/run/FASTD-<%= @mesh_code %>_FULL
-    /usr/bin/logger "$0: <%= @mesh_code %> fastd to accept new connections again (${CURPEERS} < ${MAXPEERS})"
+     if [ -e /var/run/FASTD-<%= @mesh_code %>_FULL ]; then
+        /bin/rm -f /var/run/FASTD-<%= @mesh_code %>_FULL
+        /usr/bin/logger "$0: <%= @mesh_code %> fastd to accept new connections again (${CURPEERS} < ${MAXPEERS})"
+     fi
 fi
 
 exit 0
