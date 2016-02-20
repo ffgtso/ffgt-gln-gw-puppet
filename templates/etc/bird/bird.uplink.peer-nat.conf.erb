@@ -1,7 +1,13 @@
+protocol static 'uplink_hostroute_<%= @endpoint_name %>'  {
+  import all;
+  table mesh;
+  route <%= @nat_ip %>/<%= @nat_prefixlen %> reject;
+}
+
 protocol bgp 'uplink_<%= @endpoint_name %>' from uplink {
   source address <%= @local_ip %>;
   neighbor <%= @rem_ip %> as <%= @remote_as %>;
   import where is_default();
-  export where net ~ <%= @nat_ip %>/<%= @nat_prefixlen %>;
+  export where net = <%= @nat_ip %>/<%= @nat_prefixlen %>;
   default bgp_local_pref <%= @bgp_local_pref %>;
 }
