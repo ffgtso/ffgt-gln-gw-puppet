@@ -379,7 +379,7 @@ define ff_gln_gw::uplink::nattunnel (
 
   file_line { "dummy0-${endpoint_name}-addr":
     path => '/etc/network/interfaces.d/dummy0',
-    line => "  post-up ip -4 addr add {$nat_network} dev \$IFACE\n  pre-down ip -4 addr del {$nat_network} dev \$IFACE",
+    line => "  post-up ip -4 addr add ${nat_network} dev \$IFACE\n  pre-down ip -4 addr del ${nat_network} dev \$IFACE",
   } ->
   exec {
     "restart_dummy_interface_0-${endpoint_name}":
