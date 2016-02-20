@@ -393,7 +393,7 @@ define ff_gln_gw::uplink::nattunnel (
 
   # Define Firewall rule for masquerade
   file {
-    '/etc/iptables.d/910-Masquerade-uplink-${endpoint_name}':
+    "/etc/iptables.d/910-Masquerade-uplink-${endpoint_name}":
        ensure => file,
        owner => 'root',
        group => 'root',
