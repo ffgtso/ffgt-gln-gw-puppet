@@ -325,7 +325,7 @@ define ff_gln_gw::uplink::nattunnel (
   $remote_as,
   $nat_network,
   $tunnel_network = "127.0.0.0/8",
-  $bgp_local_pref = 500
+  $bgp_local_pref = 100
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
