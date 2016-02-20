@@ -391,8 +391,6 @@ define ff_gln_gw::uplink::nattunnel (
     chain => 'mesh'
   }
 
-  class { 'ff_gln_gw::uplink': }
-
   # Define Firewall rule for masquerade
   file {
     '/etc/iptables.d/910-Masquerade-uplink-${endpoint_name}':
