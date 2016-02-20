@@ -84,18 +84,12 @@ class ff_gln_gw::uplink::ip (
 }
 
 
-class ff_gln_gw::uplink::natip (
-  $nat_network,
-  $tunnel_network = "127.0.0.0/8",
-) inherits ff_gln_gw::params {
+class ff_gln_gw::uplink::natip () inherits ff_gln_gw::params {
 
   include ff_gln_gw::firewall
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird4
-
-  $nat_ip = ip_address($nat_network)
-  $nat_netmask = ip_netmask($nat_network)
 
   Exec { path => [ "/bin" ] }
   kmod::load { 'dummy':
