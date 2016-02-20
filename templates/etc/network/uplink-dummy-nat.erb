@@ -1,0 +1,6 @@
+# Dummy interface for NAT IPv4
+auto dummy0
+iface dummy0 inet static
+  address 127.255.255.1
+  netmask 255.255.255.255
+  post-up echo 1 > /proc/sys/net/ipv4/conf/$IFACE/arp_ignore

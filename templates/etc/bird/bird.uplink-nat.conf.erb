@@ -1,0 +1,11 @@
+protocol direct {
+  interface "uplink-*";
+  table mesh;
+}
+
+template bgp uplink {
+  table mesh;
+  local as <%= @icvpn_as %>;
+  next hop self;
+  multihop 64;
+}
