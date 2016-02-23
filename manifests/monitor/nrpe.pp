@@ -42,6 +42,16 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_apt.cfg";
   }
 
+  file {
+    '/etc/nagios/nrpe.d/check_procs_name.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_procs_name.cfg";
+  }
+
   ff_gln_gw::firewall::service { 'nrpe':
     ports => ['5666'],
     chains => ['wan'];
