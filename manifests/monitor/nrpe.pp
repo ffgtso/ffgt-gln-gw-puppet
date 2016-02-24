@@ -1,5 +1,7 @@
 class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
-  package { 
+  class { 'sudo': }
+
+  package {
     'nagios-nrpe-server': 
       ensure => installed,
       notify => Service['nagios-nrpe-server'];
@@ -69,6 +71,10 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       group => 'root',
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/usr/lib//nagios/plugins/check_cciss_ffgt";
+  } ->
+  sudo::conf { 'nagios-hwraid':
+    priority => 10,
+    content  => "nagios (ALL)=ALL NOPASSWD:/usr/lib/nagios/plugins/check_cciss_ffgt",
   }
 
   file {
@@ -88,6 +94,10 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       group => 'root',
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/usr/lib//nagios/plugins/check_md_raid_ffgt";
+  } ->
+  sudo::conf { 'nagios-swraid':
+    priority => 10,
+    content  => "nagios (ALL)=ALL NOPASSWD:/usr/lib/nagios/plugins/check_md_raid_ffgt",
   }
 
   file {
