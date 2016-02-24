@@ -1,5 +1,4 @@
-class ff_gln_gw::monitor::nrpe ( $allowed_hosts
-                            ) {
+class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   package { 
     'nagios-nrpe-server': 
       ensure => installed,
@@ -32,6 +31,16 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts
       content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb');
   }
 
+
+  file {
+    '/etc/nagios/nrpe.d/check_apt.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_apt.cfg";
+  }
 
   file {
     '/etc/nagios/nrpe.d/check_disk_root.cfg':
@@ -79,9 +88,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts
   }
 }
 
-define ff_gln_gw::monitor::nrpe::check_command (
-  $command
-) {
+define ff_gln_gw::monitor::nrpe::check_command ( $command ) {
   if defined(Class['ff_gln_gw::monitor::nrpe']) {
     file {
       "/etc/nagios/nrpe.d/check_${name}.cfg":
