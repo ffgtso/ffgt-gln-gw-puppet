@@ -74,7 +74,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   } ->
   sudo::conf { 'nagios-hwraid':
     priority => 10,
-    content  => "nagios (ALL)=ALL NOPASSWD:/usr/lib/nagios/plugins/check_cciss_ffgt",
+    content  => "nagios ALL=(ALL:ALL) NOPASSWD:/usr/lib/nagios/plugins/check_cciss_ffgt -v -p",
   }
 
   file {
@@ -97,7 +97,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   } ->
   sudo::conf { 'nagios-swraid':
     priority => 10,
-    content  => "nagios (ALL)=ALL NOPASSWD:/usr/lib/nagios/plugins/check_md_raid_ffgt",
+    content  => "nagios ALL=(ALL:ALL) NOPASSWD:/usr/lib/nagios/plugins/check_md_raid_ffgt",
   }
 
   file {
