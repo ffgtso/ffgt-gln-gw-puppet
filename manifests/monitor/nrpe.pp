@@ -64,7 +64,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   file {
     '/usr/lib//nagios/plugins/check_cciss_ffgt':
       ensure => file,
-      mode => '0644',
+      mode => '0655',
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
@@ -83,7 +83,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   file {
     '/usr/lib//nagios/plugins/check_md_raid_ffgt':
       ensure => file,
-      mode => '0644',
+      mode => '0655',
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
