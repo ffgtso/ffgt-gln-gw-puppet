@@ -32,14 +32,35 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts
       content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb');
   }
 
-  file { 
-    '/etc/nagios/nrpe.d/check_apt.cfg':
+
+  file {
+    '/etc/nagios/nrpe.d/check_disk_root.cfg':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
-      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_apt.cfg";
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_disk_root.cfg";
+  }
+
+  file {
+    '/etc/nagios/nrpe.d/check_swraid.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_swraid.cfg";
+  }
+
+  file {
+    '/etc/nagios/nrpe.d/check_hwraid.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_hwraid.cfg";
   }
 
   file {
