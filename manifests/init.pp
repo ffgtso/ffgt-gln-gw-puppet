@@ -125,7 +125,30 @@ define ff_gln_gw::mesh(
       icvpn_as => $mesh_as;
     }
   }
- 
+
+  ff_gln_gw::monitor::nrpe::check_command {
+    "ff_default":
+      command => '/usr/lib/nagios/plugins/check_ff_default.sh';
+  } ->
+  file {
+    '/etc/nagios/nrpe.d/check_ff_default.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_ff_default.cfg";
+  } ->
+  file {
+    '/usr/lib//nagios/plugins/check_ff_default.sh':
+      ensure => file,
+      mode => '0655',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/usr/lib//nagios/plugins/check_ff_default.sh";
+  }
+
   # ff_gln_gw::opkg::mirror
   # ff_gln_gw::firmware mirror
 }
@@ -203,6 +226,29 @@ define ff_gln_gw::gateway(
       site_ipv4_prefixlen => $mesh_ipv4_prefixlen,
       icvpn_as => $ff_gln_gw::params::icvpn_as;
     }
+  }
+
+  ff_gln_gw::monitor::nrpe::check_command {
+    "ff_default":
+      command => '/usr/lib/nagios/plugins/check_ff_default.sh';
+  } ->
+  file {
+    '/etc/nagios/nrpe.d/check_ff_default.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_ff_default.cfg";
+  } ->
+  file {
+    '/usr/lib//nagios/plugins/check_ff_default.sh':
+      ensure => file,
+      mode => '0655',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/usr/lib//nagios/plugins/check_ff_default.sh";
   }
 
   # ff_gln_gw::opkg::mirror
