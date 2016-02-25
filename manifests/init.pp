@@ -4,15 +4,6 @@ class ff_gln_gw::monitor::install_ff_default () {
       command => '/usr/lib/nagios/plugins/check_ff_default.sh';
   } ->
   file {
-    '/etc/nagios/nrpe.d/check_ff_default.cfg':
-      ensure => file,
-      mode => '0644',
-      owner => 'root',
-      group => 'root',
-      require => Package['nagios-nrpe-server'],
-      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_ff_default.cfg";
-  } ->
-  file {
     '/usr/lib//nagios/plugins/check_ff_default.sh':
       ensure => file,
       mode => '0655',
