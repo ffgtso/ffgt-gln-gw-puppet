@@ -2,6 +2,10 @@ define ff_gln_gw::monitor::rrd_traffic (
   $rrd_interfaces, # YAML file with interface, description
   $rrd_upload_url  # URL to upload data to (e. g. http://guetersloh.freifunk.net/rrd_traffic_upload.php)
 ) {
+  package {
+    'perl-base':
+      ensure => installed;
+  }
 
   file { 
     '/root/rrd_traffic_slave.pl':
