@@ -9,7 +9,7 @@ define ff_gln_gw::monitor::rrd_traffic (
       mode => '0755',
       owner => 'root',
       group => 'root',
-      require => Package['perl'],
+      require => Package['perl-base'],
       content => template('ff_gln_gw/root/rrd_traffic_slave.pl.erb');
   }
 
