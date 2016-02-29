@@ -5,6 +5,8 @@ define ff_gln_gw::monitor::rrd_traffic (
   package {
     'perl-base':
       ensure => installed;
+    'librrds-perl':
+      ensure => installed;
   }
 
   file { 
