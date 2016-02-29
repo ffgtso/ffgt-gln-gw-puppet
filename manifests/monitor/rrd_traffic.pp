@@ -7,6 +7,8 @@ define ff_gln_gw::monitor::rrd_traffic (
       ensure => installed;
     'librrds-perl':
       ensure => installed;
+    'curl':
+      ensure => installed;
   }
 
   file { 
