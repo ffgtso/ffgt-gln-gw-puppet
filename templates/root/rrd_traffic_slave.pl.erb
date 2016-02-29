@@ -1,0 +1,266 @@
+#!/usr/bin/perl
+#
+# copyright Martin Pot 2003
+# http://martybugs.net/linux/rrdtool/traffic.cgi
+#
+# rrd_traffic.pl
+
+# use RRDs;
+
+my $SLAVEMODE="no";
+#my $SLAVEMODE=0;
+# in slave mode, where to save the data?
+my $slavedatadir="/tmp/rrd_traffic_data";
+# in slavedata mode, what's the filename?
+my $SLAVEDATAFILE="/dev/null";
+# define location of rrdtool databases
+my $rrd = '/data2/rrds';
+# define location of images
+my $img = '/data2/www-sites/ffgt/noc/rrd';
+my $hostname=`/bin/uname -n`;
+chomp($hostname);
+
+if($ARGV[0] eq "--slave") {
+    $SLAVEMODE="slave";
+}
+
+if($ARGV[0] eq "--slavedata") {
+    $SLAVEMODE="slavedata";
+    $SLAVEDATAFILE=$ARGV[1];
+}
+
+if ($SLAVEMODE eq "no") {
+    use RRDs;
+}
+
+$PROC="/proc";			# Proc directory, usually /proc
+
+if($SLAVEMODE eq "slavedata") {
+    &ProcessDataFile($SLAVEDATAFILE);
+} else {
+    # process data for each interface (add/delete as required)
+<% rrd_ifs = YAML.load_file(@rrd_interfaces); -%>
+<% rrd_ifs.each_pair do |name,text| -%>
+    &ProcessInterface("<%=name%>", "<%=text%>");
+<% end -%>
+}
+
+sub ProcessInterface
+{
+# process interface
+# inputs: $_[0]: interface name (ie, eth0/eth1/eth2/ppp0)
+#	  $_[1]: interface description 
+
+    my $i, $line, $if_name, $dumb, $if_in_b,  $if_in_p, $if_in_e,  $if_in_d;
+    my $if_in_ff, $if_in_fr, $if_in_c,  $if_in_m, $if_out_b, $if_out_p;
+    my $if_out_e, $if_out_d, $if_out_ff,$if_out_cl, $if_out_ca, $if_out_cp;
+    my $ok;
+
+    open (F_NET_DEV, "<$PROC/net/dev");
+    $i=0;
+    $in=0;
+    $out=0;
+    while ($line=<F_NET_DEV>) {
+	if ($i==0 && $line=~/:/) {
+	    ($if_name,$line)=split /: */, $line;
+	    ($dumb, $if_name)=split /^ +/, $if_name;
+	    if(length($dumb)>2) { $if_name=$dumb; }
+	    if($if_name eq $_[0]) {
+		$i=1;
+		(  $if_in_b,  $if_in_p, $if_in_e,  $if_in_d,
+		   $if_in_ff, $if_in_fr, $if_in_c,  $if_in_m,
+		   $if_out_b, $if_out_p, $if_out_e, $if_out_d,
+		   $if_out_ff,$if_out_cl, $if_out_ca, $if_out_cp
+		   ) = split / +/,$line;
+		$in=$if_in_b;
+		$out=$if_out_b;
+		$inp=$if_in_p;
+		$outp=$if_out_p;
+	    }
+	}
+    }
+    close (F_NET_DEV);
+
+	# remove eol chars
+	chomp($in);
+	chomp($out);
+	chomp($inp);
+	chomp($outp);
+
+	print "$hostname $_[0] traffic in, out: $in, $out\n";
+
+    if($SLAVEMODE eq "slave") {
+	my $now=time();
+	if (! -e $slavedatadir ) {
+	    $ok=mkdir($slavedatadir, 0755);
+	    if ($ok != 0) {
+		print "$hostname $_[0] cannot create $slavedatadir\n";
+	    }	    
+	}
+	open (MYFILE, ">> $slavedatadir/$hostname-$_[0].data");
+
+	print MYFILE "$hostname;$_[0].rrd;in:out:inp:outp;$now:$in:$out:$inp:$outp;$_[1]\n";
+	close(MYFILE);
+
+    } elsif ($SLAVEMODE eq "no") {
+	# if rrdtool database doesn't exist, create it
+	if (! -e "$rrd/$hostname-$_[0].rrd")
+	{
+		print "creating rrd database for $hostname $_[0] interface...\n";
+		RRDs::create "$rrd/$hostname-$_[0].rrd",
+			"-s 300",
+			"DS:in:DERIVE:600:0:125000000",
+			"DS:out:DERIVE:600:0:125000000",
+			"DS:inp:DERIVE:600:0:1250000",
+			"DS:outp:DERIVE:600:0:1250000",
+			"RRA:AVERAGE:0.5:1:576",
+			"RRA:AVERAGE:0.5:6:672",
+			"RRA:AVERAGE:0.5:24:732",
+			"RRA:AVERAGE:0.5:144:1460";
+	}
+
+	# insert values into rrd
+	RRDs::update "$rrd/$hostname-$_[0].rrd",
+		"-t", "in:out:inp:outp",
+		"N:$in:$out:$inp:$outp";
+
+        if ($ERROR = RRDs::error) {
+	    print "$0: unable to update $_[0] rrd: $ERROR\n";
+	}
+
+	# create traffic graphs
+	&CreateGraph($_[0], "hour", $_[1]);
+	&CreateGraph($_[0], "day", $_[1]);
+	&CreateGraph($_[0], "week", $_[1]);
+	&CreateGraph($_[0], "month", $_[1]); 
+	&CreateGraph($_[0], "year", $_[1]);
+    }
+}
+
+sub CreateGraph
+{
+# creates graph
+# inputs: $_[0]: interface name (ie, eth0/eth1/eth2/ppp0)
+#	  $_[1]: interval (ie, day, week, month, year)
+#	  $_[2]: interface description 
+
+	if (! -e $img ) {
+	    $ok=mkdir($img, 0755);
+	    if ($ok != 0) {
+		print "$hostname $_[0] cannot create $img\n";
+	    }	    
+	}
+	RRDs::graph "$img/$hostname-$_[0]bit-$_[1].png",
+		"-s -1$_[1]",
+		"-t traffic on $hostname $_[0] :: $_[2]",
+		"--lazy",
+		"-h", "140", "-w", "600",
+		"-l 0",
+		"-a", "PNG",
+		"-v bit/sec",
+		"DEF:in=$rrd/$hostname-$_[0].rrd:in:AVERAGE",
+		"DEF:out=$rrd/$hostname-$_[0].rrd:out:AVERAGE",
+		"CDEF:in_bit=in,8,*",
+		"CDEF:out_bit=out,8,*",
+		"CDEF:out_negbit=out_bit,-1,*",
+		"CDEF:out_neg=out,-1,*",
+		"AREA:in_bit#32CD32:Incoming",
+		"LINE1:in_bit#336600",
+		"GPRINT:in_bit:MAX:  Max\\: %5.1lf %s",
+		"GPRINT:in_bit:AVERAGE: Avg\\: %5.1lf %S",
+		"GPRINT:in_bit:MIN: Min\\: %5.1lf %S",
+		"GPRINT:in_bit:LAST: Current\\: %5.1lf %Sbit/sec\\n",
+		"AREA:out_negbit#4169E1:Outgoing",
+		"LINE1:out_negbit#0033CC",
+		"GPRINT:out_bit:MAX:  Max\\: %5.1lf %S",
+		"GPRINT:out_bit:AVERAGE: Avg\\: %5.1lf %S",
+		"GPRINT:out_bit:MIN: Min\\: %5.1lf %S",
+		"GPRINT:out_bit:LAST: Current\\: %5.1lf %Sbit/sec\\n",
+		"HRULE:0#000000";
+	if ($ERROR = RRDs::error) { print "$0: unable to generate $_[0] $_[1] traffic graph: $ERROR\n"; }
+
+	RRDs::graph "$img/$hostname-$_[0]pkt-$_[1].png",
+		"-s -1$_[1]",
+		"-t traffic on $hostname $_[0] :: $_[2]",
+		"--lazy",
+		"-h", "140", "-w", "600",
+		"-l 0",
+		"-a", "PNG",
+		"-v Packets",
+		"DEF:in=$rrd/$hostname-$_[0].rrd:inp:AVERAGE",
+		"DEF:out=$rrd/$hostname-$_[0].rrd:outp:AVERAGE",
+		"CDEF:in_pkt=in,1,*",
+		"CDEF:out_pkt=out,1,*",
+		"CDEF:out_negpkt=out_pkt,-1,*",
+		"CDEF:out_neg=out,-1,*",
+		"AREA:in_pkt#32CD32:Incoming",
+		"LINE1:in_pkt#336600",
+		"GPRINT:in_pkt:MAX:  Max\\: %5.1lf %s",
+		"GPRINT:in_pkt:AVERAGE: Avg\\: %5.1lf %S",
+		"GPRINT:in_pkt:MIN: Min\\: %5.1lf %S",
+		"GPRINT:in_pkt:LAST: Current\\: %5.1lf %Spkt/sec\\n",
+		"AREA:out_negpkt#4169E1:Outgoing",
+		"LINE1:out_negpkt#0033CC",
+		"GPRINT:out_pkt:MAX:  Max\\: %5.1lf %S",
+		"GPRINT:out_pkt:AVERAGE: Avg\\: %5.1lf %S",
+		"GPRINT:out_pkt:MIN: Min\\: %5.1lf %S",
+		"GPRINT:out_pkt:LAST: Current\\: %5.1lf %Spkt/sec\\n",
+		"HRULE:0#000000";
+	if ($ERROR = RRDs::error) { print "$0: unable to generate $_[0] $_[1] packet graph: $ERROR\n"; }
+}
+
+sub ProcessDataFile
+{
+# process data file
+# inputs: $_[0]: filename
+#
+# Contents:
+# nslug-1 eth0.9.rrd in:out:inp:outp 1392596776:3476196090:112515852:1149908401:616969635 "Uplink FB"
+#
+
+    my $interface, $args, $values, $desc, $line, $rrdstarttime;
+    if (! -e "$_[0]") {
+	printf("Cannot open $_[0] ...\n");
+	return;
+    }
+    open (F_DATA, $_[0]);
+    while ($line=<F_DATA>) {
+        chomp($line);
+        ($hostname, $interface, $args, $values, $desc)=split /;/, $line;
+        $interface =~ s/\.rrd//g;
+	($rrdstarttime)=split /:/, $values;
+        $rrdstarttime-=1;
+        printf("$hostname, $interface, $args, $values, $desc ($rrdstarttime)\n");
+	if (! -e "$rrd/$hostname-$interface.rrd")
+	{
+	    print "creating rrd database for $hostname $interface ...\n";
+	    RRDs::create("$rrd/$hostname-$interface.rrd",
+	        "--start", $rrdstarttime, "-s 300",
+		"DS:in:DERIVE:600:0:125000000",
+		"DS:out:DERIVE:600:0:125000000",
+		"DS:inp:DERIVE:600:0:1250000",
+		"DS:outp:DERIVE:600:0:1250000",
+		"RRA:AVERAGE:0.5:1:576",
+		"RRA:AVERAGE:0.5:6:672",
+		"RRA:AVERAGE:0.5:24:732",
+		"RRA:AVERAGE:0.5:144:1460");
+	}
+
+	# insert values into rrd
+	RRDs::update "$rrd/$hostname-$interface.rrd", "-t", "$args", "$values";
+
+        if ($ERROR = RRDs::error) {
+	    print "$0: unable to update $hostname $interface rrd: $ERROR\n";
+	}
+    }
+    close (F_DATA);
+
+    # create traffic graphs
+    &CreateGraph($interface, "hour",  $desc);
+    &CreateGraph($interface, "day",   $desc);
+    &CreateGraph($interface, "week",  $desc);
+    &CreateGraph($interface, "month", $desc); 
+    &CreateGraph($interface, "year",  $desc);
+
+    unlink($_[0]);
+}

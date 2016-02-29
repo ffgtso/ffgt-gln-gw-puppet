@@ -1,0 +1,24 @@
+#!/bin/bash
+
+pwd="`pwd`"
+tmpfile="/tmp/upload-$$"
+
+cd /tmp/rrd_traffic_data/
+for i in *.data
+do
+    /usr/bin/curl --silent --form "file_contents=@$i" <%= @rrd_upload_url %> >${tmpfile} 2>/dev/null
+    RCcurl=$?
+    /bin/grep "successfully uploaded" ${tmpfile} 2>&1 >/dev/null
+    RCgrep=$?
+
+    if [ $RCcurl -ne 0 -o $RCgrep -ne 0 ]; then
+        echo "$0: An error occured! Check ${tmpfile} ..."
+        cd "$pwd"
+        exit 1
+    else
+        echo "Removing source file $i ..."
+        /bin/rm $i
+    fi
+done
+/bin/rm ${tmpfile}
+cd "$pwd"
