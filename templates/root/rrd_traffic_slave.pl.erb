@@ -41,7 +41,7 @@ if($SLAVEMODE eq "slavedata") {
     # process data for each interface (add/delete as required)
 <% rrd_ifs = YAML.load_file(@rrd_interfaces); -%>
 <% rrd_ifs.each_pair do |name,node| -%>
-    &ProcessInterface("<%=name%>", "<%=node['desc']'%>");
+    &ProcessInterface("<%=name%>", "<%=node['desc']%>");
 <% end -%>
 }
 
