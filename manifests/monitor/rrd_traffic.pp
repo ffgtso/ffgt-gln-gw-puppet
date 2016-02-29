@@ -24,7 +24,7 @@ define ff_gln_gw::monitor::rrd_traffic (
 
   cron {
    'rrd_traffic_slave':
-     command => '/root/rrd_traffic_slave.pl --slave >/dev/null 2>&1'.
+     command => '/root/rrd_traffic_slave.pl --slave >/dev/null 2>&1',
      user    => root,
      minute  => '*/5',
      hour    => '*',
@@ -33,7 +33,7 @@ define ff_gln_gw::monitor::rrd_traffic (
 
   cron {
    'rrd_traffic_upload':
-     command => 'sleep 20 ; /root/rrd_traffic_upload.sh >/dev/null 2>&1'.
+     command => 'sleep 20 ; /root/rrd_traffic_upload.sh >/dev/null 2>&1',
      user    => root,
      minute  => '*/5',
      hour    => '*',
