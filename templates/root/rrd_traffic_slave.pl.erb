@@ -7,7 +7,7 @@
 
 # use RRDs;
 
-my $SLAVEMODE="no";
+$SLAVEMODE="no";
 #my $SLAVEMODE=0;
 # in slave mode, where to save the data?
 my $slavedatadir="/tmp/rrd_traffic_data";
@@ -90,50 +90,49 @@ sub ProcessInterface
 	print "$hostname $_[0] traffic in, out: $in, $out\n";
 
     if($SLAVEMODE eq "slave") {
-	my $now=time();
-	if (! -e $slavedatadir ) {
-	    $ok=mkdir($slavedatadir, 0755);
-	    if ($ok != 0) {
-		print "$hostname $_[0] cannot create $slavedatadir\n";
-	    }	    
-	}
-	open (MYFILE, ">> $slavedatadir/$hostname-$_[0].data");
+	    my $now=time();
+	    if (! -e $slavedatadir ) {
+	        $ok=mkdir($slavedatadir, 0755);
+	        if ($ok != 0) {
+		        print "$hostname $_[0] cannot create $slavedatadir\n";
+	        }
+	    }
+	    open (MYFILE, ">> $slavedatadir/$hostname-$_[0].data");
 
-	print MYFILE "$hostname;$_[0].rrd;in:out:inp:outp;$now:$in:$out:$inp:$outp;$_[1]\n";
-	close(MYFILE);
-
+	    print MYFILE "$hostname;$_[0].rrd;in:out:inp:outp;$now:$in:$out:$inp:$outp;$_[1]\n";
+	    close(MYFILE);
     } elsif ($SLAVEMODE eq "no") {
-	# if rrdtool database doesn't exist, create it
-	if (! -e "$rrd/$hostname-$_[0].rrd")
-	{
-		print "creating rrd database for $hostname $_[0] interface...\n";
-		RRDs::create "$rrd/$hostname-$_[0].rrd",
-			"-s 300",
-			"DS:in:DERIVE:600:0:125000000",
-			"DS:out:DERIVE:600:0:125000000",
-			"DS:inp:DERIVE:600:0:1250000",
-			"DS:outp:DERIVE:600:0:1250000",
-			"RRA:AVERAGE:0.5:1:576",
-			"RRA:AVERAGE:0.5:6:672",
-			"RRA:AVERAGE:0.5:24:732",
-			"RRA:AVERAGE:0.5:144:1460";
-	}
+	    # if rrdtool database doesn't exist, create it
+	    if (! -e "$rrd/$hostname-$_[0].rrd")
+	    {
+		    print "creating rrd database for $hostname $_[0] interface...\n";
+		    RRDs::create "$rrd/$hostname-$_[0].rrd",
+			    "-s 300",
+			    "DS:in:DERIVE:600:0:125000000",
+			    "DS:out:DERIVE:600:0:125000000",
+			    "DS:inp:DERIVE:600:0:1250000",
+			    "DS:outp:DERIVE:600:0:1250000",
+			    "RRA:AVERAGE:0.5:1:576",
+			    "RRA:AVERAGE:0.5:6:672",
+			    "RRA:AVERAGE:0.5:24:732",
+			    "RRA:AVERAGE:0.5:144:1460";
+	    }
 
-	# insert values into rrd
-	RRDs::update "$rrd/$hostname-$_[0].rrd",
-		"-t", "in:out:inp:outp",
-		"N:$in:$out:$inp:$outp";
+	    # insert values into rrd
+	    RRDs::update "$rrd/$hostname-$_[0].rrd",
+		    "-t", "in:out:inp:outp",
+		    "N:$in:$out:$inp:$outp";
 
-        if ($ERROR = RRDs::error) {
-	    print "$0: unable to update $_[0] rrd: $ERROR\n";
-	}
+            if ($ERROR = RRDs::error) {
+	            print "$0: unable to update $_[0] rrd: $ERROR\n";
+	    }
 
-	# create traffic graphs
-	&CreateGraph($_[0], "hour", $_[1]);
-	&CreateGraph($_[0], "day", $_[1]);
-	&CreateGraph($_[0], "week", $_[1]);
-	&CreateGraph($_[0], "month", $_[1]); 
-	&CreateGraph($_[0], "year", $_[1]);
+	    # create traffic graphs
+	    &CreateGraph($_[0], "hour", $_[1]);
+	    &CreateGraph($_[0], "day", $_[1]);
+	    &CreateGraph($_[0], "week", $_[1]);
+	    &CreateGraph($_[0], "month", $_[1]);
+	    &CreateGraph($_[0], "year", $_[1]);
     }
 }
 
