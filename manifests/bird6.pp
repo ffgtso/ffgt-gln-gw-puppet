@@ -113,6 +113,7 @@ define ff_gln_gw::bird6::srv (
 
 define ff_gln_gw::bird6::ospf (
   $mesh_code,
+  $range_ipv6,
   $ospf_peerings, # YAML data file for local backbone peerings
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
