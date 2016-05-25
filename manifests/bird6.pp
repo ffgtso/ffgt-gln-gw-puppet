@@ -117,8 +117,8 @@ define ff_gln_gw::bird6::ospf (
   $ospf_peerings, # YAML data file for local backbone peerings
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
-  $have_ospf_links = "no"     # Actually require & use $ospf_links
-  $ospf_type = "root"        # root/leaf: root reexports routes, leaf only exports statics.
+  $have_ospf_links = "no",    # Actually require & use $ospf_links
+  $ospf_type = "root"         # root/leaf: root reexports routes, leaf only exports statics.
 ) {
 
   include ff_gln_gw::bird6
