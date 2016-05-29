@@ -12,6 +12,11 @@
 # /etc/fastd/<%= @mesh_code %>-mesh-vpn/fastd-blacklist.sh should check for the existence
 # of /var/run//FASTD-<%= @mesh_code %>_FULL and reject new connections if it's there ...
 
+if [ ! -e /var/run/fastd-status.<%= @mesh_code %>.sock ]; then
+  /usr/bin/logger "$0: WARNING: no fastd-status socket for <%= @mesh_code %>, is fastd running?"
+  exit 0
+fi
+
 NETWORKSIZE="`/usr/sbin/batctl -m bat-<%= @mesh_code %> o | /usr/bin/wc -l`"
 NUMGATEWAYS="`/usr/sbin/batctl -m bat-<%= @mesh_code %> gwl | /usr/bin/wc -l`"
 NETWORKSIZE="`/usr/bin/expr ${NETWORKSIZE} + 50`"
