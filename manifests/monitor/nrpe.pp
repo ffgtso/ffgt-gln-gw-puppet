@@ -52,6 +52,10 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       group => 'root',
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_disk.cfg";
+  } ->
+  sudo::conf { 'nagios-disk':
+    priority => 10,
+    content  => "nagios ALL=(ALL:ALL) NOPASSWD:/usr/lib/nagios/plugins/check_disk",
   }
 
   file {
