@@ -7,6 +7,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       notify => Service['nagios-nrpe-server'];
     'nagios-plugins':
       ensure => installed;
+      notify => Service['nagios-nrpe-server'];
     'cron-apt': 
       ensure => installed;
   } 
