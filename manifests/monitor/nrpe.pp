@@ -78,6 +78,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_swraid.cfg";
   } ->
+
   file {
     '/usr/lib//nagios/plugins/check_cciss_ffgt':
       ensure => file,
@@ -101,6 +102,7 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_hwraid.cfg";
   } ->
+
   file {
     '/usr/lib//nagios/plugins/check_md_raid_ffgt':
       ensure => file,
@@ -123,6 +125,20 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       group => 'root',
       require => Package['nagios-nrpe-server'],
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_procs_name.cfg";
+  }
+
+  file {
+    '/etc/nagios/nrpe.d/check_docker.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_docker.cfg";
+  } ->
+  sudo::conf { 'nagios-docker':
+    priority => 10,
+    content  => "nagios ALL=(ALL:ALL) NOPASSWD:/usr/lib/nagios/plugins/check_docker.py",
   }
 
   ff_gln_gw::firewall::service { 'nrpe':
