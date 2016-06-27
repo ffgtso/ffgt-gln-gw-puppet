@@ -31,9 +31,9 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
-      content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb');
+      content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb'),
+      notify  => [Service['nagios-nrpe-server']];
   }
-
 
   file {
     '/etc/nagios/nrpe.d/check_apt.cfg':
@@ -99,7 +99,8 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
-      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_docker.cfg";
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_docker.cfg",
+      notify  => [Service['nagios-nrpe-server']];
   } ->
   file {
     '/usr/lib/nagios/plugins/check_docker.py':
