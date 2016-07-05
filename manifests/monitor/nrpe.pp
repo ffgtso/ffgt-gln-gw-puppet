@@ -60,6 +60,16 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   }
 
   file {
+    '/etc/nagios/nrpe.d/check_swap.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_swap.cfg";
+  }
+
+  file {
     '/etc/nagios/nrpe.d/check_disk_root.cfg':
       ensure => file,
       mode => '0644',
