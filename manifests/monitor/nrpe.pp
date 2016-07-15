@@ -2,15 +2,15 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   class { 'sudo': }
 
   package {
-    'nagios-nrpe-server': 
+    'nagios-nrpe-server':
       ensure => installed,
       notify => Service['nagios-nrpe-server'];
     'nagios-plugins':
       ensure => installed,
       notify => Service['nagios-nrpe-server'];
-    'cron-apt': 
+    'cron-apt':
       ensure => installed;
-  } 
+  }
 
   service {
     'nagios-nrpe-server':
@@ -24,14 +24,25 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
        ];
   }
 
-  file { 
-    '/etc/nagios/nrpe.d/allowed_hosts.cfg': 
-      ensure => file, 
+  file {
+    '/etc/nagios/nrpe.d/allowed_hosts.cfg':
+      ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
       require => Package['nagios-nrpe-server'],
       content => template('ff_gln_gw/etc/nagios/nrpe.d/allowed_hosts.cfg.erb'),
+      notify  => [Service['nagios-nrpe-server']];
+  }
+
+  file {
+    '/etc/nagios/nrpe.d/check_procs.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      content => template('ff_gln_gw/etc/nagios/nrpe.d/check_procs.cfg.erb'),
       notify  => [Service['nagios-nrpe-server']];
   }
 
