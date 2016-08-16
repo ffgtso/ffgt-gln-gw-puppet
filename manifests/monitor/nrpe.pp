@@ -137,6 +137,26 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
     content  => "nagios ALL=(ALL:ALL) NOPASSWD:/usr/lib/nagios/plugins/check_docker.py",
   }
 
+    file {
+    '/etc/nagios/nrpe.d/check_kernel.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_kernel.cfg",
+      notify  => [Service['nagios-nrpe-server']];
+  } ->
+  file {
+    '/usr/lib/nagios/plugins/check_deb_kernel_version':
+      ensure => file,
+      mode => '0755',
+      owner => 'root',
+      group => 'root',
+      require => Package['nagios-nrpe-server'],
+      source => "puppet:///modules/ff_gln_gw/usr/lib/nagios/plugins/check_deb_kernel_version";
+  }
+
   file {
     '/etc/nagios/nrpe.d/check_hwraid.cfg':
       ensure => file,
