@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+#    Copyright P.S. Computer Services Ltd 2014
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    This is a Nagios plugin to be used on dpkg/deb based Linux hosts.  
+#    e.g. Debian, Ubuntu etc
+#    It determines whether the running kernel is up to date with the installed kernels,
+#    or whether the host has a mis-matching kernel.  i.e. the host needs a reboot.
+#    Please note that if you haven't installed the latest kernel via apt or aptitude
+#    then this will not be flagged up.  You shoudl also run a Nagios plugin that 
+#    looks for packages that need upgrading.
+
+
+# Nagios plugin exit codes
+OK=0;
+#WARNING=1;
+CRITICAL=2;
+#UNKNOWN=3;
+
+
+LATEST_KERNEL=$(dpkg-query --search vmlinuz-* | sort -V | tail -1 | cut -d " " -f1 | sed 's/://g' | sed 's/linux-image-//g')
+
+RUNNING_KERNEL=$(uname -r)
+
+if [ "$LATEST_KERNEL" = "$RUNNING_KERNEL" ]; then
+  echo "OK - Running kernel ( $RUNNING_KERNEL ) = most recent on disk kernel ( $LATEST_KERNEL )"
+  exit $OK
+else
+  echo "CRITICAL - Reboot required. Running kernel $RUNNING_KERNEL is too old, newest kernel on disk is $LATEST_KERNEL"
+  exit $CRITICAL
+fi
+
+
+
