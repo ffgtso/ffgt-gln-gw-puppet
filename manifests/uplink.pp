@@ -315,6 +315,86 @@ define ff_gln_gw::uplink::tunnel (
   }
 }
 
+# Sets up a tunnel for v4 & v6, expects /64 for v6 P2P link ...
+define ff_gln_gw::uplink::tunnelDS (
+  $local_public_ip,
+  $remote_public_ip,
+  $local_ipv6,
+  $remote_ipv6,
+  $local_ipv4,
+  $remote_ip,              # really should be "remote_ipv4" FIXME!
+  $tunnel_mtu = 1426,
+  $remote_as,
+) {
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::firewall
+  include ff_gln_gw::bird4
+  include ff_gln_gw::bird6
+
+  $provides_uplink = $ff_gln_gw::params::provides_uplink
+
+  $endpoint_name = $name
+  $local_ip = ip_address($local_ipv4)
+  $local_netmask = ip_netmask($local_ipv4)
+  $rem_ip = ip_address($remote_ip)
+  $rem_prefix = ip_prefix($remote_ip)
+  $rem_prefixlen = ip_prefixlen($remote_ip)
+
+  Class['ff_gln_gw::resources::network'] ->
+  file {
+    "/etc/network/interfaces.d/uplink-${endpoint_name}":
+      ensure => file,
+      content => template("ff_gln_gw/etc/network/uplink-gre-DS.erb");
+  } ->
+  exec {
+    "start_uplink_${endpoint_name}_interface":
+      command => "/sbin/ifup uplink-${endpoint_name}",
+      unless  => "/bin/ip link show dev uplink-${endpoint_name}' 2> /dev/null",
+      require => [ File_Line["/etc/iproute2/rt_tables"]
+                 , Class[ff_gln_gw::resources::sysctl]
+                 ];
+  }
+
+  file_line { "bird-uplink-${endpoint_name}-include":
+    path => '/etc/bird/bird.conf.d/uplink.conf',
+    line => "include \"/etc/bird/bird.conf.d/uplink.${endpoint_name}.conf\";",
+    require => File['/etc/bird/bird.conf.d/uplink.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/uplink.${endpoint_name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.uplink.peer.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-uplink-include"],
+      Service['bird']
+    ]
+  }
+
+  file_line { "bird6-uplink-${endpoint_name}-include":
+    path => '/etc/bird/bird6.conf.d/uplink.conf',
+    line => "include \"/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf\";",
+    require => File['/etc/bird/bird6.conf.d/uplink.conf'],
+    notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.uplink.peer.conf.erb"),
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    notify  => [
+      File_line["bird6-uplink-include"],
+      Service['bird6']
+    ]
+  }
+
+  ff_gln_gw::firewall::forward { "uplink-${name}":
+    chain => 'mesh'
+  }
+}
+
 
 define ff_gln_gw::uplink::nattunnel (
   $local_public_ip,
