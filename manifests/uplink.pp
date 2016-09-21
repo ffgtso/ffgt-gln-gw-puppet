@@ -357,6 +357,7 @@ define ff_gln_gw::uplink::tunnelDS (
   include ff_gln_gw::bird6
 
   $provides_uplink = $ff_gln_gw::params::provides_uplink
+  $icvpn_as  = $ff_gln_gw::params::icvpn_as
 
   $endpoint_name = $name
   $local_ip = ip_address($local_ipv4)
@@ -523,7 +524,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   $nat_network,
   $v6_network,
   $tunnel_network = "127.0.0.0/8",
-  $bgp_local_pref = 100
+  $bgp_local_pref = 100,
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -536,6 +537,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   $nat_prefixlen = ip_prefixlen($nat_network)
 
   $provides_uplink = $ff_gln_gw::params::provides_uplink
+  $icvpn_as  = $ff_gln_gw::params::icvpn_as
 
   $endpoint_name = $name
   $local_ip = ip_address($local_ipv4)
