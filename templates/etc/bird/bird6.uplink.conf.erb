@@ -1,0 +1,19 @@
+protocol direct {
+  interface "uplink-*";
+  table mesh;
+}
+
+protocol static uplink_hostroute {
+  import all;
+  table mesh;
+  route <%= @v6_network %> reject;
+}
+
+template bgp uplink {
+  table mesh;
+  local as <%= @icvpn_as %>;
+  import where is_default();
+  export where proto = "uplink_hostroute";
+  next hop self;
+  multihop 64;
+}

@@ -12,11 +12,11 @@ class ff_gln_gw::uplink (
   }
 }
 
+
 class ff_gln_gw::uplink::ip (
   $nat_network,
   $tunnel_network = "127.0.0.0/8",
 ) inherits ff_gln_gw::params {
-
   include ff_gln_gw::firewall
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -85,7 +85,6 @@ class ff_gln_gw::uplink::ip (
 
 
 class ff_gln_gw::uplink::natip () inherits ff_gln_gw::params {
-
   include ff_gln_gw::firewall
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -143,12 +142,43 @@ class ff_gln_gw::uplink::natip () inherits ff_gln_gw::params {
 }
 
 
+class ff_gln_gw::uplink::ipv6 () inherits ff_gln_gw::params {
+  include ff_gln_gw::firewall
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::bird6
+
+  Exec { path => [ "/bin" ] }
+  kmod::load { 'dummy':
+    ensure => present,
+  }
+
+  class { 'ff_gln_gw::uplink': }
+
+  file_line { "bird6-uplink-include":
+    path => '/etc/bird/bird6.conf',
+    line => "include \"/etc/bird/bird6.conf.d/uplink.conf\";",
+    require => File['/etc/bird/bird6.conf'],
+    notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/uplink.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.uplink.conf.erb"),
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    notify  => [
+      File_line["bird6-uplink-include"],
+      Service['bird6']
+    ]
+  }
+}
+
+
 class ff_gln_gw::uplink::provide (
   $nat_network,
   $tunnel_network,
   $uplink_as,
 ) inherits ff_gln_gw::params {
-
   include ff_gln_gw::firewall
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -179,12 +209,12 @@ class ff_gln_gw::uplink::provide (
   }
 }
 
+
 class ff_gln_gw::uplink::bgp (
   $nat_network = "127.0.0.1/32",
   $tunnel_network = "127.0.0.0/8",
   $do_nat = "yes"
 ) inherits ff_gln_gw::params {
-
   include ff_gln_gw::firewall
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -324,7 +354,8 @@ define ff_gln_gw::uplink::tunnelDS (
   $local_ipv4,
   $remote_ip,              # really should be "remote_ipv4" FIXME!
   $tunnel_mtu = 1426,
-  $remote_as,
+  $v6_network,
+ $remote_as,
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -494,6 +525,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   $remote_ipv6,
   $remote_as,
   $nat_network,
+  $v6_network,
   $tunnel_network = "127.0.0.0/8",
   $bgp_local_pref = 100
 ) {
