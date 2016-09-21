@@ -12,11 +12,11 @@ iface uplink-<%= @endpoint_name %> inet static
   pre-down  /sbin/ip -6 addr del <%= @local_ipv6 %>/64 dev $IFACE
   post-up   /sbin/ip -6 route add <%= @local_ipv6 %>/64 dev $IFACE table 42
   pre-down  /sbin/ip -6 route del <%= @local_ipv6 %>/64 dev $IFACE table 42
-  post-up   /sbin/ip -6 rule add from <%= @local_ipv6_prefix %>/<%= @local_ipv6_prefix %> lookup 42
-  post-up   /sbin/ip -6 rule add from <%= @ipv6_network %> lookup 42
+  post-up   /sbin/ip -6 rule add from <%= @local_ipv6_prefix %>/<%= @local_ipv6_prefixlen %> lookup 42
+  post-up   /sbin/ip -6 rule add from <%= @v6_network %> lookup 42
   post-up   /sbin/ip -6 rule add iif $IFACE lookup 42
-  pre-down  /sbin/ip -6 rule del from <%= @local_ipv6_prefix %>/<%= @local_ipv6_prefix %> lookup 42
-  pre-down  /sbin/ip -6 rule del from <%= @ipv6_network %> lookup 42
+  pre-down  /sbin/ip -6 rule del from <%= @local_ipv6_prefix %>/<%= @local_ipv6_prefixlen %> lookup 42
+  pre-down  /sbin/ip -6 rule del from <%= @v6_network %> lookup 42
   pre-down  /sbin/ip -6 rule del iif $IFACE lookup 42
   <% if @provides_uplink != "yes" %>
   post-up   /sbin/ip route replace <%= @rem_prefix %>/<%= @rem_prefixlen %> dev $IFACE src <%= @local_ip %> table 42
