@@ -484,6 +484,113 @@ define ff_gln_gw::uplink::nattunnel (
 }
 
 
+define ff_gln_gw::uplink::nattunnelDS (
+  $local_public_ip,
+  $remote_public_ip,
+  $local_ipv4,
+  $remote_ip,
+  $tunnel_mtu = 1426,
+  $local_ipv6,
+  $remote_ipv6,
+  $remote_as,
+  $nat_network,
+  $tunnel_network = "127.0.0.0/8",
+  $bgp_local_pref = 100
+) {
+  include ff_gln_gw::resources::network
+  include ff_gln_gw::resources::sysctl
+  include ff_gln_gw::firewall
+  include ff_gln_gw::bird4
+  include ff_gln_gw::bird4
+
+  $nat_ip = ip_address($nat_network)
+  $nat_netmask = ip_netmask($nat_network)
+  $nat_prefixlen = ip_prefixlen($nat_network)
+
+  $provides_uplink = $ff_gln_gw::params::provides_uplink
+
+  $endpoint_name = $name
+  $local_ip = ip_address($local_ipv4)
+  $local_netmask = ip_netmask($local_ipv4)
+  $rem_ip = ip_address($remote_ip)
+  $rem_prefix = ip_prefix($remote_ip)
+  $rem_prefixlen = ip_prefixlen($remote_ip)
+
+  Class['ff_gln_gw::resources::network'] ->
+  file {
+    "/etc/network/interfaces.d/uplink-${endpoint_name}":
+      ensure => file,
+      content => template("ff_gln_gw/etc/network/uplink-gre-DS.erb");
+  } ->
+  exec {
+    "start_uplink_${endpoint_name}_interface":
+      command => "/sbin/ifup uplink-${endpoint_name}",
+      unless  => "/bin/ip link show dev uplink-${endpoint_name}' 2> /dev/null",
+      require => [ File_Line["/etc/iproute2/rt_tables"]
+                 , Class[ff_gln_gw::resources::sysctl]
+                 ];
+  }
+
+  file_line { "bird-uplink-${endpoint_name}-include":
+    path => '/etc/bird/bird.conf.d/uplink.conf',
+    line => "include \"/etc/bird/bird.conf.d/uplink.${endpoint_name}.conf\";",
+    require => File['/etc/bird/bird.conf.d/uplink.conf'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/uplink.${endpoint_name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.uplink.peer-nat.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-uplink-include"],
+      Service['bird']
+    ]
+  }
+
+  file_line { "bird6-uplink-${endpoint_name}-include":
+    path => '/etc/bird/bird6.conf.d/uplink.conf',
+    line => "include \"/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf\";",
+    require => File['/etc/bird/bird6.conf.d/uplink.conf'],
+    notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.uplink.peer.conf.erb"),
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    notify  => [
+      File_line["bird6-uplink-include"],
+      Service['bird6']
+    ]
+  }
+
+  file_line { "dummy0-${endpoint_name}-addr":
+    path => '/etc/network/interfaces.d/dummy0',
+    line => "  post-up ip -4 addr add ${nat_network} dev \$IFACE\n  pre-down ip -4 addr del ${nat_network} dev \$IFACE",
+  } ->
+  exec {
+    "restart_dummy_interface_0-${endpoint_name}":
+      command => "/sbin/ifdown dummy0 && /sbin/ifup dummy0",
+      unless  => "/bin/ip link show dev dummy0 | grep 'dummy0' 2> /dev/null";
+  }
+
+  ff_gln_gw::firewall::forward { "uplink-${name}":
+    chain => 'mesh'
+  }
+
+  # Define Firewall rule for masquerade
+  file {
+    "/etc/iptables.d/910-Masquerade-uplink-${endpoint_name}":
+       ensure => file,
+       owner => 'root',
+       group => 'root',
+       mode => '0644',
+       content => inline_template("ip4tables -t nat -A POSTROUTING -o uplink-<%=@endpoint_name%> ! -d <%=@tunnel_network%> -j SNAT --to <%=@nat_ip%>"),
+       require => [File['/etc/iptables.d/']];
+  }
+}
+
 define ff_gln_gw::uplink::static (
   $endpoint_ip,
   $do_nat = "no",
