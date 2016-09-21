@@ -348,7 +348,7 @@ define ff_gln_gw::uplink::tunnelDS (
   $remote_ip,              # really should be "remote_ipv4" FIXME!
   $tunnel_mtu = 1426,
   $v6_network,
- $remote_as,
+  $remote_as,
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -364,6 +364,9 @@ define ff_gln_gw::uplink::tunnelDS (
   $rem_ip = ip_address($remote_ip)
   $rem_prefix = ip_prefix($remote_ip)
   $rem_prefixlen = ip_prefixlen($remote_ip)
+  $local_ipv6_ip = ip_address("${local_ipv6}/64")
+  $local_ipv6_prefix = ip_prefix("${local_ipv6}/64")
+  $local_ipv6_prefixlen = ip_prefixlen("${local_ipv6}/64")
 
   Class['ff_gln_gw::resources::network'] ->
   file {

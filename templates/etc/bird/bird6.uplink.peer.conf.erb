@@ -3,7 +3,7 @@ protocol bgp 'uplink_<%= @endpoint_name %>' {
   source address <%= @local_ipv6 %>;
   local as <%= @icvpn_as %>;
   import where is_default();
-  export where net ~  <%= @v6_network %>;
+  export where net ~ <%= @v6_network %>;
   next hop self;
   multihop 64;
   neighbor <%= @remote_ipv6 %> as <%= @remote_as %>;
