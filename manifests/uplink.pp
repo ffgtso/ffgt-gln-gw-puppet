@@ -148,8 +148,6 @@ class ff_gln_gw::uplink::ipv6 () inherits ff_gln_gw::params {
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::bird6
 
-  class { 'ff_gln_gw::uplink': }
-
   file_line { "bird6-uplink-include":
     path => '/etc/bird/bird6.conf',
     line => "include \"/etc/bird/bird6.conf.d/uplink.conf\";",
