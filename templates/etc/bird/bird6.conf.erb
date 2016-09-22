@@ -41,6 +41,11 @@ function is_freifunk() {
                ];
 }
 
+# Filter function to check if an IPv6 Route is a dn42.
+function is_dn42() {
+  return (net ~ [ fd00::/8{48,64} ]);
+};
+
 # default route
 # be careful with importing default routes from arbitrary peers
 function is_default() {

@@ -46,7 +46,7 @@ function is_chaos() {
 # Filter function to check if an IPv4 route is from DN42 IP range.
 # as of https://dn42.net/services-whois
 function is_dn42() {
-  return (net ~ [ 172.22.0.0/15+ ]);
+  return (net ~ [ 172.20.0.0/14+ ]);
 };
 
 # Check for the IPv4 default route and it's more specific nephew

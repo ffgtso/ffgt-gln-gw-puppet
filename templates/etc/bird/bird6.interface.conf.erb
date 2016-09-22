@@ -17,7 +17,7 @@ protocol static 'local_<%= @mesh_code %>' {
 };
 
 function 'is_self_<%= @mesh_code %>' () {
-  return (proto = "static_<%= @mesh_code %>");
+  return (net ~ [ <%= @range_ipv6 %> ]);
 };
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
