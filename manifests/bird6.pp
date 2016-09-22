@@ -126,7 +126,7 @@ define ff_gln_gw::bird6::ospf (
 
   file_line { "bird6-ospf-${mesh_code}-include":
     path => '/etc/bird/bird6.conf',
-    line => "include \"/etc/bird/bird.conf.d/ospf6-${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird6.conf.d/ospf6-${mesh_code}.conf\";",
     require => File['/etc/bird/bird6.conf'],
     notify  => Service['bird6'];
   }
