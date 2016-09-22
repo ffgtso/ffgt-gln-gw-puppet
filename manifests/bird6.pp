@@ -131,7 +131,7 @@ define ff_gln_gw::bird6::ospf (
     notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird.conf.d/ospf6-${mesh_code}.conf":
+  file { "/etc/bird/bird6.conf.d/ospf6-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-mesh6.conf.erb"),
     require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
