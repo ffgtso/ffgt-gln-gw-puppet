@@ -88,7 +88,7 @@ class ff_gln_gw::bird4 (
       ensure => running,
       enable => true,
       hasstatus => false,
-      restart => "/usr/sbin/birdc configure",
+      restart => "/usr/bin/sort -o /etc/bird/bird.conf.inc /etc/bird/bird.conf.inc ; /usr/sbin/birdc configure",
       require => Package['bird'],
       subscribe => File['/etc/bird/bird.conf'];
   }

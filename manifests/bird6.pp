@@ -64,7 +64,7 @@ class ff_gln_gw::bird6 (
       ensure => running,
       enable => true,
       hasstatus => false,
-      restart => "/usr/sbin/birdc6 configure",
+      restart => "/usr/bin/sort -o /etc/bird/bird6.conf.inc /etc/bird/bird6.conf.inc ; /usr/sbin/birdc6 configure",
       require => Package['bird6'],
       subscribe => File['/etc/bird/bird6.conf'];
   }
