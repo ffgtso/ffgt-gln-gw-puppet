@@ -115,9 +115,9 @@ define ff_gln_gw::bird4::mesh (
   include ff_gln_gw::bird4
 
   file_line { "bird-${mesh_code}-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/${mesh_code}.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -141,9 +141,9 @@ define ff_gln_gw::bird4::srv (
   include ff_gln_gw::bird4
 
   file_line { "bird-${mesh_code}-srv-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/srv-${mesh_code}.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -189,9 +189,9 @@ define ff_gln_gw::bird4::ospf (
   }
 
   file_line { "bird-ospf-${mesh_code}-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/ospf-${mesh_code}.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -212,16 +212,16 @@ define ff_gln_gw::bird4::local (
   include ff_gln_gw::bird4
 
   file_line { "bird-local-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/local.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => [ Exec['touch-local-conf'], Service['bird'] ];
   }
 
   exec { "touch-local-conf":
     command => "/usr/bin/touch -a local.conf",
     cwd => "/etc/bird/bird.conf.d/",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
   }
 
   file { "/etc/bird/bird.conf.d/local.conf":
@@ -252,17 +252,17 @@ define ff_gln_gw::bird4::icvpn (
 
   file_line { 
     "icvpn-template":
-      path => '/etc/bird/bird.conf',
+      path => '/etc/bird/bird.conf.inc',
       line => 'include "/etc/bird/bird.conf.d/icvpn-template.conf";',
-      require => File['/etc/bird/bird.conf'],
+      require => File['/etc/bird/bird.conf.inc'],
       notify  => Service['bird'];
   }->
   file_line {
     "icvpn-include":
-      path => '/etc/bird/bird.conf',
+      path => '/etc/bird/bird.conf.inc',
       line => 'include "/etc/bird/bird.conf.d/icvpn-peers.conf";',
       require => [
-        File['/etc/bird/bird.conf'],
+        File['/etc/bird/bird.conf.inc'],
         Class['ff_gln_gw::resources::meta']
       ],
       notify  => Service['bird'];
@@ -297,9 +297,9 @@ define ff_gln_gw::bird4::dn42 (
 
   file_line {
     "dn42-template":
-      path => '/etc/bird/bird.conf',
+      path => '/etc/bird/bird.conf.inc',
       line => 'include "/etc/bird/bird.conf.d/dn42-template.conf";',
-      require => File['/etc/bird/bird.conf'],
+      require => File['/etc/bird/bird.conf.inc'],
       notify  => Service['bird'];
   }
 
@@ -329,9 +329,9 @@ define ff_gln_gw::bird4::anycast (
 
   file_line {
     "anycast-${name}-template":
-      path => '/etc/bird/bird.conf',
+      path => '/etc/bird/bird.conf.inc',
       line => "include \"/etc/bird/bird.conf.d/anycast-${name}.conf\";",
-      require => File['/etc/bird/bird.conf'],
+      require => File['/etc/bird/bird.conf.inc'],
       notify  => Service['bird'];
   }
 

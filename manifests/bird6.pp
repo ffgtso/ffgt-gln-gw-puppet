@@ -36,8 +36,7 @@ class ff_gln_gw::bird6 (
       target => '/etc/bird/bird6.conf',
       require => File['/etc/bird/bird6.conf'],
       notify => Service['bird6'];
-  } 
-
+  }
 
   file {
     '/etc/bird/bird6.conf.inc':
@@ -90,9 +89,9 @@ define ff_gln_gw::bird6::mesh (
   include ff_gln_gw::bird6
 
   file_line { "bird6-${mesh_code}-include":
-    path => '/etc/bird/bird6.conf',
+    path => '/etc/bird/bird6.conf.inc',
     line => "include \"/etc/bird/bird6.conf.d/${mesh_code}.conf\";",
-    require => File['/etc/bird/bird6.conf'],
+    require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
@@ -116,9 +115,9 @@ define ff_gln_gw::bird6::srv (
   include ff_gln_gw::bird6
 
   file_line { "bird6-${mesh_code}-srv-include":
-    path => '/etc/bird/bird6.conf',
+    path => '/etc/bird/bird6.conf.inc',
     line => "include \"/etc/bird/bird6.conf.d/srv-${mesh_code}.conf\";",
-    require => File['/etc/bird/bird6.conf'],
+    require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
@@ -147,9 +146,9 @@ define ff_gln_gw::bird6::ospf (
   include ff_gln_gw::bird6
 
   file_line { "bird6-ospf-${mesh_code}-include":
-    path => '/etc/bird/bird6.conf',
+    path => '/etc/bird/bird6.conf.inc',
     line => "include \"/etc/bird/bird6.conf.d/ospf6-${mesh_code}.conf\";",
-    require => File['/etc/bird/bird6.conf'],
+    require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
@@ -182,17 +181,17 @@ define ff_gln_gw::bird6::icvpn (
 
   file_line { 
     "icvpn-template6":
-      path => '/etc/bird/bird6.conf',
+      path => '/etc/bird/bird6.conf.inc',
       line => 'include "/etc/bird/bird6.conf.d/icvpn-template.conf";',
-      require => File['/etc/bird/bird6.conf'],
+      require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }->
   file_line {
     "icvpn-include6":
-      path => '/etc/bird/bird6.conf',
+      path => '/etc/bird/bird6.conf.inc',
       line => 'include "/etc/bird/bird6.conf.d/icvpn-peers.conf";',
       require => [
-        File['/etc/bird/bird6.conf'],
+        File['/etc/bird/bird6.conf.inc'],
         Class['ff_gln_gw::resources::meta']
       ],
       notify  => Service['bird6'];
