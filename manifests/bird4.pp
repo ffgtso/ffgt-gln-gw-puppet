@@ -78,7 +78,7 @@ class ff_gln_gw::bird4 (
   }
 
   exec { "sort-bird4-include":
-    command => "/bin/sort /etc/bird/bird.conf.inc",
+    command => "/usr/bin/sort /etc/bird/bird.conf.inc",
     cwd => "/tmp",
     subscribe => File['/etc/bird/bird.conf.inc'],
   }

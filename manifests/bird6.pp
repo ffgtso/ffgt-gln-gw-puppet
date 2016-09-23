@@ -55,7 +55,7 @@ class ff_gln_gw::bird6 (
   }
 
   exec { "sort-bird6-include":
-    command => "/bin/sort /etc/bird/bird6.conf.inc",
+    command => "/usr/bin/sort /etc/bird/bird6.conf.inc",
     cwd => "/tmp",
     subscribe => File['/etc/bird/bird6.conf.inc'],
   }
