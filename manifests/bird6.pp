@@ -85,7 +85,7 @@ define ff_gln_gw::bird6::mesh (
 
   include ff_gln_gw::bird6
 
-  range_ipv6 = "${site_ipv6_prefix}/${site_ipv6_prefixlen}"  # This should not happen; FIXME!
+  $range_ipv6 = "${site_ipv6_prefix}/${site_ipv6_prefixlen}"  # This should not happen; FIXME!
 
   file_line { "bird6-${mesh_code}-include":
     path => '/etc/bird/bird6.conf.inc',
