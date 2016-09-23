@@ -349,7 +349,7 @@ define ff_gln_gw::uplink::tunnelDS (
   $tunnel_mtu = 1426,
   $v6_network,
   $remote_as,
-  $mesh_code,
+  $mesh_code
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -434,8 +434,8 @@ define ff_gln_gw::uplink::nattunnel (
   $remote_as,
   $nat_network,
   $tunnel_network = "127.0.0.0/8",
-  $bgp_local_pref = 100
-  $mesh_code,
+  $bgp_local_pref = 100,
+  $mesh_code
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
@@ -527,7 +527,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   $v6_network,
   $tunnel_network = "127.0.0.0/8",
   $bgp_local_pref = 100,
-  $mesh_code,
+  $mesh_code
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
