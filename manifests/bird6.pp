@@ -38,6 +38,28 @@ class ff_gln_gw::bird6 (
       notify => Service['bird6'];
   } 
 
+
+  file {
+    '/etc/bird/bird6.conf.inc':
+      ensure => file,
+      mode => "0644",
+      content => template("ff_gln_gw/etc/bird/bird6.conf.inc.erb"),
+      require => [Package['bird6'],File['/etc/bird/']];
+  }
+
+  file_line { "bird6-include":
+    path => '/etc/bird/bird6.conf',
+    line => "include \"/etc/bird/bird6.conf.inc\";",
+    require => File['/etc/bird/bird6.conf'],
+    notify  => Service['bird6'];
+  }
+
+  exec { "sort-bird6-include":
+    command => "/bin/sort /etc/bird/bird6.conf.inc",
+    cwd => "/tmp",
+    subscribe => File['/etc/bird/bird6.conf.inc'],
+  }
+
   service {
     'bird6':
       ensure => running,

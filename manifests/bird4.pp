@@ -62,6 +62,27 @@ class ff_gln_gw::bird4 (
     }
   }
 
+  file {
+    '/etc/bird/bird.conf.inc':
+      ensure => file,
+      mode => "0644",
+      content => template("ff_gln_gw/etc/bird/bird.conf.inc.erb"),
+      require => [Package['bird'],File['/etc/bird/']];
+  }
+
+  file_line { "bird4-include":
+    path => '/etc/bird/bird.conf',
+    line => "include \"/etc/bird/bird.conf.inc\";",
+    require => File['/etc/bird/bird.conf'],
+    notify  => Service['bird'];
+  }
+
+  exec { "sort-bird4-include":
+    command => "/bin/sort /etc/bird/bird.conf.inc",
+    cwd => "/tmp",
+    subscribe => File['/etc/bird/bird.conf.inc'],
+  }
+
   service {
     'bird':
       ensure => running,

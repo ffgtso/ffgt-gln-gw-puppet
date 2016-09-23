@@ -66,9 +66,9 @@ class ff_gln_gw::uplink::ip (
   }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -124,9 +124,9 @@ class ff_gln_gw::uplink::natip () inherits ff_gln_gw::params {
   }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -149,9 +149,9 @@ class ff_gln_gw::uplink::ipv6 () inherits ff_gln_gw::params {
   include ff_gln_gw::bird6
 
   file_line { "bird6-uplink-include":
-    path => '/etc/bird/bird6.conf',
+    path => '/etc/bird/bird6.conf.inc',
     line => "include \"/etc/bird/bird6.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird6.conf'],
+    require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
@@ -185,9 +185,9 @@ class ff_gln_gw::uplink::provide (
   class { 'ff_gln_gw::uplink': }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -261,9 +261,9 @@ class ff_gln_gw::uplink::bgp (
   }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
@@ -660,9 +660,9 @@ define ff_gln_gw::uplink::static (
   }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/static-uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 

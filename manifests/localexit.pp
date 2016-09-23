@@ -66,9 +66,9 @@ class ff_gln_gw::localexit::ip (
   }
 
   file_line { "bird-uplink-include":
-    path => '/etc/bird/bird.conf',
+    path => '/etc/bird/bird.conf.inc',
     line => "include \"/etc/bird/bird.conf.d/uplink.conf\";",
-    require => File['/etc/bird/bird.conf'],
+    require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
