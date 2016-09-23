@@ -66,7 +66,7 @@ class ff_gln_gw::bird6 (
       hasstatus => false,
       restart => "/usr/bin/sort -o /etc/bird/bird6.conf.inc /etc/bird/bird6.conf.inc ; /usr/sbin/birdc6 configure",
       require => Package['bird6'],
-      subscribe => File['/etc/bird/bird6.conf'];
+      subscribe => File['/etc/bird/bird6.conf.inc'];
   }
 
   include ff_gln_gw::resources::bird

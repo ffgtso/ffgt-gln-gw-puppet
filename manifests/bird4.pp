@@ -90,7 +90,7 @@ class ff_gln_gw::bird4 (
       hasstatus => false,
       restart => "/usr/bin/sort -o /etc/bird/bird.conf.inc /etc/bird/bird.conf.inc ; /usr/sbin/birdc configure",
       require => Package['bird'],
-      subscribe => File['/etc/bird/bird.conf'];
+      subscribe => File['/etc/bird/bird.conf.inc'];
   }
 
   include ff_gln_gw::resources::bird
