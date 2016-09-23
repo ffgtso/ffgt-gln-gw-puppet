@@ -74,19 +74,18 @@ class ff_gln_gw::bird6 (
 
 define ff_gln_gw::bird6::mesh (
   $mesh_code,
-
   $mesh_ipv4_address,
   $mesh_ipv6_address,
   $mesh_peerings, # YAML data file for local peerings
   $have_mesh_peerings = "no", # Actually require & use $mesh_peerings
-
   $icvpn_as,
-
   $site_ipv6_prefix,
   $site_ipv6_prefixlen,
 ) {
 
   include ff_gln_gw::bird6
+
+  range_ipv6 = "${site_ipv6_prefix}/${site_ipv6_prefixlen}"  # This should not happen; FIXME!
 
   file_line { "bird6-${mesh_code}-include":
     path => '/etc/bird/bird6.conf.inc',
