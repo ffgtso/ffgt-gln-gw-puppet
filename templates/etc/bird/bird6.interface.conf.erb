@@ -20,6 +20,11 @@ function 'is_self_<%= @mesh_code %>' () {
   return (net ~ [ <%= @range_ipv6 %> ]);
 };
 
+# Check if net is part of own prefix
+function is_in_<%= @mesh_code %>_prefix() {
+  return (net ~ [ <%= @range_ipv6 %>+ ]);
+};
+
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import only iff not in own network.
 protocol pipe 'pipe_mesh_<%=@mesh_code%>' {
