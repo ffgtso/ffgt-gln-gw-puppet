@@ -116,12 +116,12 @@ define ff_gln_gw::bird4::mesh (
 
   file_line { "bird-${mesh_code}-include":
     path => '/etc/bird/bird.conf.inc',
-    line => "include \"/etc/bird/bird.conf.d/${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird.conf.d/01-${mesh_code}.conf\";",
     require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
-  file { "/etc/bird/bird.conf.d/${mesh_code}.conf":
+  file { "/etc/bird/bird.conf.d/01-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird.interface.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
@@ -142,12 +142,12 @@ define ff_gln_gw::bird4::srv (
 
   file_line { "bird-${mesh_code}-srv-include":
     path => '/etc/bird/bird.conf.inc',
-    line => "include \"/etc/bird/bird.conf.d/srv-${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird.conf.d/05-srv-${mesh_code}.conf\";",
     require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
-  file { "/etc/bird/bird.conf.d/srv-${mesh_code}.conf":
+  file { "/etc/bird/bird.conf.d/05-srv-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird.srv-interface.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
@@ -190,12 +190,12 @@ define ff_gln_gw::bird4::ospf (
 
   file_line { "bird-ospf-${mesh_code}-include":
     path => '/etc/bird/bird.conf.inc',
-    line => "include \"/etc/bird/bird.conf.d/ospf-${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird.conf.d/05-ospf-${mesh_code}.conf\";",
     require => File['/etc/bird/bird.conf.inc'],
     notify  => Service['bird'];
   }
 
-  file { "/etc/bird/bird.conf.d/ospf-${mesh_code}.conf":
+  file { "/etc/bird/bird.conf.d/05-ospf-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-mesh.conf.erb"),
     require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
@@ -253,7 +253,7 @@ define ff_gln_gw::bird4::icvpn (
   file_line { 
     "icvpn-template":
       path => '/etc/bird/bird.conf.inc',
-      line => 'include "/etc/bird/bird.conf.d/icvpn-template.conf";',
+      line => 'include "/etc/bird/bird.conf.d/03-icvpn.conf";',
       require => File['/etc/bird/bird.conf.inc'],
       notify  => Service['bird'];
   }->
@@ -269,7 +269,7 @@ define ff_gln_gw::bird4::icvpn (
   } 
 
   # Process meta data from tinc directory
-  file { "/etc/bird/bird.conf.d/icvpn-template.conf":
+  file { "/etc/bird/bird.conf.d/03-icvpn.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird.icvpn-template.conf.erb"),
     require => [ 
@@ -330,12 +330,12 @@ define ff_gln_gw::bird4::anycast (
   file_line {
     "anycast-${name}-template":
       path => '/etc/bird/bird.conf.inc',
-      line => "include \"/etc/bird/bird.conf.d/anycast-${name}.conf\";",
+      line => "include \"/etc/bird/bird.conf.d/07-anycast-${name}.conf\";",
       require => File['/etc/bird/bird.conf.inc'],
       notify  => Service['bird'];
   }
 
-  file { "/etc/bird/bird.conf.d/anycast-${name}.conf":
+  file { "/etc/bird/bird.conf.d/07-anycast-${name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-anycast-template.conf.erb"),
     require => [

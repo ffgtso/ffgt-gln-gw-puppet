@@ -90,12 +90,12 @@ define ff_gln_gw::bird6::mesh (
 
   file_line { "bird6-${mesh_code}-include":
     path => '/etc/bird/bird6.conf.inc',
-    line => "include \"/etc/bird/bird6.conf.d/${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird6.conf.d/01-${mesh_code}.conf\";",
     require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/${mesh_code}.conf":
+  file { "/etc/bird/bird6.conf.d/01-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.interface.conf.erb"),
     require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
@@ -116,12 +116,12 @@ define ff_gln_gw::bird6::srv (
 
   file_line { "bird6-${mesh_code}-srv-include":
     path => '/etc/bird/bird6.conf.inc',
-    line => "include \"/etc/bird/bird6.conf.d/srv-${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird6.conf.d/05-srv-${mesh_code}.conf\";",
     require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/srv-${mesh_code}.conf":
+  file { "/etc/bird/bird6.conf.d/05-srv-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.srv-interface.conf.erb"),
     require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
@@ -147,18 +147,45 @@ define ff_gln_gw::bird6::ospf (
 
   file_line { "bird6-ospf-${mesh_code}-include":
     path => '/etc/bird/bird6.conf.inc',
-    line => "include \"/etc/bird/bird6.conf.d/ospf6-${mesh_code}.conf\";",
+    line => "include \"/etc/bird/bird6.conf.d/05-ospf6-${mesh_code}.conf\";",
     require => File['/etc/bird/bird6.conf.inc'],
     notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/ospf6-${mesh_code}.conf":
+  file { "/etc/bird/bird6.conf.d/05-ospf6-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-mesh6.conf.erb"),
     require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
     notify  => [
       File_line["bird6-ospf-${mesh_code}-include"],
       Service['bird']
+    ]
+  }
+}
+
+# Allow local additions via local.conf
+define ff_gln_gw::bird6::local (
+) {
+  include ff_gln_gw::bird6
+
+  file_line { "bird6-local-include":
+    path => '/etc/bird/bird6.conf.inc',
+    line => "include \"/etc/bird/bird6.conf.d/local.conf\";",
+    require => File['/etc/bird/bird.conf.inc'],
+    notify  => [ Exec['touch-local6-conf'], Service['bird'] ];
+  }
+
+  exec { "touch-local6-conf":
+    command => "/usr/bin/touch -a local.conf",
+    cwd => "/etc/bird/bird6.conf.d/",
+    require => File['/etc/bird/bird6.conf.inc'],
+  }
+
+  file { "/etc/bird/bird6.conf.d/local.conf":
+    mode => "0644",
+    notify  => [
+      File_line["bird6-local-include"],
+      Service['bird6']
     ]
   }
 }
@@ -182,7 +209,7 @@ define ff_gln_gw::bird6::icvpn (
   file_line { 
     "icvpn-template6":
       path => '/etc/bird/bird6.conf.inc',
-      line => 'include "/etc/bird/bird6.conf.d/icvpn-template.conf";',
+      line => 'include "/etc/bird/bird6.conf.d/03-icvpn.conf";',
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }->
@@ -198,7 +225,7 @@ define ff_gln_gw::bird6::icvpn (
   } 
 
   # Process meta data from tinc directory
-  file { "/etc/bird/bird6.conf.d/icvpn-template.conf":
+  file { "/etc/bird/bird6.conf.d/03-icvpn.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.icvpn-template.conf.erb"),
     require => [ 
