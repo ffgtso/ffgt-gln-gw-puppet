@@ -435,12 +435,17 @@ define ff_gln_gw::uplink::nattunnel (
   $nat_network,
   $tunnel_network = "127.0.0.0/8",
   $bgp_local_pref = 100,
+  $bgp_local_pref6 = -1,
   $mesh_code
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::firewall
   include ff_gln_gw::bird4
+
+  if $bgp_local_pref6 == -1 {
+    $bgp_local_pref6 = $bgp_local_pref
+  }
 
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)

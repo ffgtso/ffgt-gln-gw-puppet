@@ -7,4 +7,5 @@ protocol bgp 'uplink_<%= @endpoint_name %>' {
   next hop self;
   multihop 64;
   neighbor <%= @remote_ipv6 %> as <%= @remote_as %>;
+  default bgp_local_pref <%= @bgp_local_pref6 %>;
 }
