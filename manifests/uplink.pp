@@ -349,6 +349,8 @@ define ff_gln_gw::uplink::tunnelDS (
   $tunnel_mtu = 1426,
   $v6_network,
   $remote_as,
+  $bgp_local_pref = 100,
+  $bgp_local_pref6 = -1,
   $mesh_code
 ) {
   include ff_gln_gw::resources::network
@@ -356,6 +358,10 @@ define ff_gln_gw::uplink::tunnelDS (
   include ff_gln_gw::firewall
   include ff_gln_gw::bird4
   include ff_gln_gw::bird6
+
+  if $bgp_local_pref6 == -1 {
+    $bgp_local_pref6 = $bgp_local_pref
+  }
 
   $provides_uplink = $ff_gln_gw::params::provides_uplink
   $icvpn_as  = $ff_gln_gw::params::icvpn_as
@@ -435,17 +441,12 @@ define ff_gln_gw::uplink::nattunnel (
   $nat_network,
   $tunnel_network = "127.0.0.0/8",
   $bgp_local_pref = 100,
-  $bgp_local_pref6 = -1,
   $mesh_code
 ) {
   include ff_gln_gw::resources::network
   include ff_gln_gw::resources::sysctl
   include ff_gln_gw::firewall
   include ff_gln_gw::bird4
-
-  if $bgp_local_pref6 == -1 {
-    $bgp_local_pref6 = $bgp_local_pref
-  }
 
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)
@@ -532,6 +533,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   $v6_network,
   $tunnel_network = "127.0.0.0/8",
   $bgp_local_pref = 100,
+  $bgp_local_pref6 = -1,
   $mesh_code
 ) {
   include ff_gln_gw::resources::network
@@ -539,6 +541,10 @@ define ff_gln_gw::uplink::nattunnelDS (
   include ff_gln_gw::firewall
   include ff_gln_gw::bird4
   include ff_gln_gw::bird4
+
+  if $bgp_local_pref6 == -1 {
+    $bgp_local_pref6 = $bgp_local_pref
+  }
 
   $nat_ip = ip_address($nat_network)
   $nat_netmask = ip_netmask($nat_network)
