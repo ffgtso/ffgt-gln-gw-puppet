@@ -34,10 +34,10 @@ function is_ula() {
 # Filter function to check if an IPv6 Route is from
 # a Freifunk range.
 function is_freifunk() {
-  return net ~ [ 2001:0bf7::/32+,        # Förderverein freie Netzwerke e.V.
-                 2a03:2260::/29+,        # Freifunk Rheinland e.V.
-                 2001:470:70e2::/48+,    # HE6 FFGT
-                 2001:470:1f0b:89b::/64+ # HE6 FFGE
+  return net ~ [ 2001:0bf7::/32{32,64},        # Förderverein freie Netzwerke e.V.
+                 2a03:2260::/29{29,64},        # Freifunk Rheinland e.V.
+                 2001:470:70e2::/48{48,64},    # HE6 FFGT
+                 2001:470:1f0b:89b::/64        # HE6 FFGT
                ];
 }
 
