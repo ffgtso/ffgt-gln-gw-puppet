@@ -213,18 +213,18 @@ define ff_gln_gw::bird4::local (
 
   file_line { "bird-local-include":
     path => '/etc/bird/bird.conf.inc',
-    line => "include \"/etc/bird/bird.conf.d/local.conf\";",
+    line => "include \"/etc/bird/bird.conf.d/99-local.conf\";",
     require => File['/etc/bird/bird.conf.inc'],
     notify  => [ Exec['touch-local-conf'], Service['bird'] ];
   }
 
   exec { "touch-local-conf":
-    command => "/usr/bin/touch -a local.conf",
+    command => "/usr/bin/touch -a 99-local.conf",
     cwd => "/etc/bird/bird.conf.d/",
     require => File['/etc/bird/bird.conf.inc'],
   }
 
-  file { "/etc/bird/bird.conf.d/local.conf":
+  file { "/etc/bird/bird.conf.d/99-local.conf":
     mode => "0644",
     notify  => [
       File_line["bird-local-include"],
