@@ -252,7 +252,7 @@ define ff_gln_gw::bird6::ibgp (
   file_line {
     "bird6-ibgp-${name}":
       path => '/etc/bird/bird6.conf.inc',
-      line => 'include "/etc/bird/bird6.conf.d/02-ibgp-${name}.conf";',
+      line => "include \"/etc/bird/bird6.conf.d/02-ibgp-${name}.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }

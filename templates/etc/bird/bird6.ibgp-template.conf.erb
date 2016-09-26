@@ -22,16 +22,15 @@ template bgp ibgp {
     reject;
   };
 };
-
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |gretun,node| -%>
-<% @routes.each do |tunnel,pref| -%>
+<% @peers.each do |tunnel,pref| -%>
 <% if gretun == tunnel -%>
 
-protocol bgp 'ibgp_<%= tunnel %>' from ibgp {
+protocol bgp ibgp_<%= tunnel.gsub('-', '_') %> from ibgp {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= @icvpn_as %>;
-    ldefault bgp_local_pref <%= pref %>;
+    default bgp_local_pref <%= pref %>;
 }
 <% end -%>
 <% end -%>
