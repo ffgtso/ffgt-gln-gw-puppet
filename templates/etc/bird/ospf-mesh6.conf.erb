@@ -73,9 +73,8 @@ protocol static ospf_<%=name%> {
 
 protocol ospf int_<%= @mesh_code %> {
   table ospf_<%= @mesh_code %>;
-  import all;
-  #import where !is_default();
-#  export all;
+  import keep filtered;
+  import <% if @ospf_type == "root" %>where !is_default()<% else %>all<% end %>;
   export filter {
     ospf_tag = 10;
     if (is_default() && (source = RTS_BGP)) then accept;
