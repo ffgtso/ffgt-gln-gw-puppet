@@ -205,7 +205,7 @@ define ff_gln_gw::bird6::icvpn (
 
   include ff_gln_gw::icvpn
 
-  file_line { 
+  file_line {
     "icvpn-template6":
       path => '/etc/bird/bird6.conf.inc',
       line => 'include "/etc/bird/bird6.conf.d/03-icvpn.conf";',
@@ -221,13 +221,13 @@ define ff_gln_gw::bird6::icvpn (
         Class['ff_gln_gw::resources::meta']
       ],
       notify  => Service['bird6'];
-  } 
+  }
 
   # Process meta data from tinc directory
   file { "/etc/bird/bird6.conf.d/03-icvpn.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.icvpn-template.conf.erb"),
-    require => [ 
+    require => [
       File['/etc/bird/bird6.conf.d/'],
       Package['bird6'],
       Class['ff_gln_gw::tinc'],
@@ -237,5 +237,36 @@ define ff_gln_gw::bird6::icvpn (
       File_line['icvpn-include6'],
       File_line['icvpn-template6']
     ];
-  } 
+  }
+}
+
+
+define ff_gln_gw::bird6::ibgp (
+  $peers,
+  $gre_yaml
+) {
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
+  $icvpn_as  = $ff_gln_gw::params::icvpn_as
+
+  file_line {
+    "bird6-ibgp-${name}":
+      path => '/etc/bird/bird6.conf.inc',
+      line => 'include "/etc/bird/bird6.conf.d/02-ibgp-${name}.conf";',
+      require => File['/etc/bird/bird6.conf.inc'],
+      notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/02-ibgp-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.ibgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird6.conf.d/'],
+      Package['bird6']
+    ],
+    notify  => [
+      Service['bird6'],
+      File_line["bird6-ibgp-${name}"]
+    ];
+  }
 }
