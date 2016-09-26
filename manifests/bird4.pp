@@ -5,7 +5,6 @@ class ff_gln_gw::bird4 (
   $include_dn42  = $ff_gln_gw::params::include_dn42_routes,
   $provides_uplink = $ff_gln_gw::params::provides_uplink
 ) inherits ff_gln_gw::params {
-
   require ff_gln_gw::resources::repos
  
   ff_gln_gw::monitor::nrpe::check_command {
@@ -96,16 +95,15 @@ class ff_gln_gw::bird4 (
   include ff_gln_gw::resources::bird
 }
 
+
 define ff_gln_gw::bird4::mesh (
   $mesh_code,
-
   $mesh_ipv4_address,
   $range_ipv4,
   $mesh_ipv6_address,
   $mesh_peerings, # YAML data file for local peerings
   $have_mesh_peerings = "no", # Actually require & use $mesh_peerings
   $icvpn_as,
-
   $site_ipv4_prefix,
   $site_ipv4_prefixlen,
   $include_chaos = $ff_gln_gw::params::include_chaos_routes,
@@ -131,6 +129,7 @@ define ff_gln_gw::bird4::mesh (
     ]
   }
 }
+
 
 define ff_gln_gw::bird4::srv (
   $mesh_code,
@@ -158,6 +157,7 @@ define ff_gln_gw::bird4::srv (
   }
 }
 
+
 define ff_gln_gw::bird4::ospf (
   $mesh_code,
   $range_ipv4,
@@ -169,7 +169,6 @@ define ff_gln_gw::bird4::ospf (
   $ospf_type = "root",        # root/leaf: root reexports routes, leaf only exports statics.
   $announce_rid = "yes"       # Shall we announce the RID (set to no if part of mesh)?
 ) {
-
   include ff_gln_gw::bird4
   include ff_gln_gw::resources::network
 
@@ -206,6 +205,7 @@ define ff_gln_gw::bird4::ospf (
   }
 }
 
+
 # Allow local additions via local.conf
 define ff_gln_gw::bird4::local (
 ) {
@@ -232,6 +232,7 @@ define ff_gln_gw::bird4::local (
     ]
   }
 }
+
 
 define ff_gln_gw::bird4::icvpn (
   $icvpn_as,
@@ -284,6 +285,7 @@ define ff_gln_gw::bird4::icvpn (
     ];
   } 
 }
+
 
 define ff_gln_gw::bird4::dn42 (
   $icvpn_as,
@@ -345,6 +347,37 @@ define ff_gln_gw::bird4::anycast (
     notify  => [
       Service['bird'],
       File_line["anycast-${name}-template"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::ibgp (
+  $peers,
+  $gre_yaml
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+  $icvpn_as  = $ff_gln_gw::params::icvpn_as
+
+  file_line {
+    "bird-ibgp-${name}":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/02-ibgp-${name}.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/02-ibgp-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ibgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ibgp-${name}"]
     ];
   }
 }

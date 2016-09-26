@@ -2,7 +2,6 @@ class ff_gln_gw::bird6 (
   $router_id = $ff_gln_gw::params::router_id,
   $icvpn_as  = $ff_gln_gw::params::icvpn_as
 ) inherits ff_gln_gw::params {
-
   require ff_gln_gw::resources::repos
  
   ff_gln_gw::monitor::nrpe::check_command {
@@ -72,6 +71,7 @@ class ff_gln_gw::bird6 (
   include ff_gln_gw::resources::bird
 }
 
+
 define ff_gln_gw::bird6::mesh (
   $mesh_code,
   $mesh_ipv4_address,
@@ -82,7 +82,6 @@ define ff_gln_gw::bird6::mesh (
   $site_ipv6_prefix,
   $site_ipv6_prefixlen,
 ) {
-
   include ff_gln_gw::bird6
 
   $range_ipv6 = "${site_ipv6_prefix}/${site_ipv6_prefixlen}"  # This should not happen; FIXME!
@@ -104,6 +103,7 @@ define ff_gln_gw::bird6::mesh (
     ]
   }
 }
+
 
 define ff_gln_gw::bird6::srv (
   $mesh_code,
@@ -131,6 +131,7 @@ define ff_gln_gw::bird6::srv (
   }
 }
 
+
 define ff_gln_gw::bird6::ospf (
   $mesh_code,
   $range_ipv6,
@@ -141,7 +142,6 @@ define ff_gln_gw::bird6::ospf (
   $have_ospf_links = "no",    # Actually require & use $ospf_links
   $ospf_type = "root"         # root/leaf: root reexports routes, leaf only exports statics.
 ) {
-
   include ff_gln_gw::bird6
 
   file_line { "bird6-ospf-${mesh_code}-include":
@@ -161,6 +161,7 @@ define ff_gln_gw::bird6::ospf (
     ]
   }
 }
+
 
 # Allow local additions via local.conf
 define ff_gln_gw::bird6::local (
@@ -189,6 +190,7 @@ define ff_gln_gw::bird6::local (
   }
 }
 
+
 define ff_gln_gw::bird6::icvpn (
   $icvpn_as,
   $icvpn_ipv4_address,
@@ -197,12 +199,9 @@ define ff_gln_gw::bird6::icvpn (
   $mesh_code,
   $tinc_keyfile,
   ){
-
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
-
   $icvpn_name = $name
-
   include ff_gln_gw::icvpn
 
   file_line {
@@ -247,7 +246,6 @@ define ff_gln_gw::bird6::ibgp (
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
-  $icvpn_as  = $ff_gln_gw::params::icvpn_as
 
   file_line {
     "bird6-ibgp-${name}":
@@ -267,6 +265,37 @@ define ff_gln_gw::bird6::ibgp (
     notify  => [
       Service['bird6'],
       File_line["bird6-ibgp-${name}"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::ebgp (
+  $peers,
+  $gre_yaml,
+  $our_as
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  file_line {
+    "bird-ebgp-${name}":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/03-ebgp-${name}.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/03-ebgp-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ebgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ebgp-${name}"]
     ];
   }
 }
