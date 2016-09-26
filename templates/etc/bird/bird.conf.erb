@@ -29,24 +29,24 @@ table kernel_main;
 # Filter function to check if an IPv4 route is from Freifunk IP range.
 # We do not include 104.0.0.0/8+ here anymore
 function is_freifunk() {
-  return (net ~ [ 10.0.0.0/8+ ]);
+  return (net ~ [ 10.0.0.0/8{8,24} ]);
 };
 
 # Filter function to check if an IPv4 route is from ChaosVPN IP range.
 # as of http://wiki.hamburg.ccc.de/ChaosVPN:IPRanges#ChaosVPN_IP_Ranges
 function is_chaos() {
-  return (net ~ [ 10.4.0.0/16+,
-    10.32.0.0/16+,
-    10.100.0.0/14+,
-    10.104.0.0/14+,
-    172.31.0.0/16+
+  return (net ~ [ 10.4.0.0/16{16,24},
+    10.32.0.0/16{16,24},
+    10.100.0.0/14{14,24},
+    10.104.0.0/14{14,24},
+    172.31.0.0/16[16,24}
   ]);
 };
 
 # Filter function to check if an IPv4 route is from DN42 IP range.
 # as of https://dn42.net/services-whois
 function is_dn42() {
-  return (net ~ [ 172.20.0.0/14+ ]);
+  return (net ~ [ 172.20.0.0/14{14,24} ]);
 };
 
 # Check for the IPv4 default route and it's more specific nephew
