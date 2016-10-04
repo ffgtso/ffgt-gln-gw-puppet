@@ -7,7 +7,7 @@ function in_prefix_range_ebgp() {
   return true;
 }
 
-<% if @ipv6_main_prefix != "" -%>
+<% if @ipv6_main_prefix.to_s != "" -%>
 # FIXME, this is basically a duplicate.
 protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
   table mesh;
@@ -94,7 +94,7 @@ template bgp ebgp {
 <% peerings.each_pair do |gretun,node| -%>
 <% @peers.each do |tunnel,args| -%>
 <% if gretun == tunnel -%>
-<% array = args.split(':') %>
+<% array = args.split(';') %>
 protocol bgp ebgp_<%= tunnel.gsub('-', '_') %> from ebgp {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= array[0] %>;
