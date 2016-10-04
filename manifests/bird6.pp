@@ -302,3 +302,36 @@ define ff_gln_gw::bird4::ebgp (
     ];
   }
 }
+
+
+define ff_gln_gw::bird6::ebgp (
+  $peers,
+  $mesh_code,
+  $type = "peer",
+  $gre_yaml,
+  $our_as
+) {
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
+
+  file_line {
+    "bird6-ebgp-${name}":
+      path => '/etc/bird/bird6.conf.inc',
+      line => "include \"/etc/bird/bird6.conf.d/03-ebgp-${name}.conf\";",
+      require => File['/etc/bird/bird6.conf.inc'],
+      notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/03-ebgp-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.ebgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird6.conf.d/'],
+      Package['bird6']
+    ],
+    notify  => [
+      Service['bird6'],
+      File_line["bird6-ebgp-${name}"]
+    ];
+  }
+}
