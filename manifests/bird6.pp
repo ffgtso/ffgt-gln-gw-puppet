@@ -192,7 +192,7 @@ define ff_gln_gw::bird6::local (
 
 
 define ff_gln_gw::bird6::icvpn (
-  $icvpn_as =  = $ff_gln_gw::params::icvpn_as,
+  $icvpn_as = $ff_gln_gw::params::icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
