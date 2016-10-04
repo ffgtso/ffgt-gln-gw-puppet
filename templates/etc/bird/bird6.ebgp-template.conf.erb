@@ -7,21 +7,71 @@ function in_prefix_range_ebgp() {
   return true;
 }
 
+function is_global_unicast() {
+  return net ~ [ 2000::/3 ];
+}
+
+#function rt_import(int asn; int set peer_asns; prefix set peer_nets)
+#{
+#  if ! (net ~ peer_nets) then return false;
+#  if ! (bgp_path.last ~ peer_asns) then return false;
+#  if bgp_path.first != asn then return false;
+#  if bgp_path.len > 64 then return false;
+#  if bgp_next_hop != from then return false;
+#  return true;
+#}
+
+#function rt_import_all(int asn)
+#{
+#  if net_martian() || net_local() then return false;
+#  if bgp_path.first != asn then return false;
+#  if bgp_path.len > 64 then return false;
+#  if bgp_next_hop != from then return false;
+#  return true;
+#}
+
+filter import_ebgp_friend {
+  if is_default() then accept;
+  if is_global_unicast() && in_prefix_range_ebgp() then accept;
+  reject;
+}
+
+filter export_ebgp_friend {
+  if is_default() then accept;
+  if is_global_unicast() && in_prefix_range_ebgp() then accept;
+  reject;
+}
+
+#  import where is_default();
+#  export where is_in_<%= @mesh_code %>_prefix();
+
+filter import_ebgp_peer {
+  if is_global_unicast() && ! is_in_<%= @mesh_code %>_prefix() then accept;
+  reject;
+}
+
+filter export_ebgp_peer {
+  if is_self_<%= @mesh_code %>_prefix() then accept;
+  reject;
+}
+
+filter import_ebgp_transit {
+  if is_default() then accept;
+  if is_global_unicast() then accept;
+  reject;
+}
+
+filter export_ebgp_transit {
+  if is_self_<%= @mesh_code %>_prefix() then accept;
+  reject;
+}
+
 # template for ebgp route exchange
 template bgp ebgp {
   table mesh;
   local as <%= @our_as %>;
-  import filter {
-    if is_default() then accept;
-    if in_prefix_range_ebgp() then accept;
-    reject;
-  };
-  export filter {
-    if is_default() then accept;
-    if in_prefix_range_ebgp() then accept;
-    reject;
-  };
 };
+
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |gretun,node| -%>
 <% @peers.each do |tunnel,args| -%>
@@ -30,6 +80,8 @@ template bgp ebgp {
 protocol bgp ebgp_<%= tunnel.gsub('-', '_') %> from ebgp {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= array[0] %>;
+    import filter import_ebgp_<%= @type %>;
+    export filter export_ebgp_<%= @type %>;
     default bgp_local_pref <%= array[1] %>;
 }
 <% end -%>
