@@ -281,6 +281,8 @@ define ff_gln_gw::bird6::ebgp (
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
 
+  $ipv6_main_prefix = $ff_gln_gw::params::ipv6_main_prefix,
+
   file_line {
     "bird6-ebgp-${name}":
       path => '/etc/bird/bird6.conf.inc',

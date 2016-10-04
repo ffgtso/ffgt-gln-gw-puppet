@@ -7,12 +7,12 @@ function in_prefix_range_ebgp() {
   return true;
 }
 
-<% if @ff_gln_gw::params::ipv6_main_prefix != "" -%>
+<% if @ipv6_main_prefix != "" -%>
 # FIXME, this is basically a duplicate.
 protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
   table mesh;
   # reject route if announced from external
-  route <%= @ff_gln_gw::params::ipv6_main_prefix %> reject;
+  route <%= @ipv6_main_prefix %> reject;
 };
 
 <% end -%>
