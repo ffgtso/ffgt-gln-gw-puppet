@@ -31,7 +31,7 @@ function is_in_<%= @mesh_code.gsub('-', '_') %>_upstream_prefix() {
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import only iff not in own network.
-protocol pipe pipe_mesh_<%=@mesh_code.gsub('-', '_') %> {
+protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
   import where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
@@ -40,8 +40,8 @@ protocol pipe pipe_mesh_<%=@mesh_code.gsub('-', '_') %> {
 
 # template for local mesh connections
 # extend local_mesh template
-template bgp local_mesh_<%=@mesh_code%>.gsub('-', '_') from local_mesh {
-  table mesh_<%=@mesh_code.gsub('-', '_') %>;
+template bgp local_mesh_<%= @mesh_code.gsub('-', '_') %> from local_mesh {
+  table mesh_<%= @mesh_code.gsub('-', '_') %>;
   local as <%=@icvpn_as%>;
 };
 <% if @have_mesh_peerings == "yes" %>
