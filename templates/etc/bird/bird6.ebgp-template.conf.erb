@@ -7,13 +7,25 @@ function in_prefix_range_ebgp() {
   return true;
 }
 
+<% ff_gln_gw::params::ipv6_main_prefix != "" -%>
 # FIXME, this is basically a duplicate.
 protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
   table mesh;
   # reject route if announced from external
-  route <%= @site_ipv6_prefix %>/<%= @site_ipv6_prefixlen %> via "lo";
+  route <%= @ff_gln_gw::params::ipv6_main_prefix %> reject;
 };
 
+<% end -%>
+<% @peers.each do |tunnel,args| -%>
+<% array = args.split(';') -%>
+<% if array[2] != "" -%>
+protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
+  table mesh;
+  route <%= array[2] %> reject;
+};
+
+<% end -%>
+<% end -%>
 function is_global_unicast() {
   return net ~ [ 2000::/3+ ];
 }
@@ -66,7 +78,7 @@ filter import_ebgp_transit {
 }
 
 filter export_ebgp_transit {
-  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) {
+  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) then {
     if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
   }
   reject;
@@ -86,10 +98,10 @@ template bgp ebgp {
 protocol bgp ebgp_<%= tunnel.gsub('-', '_') %> from ebgp {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= array[0] %>;
+    import keep filtered;
     import filter import_ebgp_<%= @type %>;
     export filter export_ebgp_<%= @type %>;
     default bgp_local_pref <%= array[1] %>;
-    keep filtered;
 }
 <% end -%>
 <% end -%>

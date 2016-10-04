@@ -192,7 +192,7 @@ define ff_gln_gw::bird6::local (
 
 
 define ff_gln_gw::bird6::icvpn (
-  $icvpn_as,
+  $icvpn_as =  = $ff_gln_gw::params::icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
@@ -276,7 +276,7 @@ define ff_gln_gw::bird6::ebgp (
   $mesh_code,
   $type = "peer",
   $gre_yaml,
-  $our_as
+  $our_as = $ff_gln_gw::params::icvpn_as,
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta

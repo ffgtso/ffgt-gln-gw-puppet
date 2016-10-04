@@ -9,6 +9,7 @@ class ff_gln_gw::params (
   $include_chaos_routes = "no",
   $include_dn42_routes = "no",
   $provides_uplink = "no",
+  $ipv6_main_prefix = "",
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
 ) {
