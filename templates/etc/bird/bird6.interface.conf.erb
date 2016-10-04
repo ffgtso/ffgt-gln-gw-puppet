@@ -2,53 +2,53 @@
 
 # bird6 community configuration
 
-table 'mesh_<%= @mesh_code %>';
+table mesh_<%= @mesh_code.gsub('-', '_') %>;
 
-protocol static 'static_<%= @mesh_code %>' {
-  table 'mesh_<%= @mesh_code %>';
+protocol static static_<%= @mesh_code.gsub('-', '_') %> {
+  table mesh_<%= @mesh_code.gsub('-', '_') %>;
   # reject route if announced from external
   route <%= @site_ipv6_prefix %>/<%= @site_ipv6_prefixlen %> reject;
   };
 
-protocol static 'local_<%= @mesh_code %>' {
-  table 'mesh_<%= @mesh_code %>';
+protocol static local_<%= @mesh_code.gsub('-', '_') %> {
+  table mesh_<%= @mesh_code.gsub('-', '_') %>;
   # reject route if announced from external
   route <%= @site_ipv6_prefix %>/<%= @site_ipv6_prefixlen %> via "br-<%= @mesh_code%>";
 };
 
-function 'is_self_<%= @mesh_code %>' () {
+function is_self_<%= @mesh_code.gsub('-', '_') %> () {
   return (net ~ [ <%= @range_ipv6 %> ]);
 };
 
 # Check if net is part of own prefix
-function is_in_<%= @mesh_code %>_prefix() {
+function is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() {
   return (net ~ [ <%= @range_ipv6 %>+ ]);
 };
 
-function is_in_<%= @mesh_code %>_upstream_prefix() {
+function is_in_<%= @mesh_code.gsub('-', '_') %>_upstream_prefix() {
   return (net ~ [ <%= @range_ipv6 %>- ]);
 };
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import only iff not in own network.
-protocol pipe 'pipe_mesh_<%=@mesh_code%>' {
+protocol pipe pipe_mesh_<%=@mesh_code.gsub('-', '_') %> {
   table mesh;
-  peer table 'mesh_<%= @mesh_code %>';
-  import where ! 'is_self_<%=@mesh_code %>'();
+  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
+  import where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
   export where (source = RTS_BGP || source = RTS_STATIC_DEVICE);
 };
 
 # template for local mesh connections
 # extend local_mesh template
-template bgp 'local_mesh_<%=@mesh_code%>' from local_mesh {
-  table 'mesh_<%=@mesh_code%>';
+template bgp local_mesh_<%=@mesh_code%>.gsub('-', '_') from local_mesh {
+  table mesh_<%=@mesh_code.gsub('-', '_') %>;
   local as <%=@icvpn_as%>;
 };
 <% if @have_mesh_peerings == "yes" %>
 <% peerings = YAML.load_file(@mesh_peerings); -%>
 <% peerings.each_pair do |name,node| %>
 
-protocol bgp 'local_<%=@mesh_code%>_<%=name%>' from 'local_mesh_<%= @mesh_code %>' {
+protocol bgp local_<%= @mesh_code.gsub('-', '_') %>_<%=name%>' from local_mesh_<%= @mesh_code.gsub('-', '_') %> {
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %> as <%= @icvpn_as %>;
 };

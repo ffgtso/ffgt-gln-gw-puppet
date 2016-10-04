@@ -2,17 +2,13 @@
 
 # bird6 community configuration for a server (non-member of the mesh)
 
-table 'mesh_<%= @mesh_code %>';
-
-#function 'is_self_<%= @mesh_code %>' () {
-#  return (proto = "static_<%= @mesh_code %>");
-#};
+table mesh_<%= @mesh_code.gsub('-', '_') %>;
 
 # pipe between mesh and mesh_<%= @mesh_code %> table
 # import #only if not in own network.
-protocol pipe 'pipe_mesh_<%=@mesh_code%>' {
+protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
-  peer table 'mesh_<%= @mesh_code %>';
+  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
   import all; #where ! 'is_self_<%=@mesh_code %>'();
   export where source = RTS_STATIC_DEVICE;
 };
