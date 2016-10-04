@@ -18,7 +18,7 @@ protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
 <% end -%>
 <% @peers.each do |tunnel,args| -%>
 <% array = args.split(';') -%>
-<% if array[2] != "" -%>
+<% if array[2].to_s != "" -%>
 protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
   table mesh;
   route <%= array[2] %> reject;
