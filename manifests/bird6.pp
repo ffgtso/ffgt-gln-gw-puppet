@@ -271,39 +271,6 @@ define ff_gln_gw::bird6::ibgp (
 }
 
 
-define ff_gln_gw::bird4::ebgp (
-  $peers,
-  $mesh_code,
-  $type = "peer",
-  $gre_yaml,
-  $our_as
-) {
-  include ff_gln_gw::bird4
-  include ff_gln_gw::resources::meta
-
-  file_line {
-    "bird-ebgp-${name}":
-      path => '/etc/bird/bird.conf.inc',
-      line => "include \"/etc/bird/bird.conf.d/03-ebgp-${name}.conf\";",
-      require => File['/etc/bird/bird.conf.inc'],
-      notify  => Service['bird'];
-  }
-
-  file { "/etc/bird/bird.conf.d/03-ebgp-${name}.conf":
-    mode => "0644",
-    content => template("ff_gln_gw/etc/bird/bird.ebgp-template.conf.erb"),
-    require => [
-      File['/etc/bird/bird.conf.d/'],
-      Package['bird']
-    ],
-    notify  => [
-      Service['bird'],
-      File_line["bird-ebgp-${name}"]
-    ];
-  }
-}
-
-
 define ff_gln_gw::bird6::ebgp (
   $peers,
   $mesh_code,
