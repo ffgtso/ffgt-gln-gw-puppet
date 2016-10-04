@@ -59,7 +59,7 @@ filter import_ebgp_transit {
 }
 
 filter export_ebgp_transit {
-  if is_self_<%= @mesh_code.gsub('-', '_') %>_prefix() then accept;
+  if is_self_<%= @mesh_code.gsub('-', '_') %> then accept;
   reject;
 }
 
