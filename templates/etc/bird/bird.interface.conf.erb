@@ -2,29 +2,29 @@
 
 # bird community configuration
 
-table mesh_<%= @mesh_code %>;
+table mesh_<%= @mesh_code.gsub('-', '_') %>;
 
-protocol static static_<%= @mesh_code %> {
-  table mesh_<%= @mesh_code %>;
+protocol static static_<%= @mesh_code.gsub('-', '_') %> {
+  table mesh_<%= @mesh_code.gsub('-', '_') %>;
   # reject route if announced from external
   route <%= @range_ipv4 %> via "lo";
 };
 
-#function is_self_<%= @mesh_code %> () {
-#  return (proto = "static_<%= @mesh_code %>");
+#function is_self_<%= @mesh_code.gsub('-', '_') %> () {
+#  return (proto = "static_<%= @mesh_code.gsub('-', '_') %>");
 #};
 
-function is_self_<%= @mesh_code %>() {
+function is_self_<%= @mesh_code.gsub('-', '_') %>() {
   return (net ~ [ <%= @range_ipv4 %> ]);
 };
 
 # Check if net is part of own prefix
-function is_in_<%= @mesh_code %>_prefix() {
+function is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() {
   return (net ~ [ <%= @range_ipv4 %>+ ]);
 };
 
 # Check if net is part of own prefix within exportable range: /16 to /21
-function <%= @mesh_code %>_export_prefix() {
+function <%= @mesh_code.gsub('-', '_') %>_export_prefix() {
   return (net ~ [ <%= @range_ipv4 %>{16,24} ]);
 };
 
@@ -32,22 +32,22 @@ function <%= @mesh_code %>_export_prefix() {
 # import only if not in own network.
 protocol pipe pipe_mesh_<%=@mesh_code%> {
   table mesh;
-  peer table mesh_<%= @mesh_code %>;
-  import all; # where ! is_self_<%=@mesh_code %>();
+  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
+  import all; # where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
   export where source = RTS_BGP || source = RTS_STATIC;
 };
 
 # template for local mesh connections
 # extend local_mesh template
-template bgp local_mesh_<%=@mesh_code%> from local_mesh {
-  table mesh_<%=@mesh_code%>;
+template bgp local_mesh_<%= @mesh_code.gsub('-', '_') %> from local_mesh {
+  table mesh_<%= @mesh_code.gsub('-', '_') %>;
   local as <%=@icvpn_as%>;
 };
 <% if @have_mesh_peerings == "yes" %>
 <% peerings = YAML.load_file(@mesh_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
 
-protocol bgp local_<%=@mesh_code%>_<%=name%> from local_mesh_<%= @mesh_code %> {
+protocol bgp local_<%= @mesh_code.gsub('-', '_') %>_<%=name%> from local_mesh_<%= @mesh_code.gsub('-', '_') %> {
   source address <%= node['ipv4src'] %>;
   neighbor <%= node['ipv4dst'] %> as <%= @icvpn_as %>;
 };

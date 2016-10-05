@@ -2,20 +2,20 @@
 
 # bird OSPF configuration
 
-table ospf_<%= @mesh_code %>;
+table ospf_<%= @mesh_code.gsub('-', '_') %>;
 <% if @announce_rid == "yes" %>
 protocol static ospf_routerid {
   import all;
-  table ospf_<%= @mesh_code %>;
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
   route <%=@router_id%>/32 via "br-rid";
 }<% end -%>
 
-# pipe between mesh and ospfmesh_<%= @mesh_code %> table
+# pipe between mesh and ospfmesh_<%= @mesh_code.gsub('-', '_') %> table
 # import all from mesh, export from ospf_xxxx to mesh own network and default route(s)
-protocol pipe pipe_ospf_<%=@mesh_code%> {
+protocol pipe pipe_ospf_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
-  peer table ospf_<%= @mesh_code %>;
-  import all; # where ! is_self_<%=@mesh_code %>();
+  peer table ospf_<%= @mesh_code.gsub('-', '_') %>;
+  import all; # where ! is_self_<%= @mesh_code.gsub('-', '_') %>();
   export filter {
     if is_self_ffgt() || is_default() then accept;
     reject;
@@ -26,14 +26,14 @@ protocol pipe pipe_ospf_<%=@mesh_code%> {
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
 protocol static ospf_<%=name%> {
-  table ospf_<%= @mesh_code %>;
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
   route <%= node['ipv4src'] %>/32 via "ospf-<%=name%>";
   #route <%= node['ipv4dst'] %>/32 via "ospf-<%=name%>";
 }
 <% end -%>
 
-protocol ospf bb_<%= @mesh_code %> {
-  table ospf_<%= @mesh_code %>;
+protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
   #import all;
   import keep filtered;
   import where !is_default();
@@ -44,7 +44,7 @@ protocol ospf bb_<%= @mesh_code %> {
   export filter {
     #if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     if is_default() && source = RTS_BGP then accept;
-    if source = RTS_STATIC then accept; #|| is_in_<%= @mesh_code %>_prefix() then accept;
+    if source = RTS_STATIC then accept; #|| is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() then accept;
     reject;
   };
 
@@ -76,21 +76,21 @@ protocol ospf bb_<%= @mesh_code %> {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
 protocol static ospf_<%=name%> {
-  table ospf_<%= @mesh_code %>;
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
   route <%= node['ipv4src'] %>/32 via "ospf-<%=name%>";
   #route <%= node['ipv4dst'] %>/32 via "ospf-<%=name%>";
 }
 <% end -%>
 
-protocol ospf int_<%= @mesh_code %> {
-  table ospf_<%= @mesh_code %>;
+protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
   import keep filtered;
   import <% if @ospf_type == "root" %>where !is_default()<% else %>all<% end %>;
   export filter {
     ospf_tag = 10;
     if (is_default() && (source = RTS_BGP)) then accept;
     if source = RTS_STATIC then accept;
-    if is_in_<%= @mesh_code %>_prefix() then accept;
+    if is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() then accept;
     reject;
   };
 
@@ -107,7 +107,7 @@ protocol ospf int_<%= @mesh_code %> {
     };
 
 <% end -%>
-    interface "br-<%= @mesh_code %>" {
+    interface "br-<%= @mesh_code.gsub('-', '_') %>" {
       cost 70;
       stub;
     };

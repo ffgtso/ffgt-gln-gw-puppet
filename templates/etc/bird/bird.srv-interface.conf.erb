@@ -2,21 +2,21 @@
 
 # bird community configuration for servers (non-members of the mesh)
 
-table mesh_<%= @mesh_code %>;
+table mesh_<%= @mesh_code.gsub('-', '_') %>;
 
-#function is_self_<%= @mesh_code %> () {
-#  return (proto = "static_<%= @mesh_code %>");
+#function is_self_<%= @mesh_code.gsub('-', '_') %> () {
+#  return (proto = "static_<%= @mesh_code.gsub('-', '_') %>");
 #};
 
-function is_self_<%= @mesh_code %>() {
+function is_self_<%= @mesh_code.gsub('-', '_') %>() {
   return (net ~ [ <%= @srv_ipv4_address %>/32 ]);
 };
 
-# pipe between mesh and mesh_<%= @mesh_code %> table
+# pipe between mesh and mesh_<%= @mesh_code.gsub('-', '_') %> table
 # import only if not in own network.
-protocol pipe pipe_mesh_<%=@mesh_code%> {
+protocol pipe pipe_mesh_<%=@ mesh_code.gsub('-', '_') %> {
   table mesh;
-  peer table mesh_<%= @mesh_code %>;
-  import where ! is_self_<%=@mesh_code %>();
+  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
+  import where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
   export where source = RTS_STATIC;
 };
