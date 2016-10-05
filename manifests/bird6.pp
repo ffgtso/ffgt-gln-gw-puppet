@@ -242,7 +242,8 @@ define ff_gln_gw::bird6::icvpn (
 
 define ff_gln_gw::bird6::ibgp (
   $peers,
-  $gre_yaml
+  $gre_yaml,
+  $our_as = $ff_gln_gw::params::icvpn_as
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta

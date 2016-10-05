@@ -10,7 +10,7 @@ function in_prefix_range_ibgp() {
 # template for ibgp route exchange
 template bgp ibgp {
   table mesh;
-  local as <%= @icvpn_as %>;
+  local as <%= @our_as %>;
   import filter {
     if is_default() then accept;
     if in_prefix_range_ibgp() then accept;
@@ -29,7 +29,7 @@ template bgp ibgp {
 
 protocol bgp ibgp_<%= tunnel.gsub('-', '_') %> from ibgp {
     source address <%= node['ipv6src'] %>;
-    neighbor <%= node['ipv6dst'] %> as <%= @icvpn_as %>;
+    neighbor <%= node['ipv6dst'] %> as <%= @our_as %>;
     default bgp_local_pref <%= pref %>;
 }
 <% end -%>
