@@ -242,7 +242,6 @@ define ff_gln_gw::bird6::icvpn (
 
 define ff_gln_gw::bird6::ibgp (
   $peers,
-  $mesh_code,
   $gre_yaml
 ) {
   include ff_gln_gw::bird6
