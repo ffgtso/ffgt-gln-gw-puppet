@@ -276,6 +276,7 @@ define ff_gln_gw::bird6::ebgp (
   $mesh_code,
   $type = "peer",
   $gre_yaml,
+  $multihop = "no",
   $our_as = $ff_gln_gw::params::icvpn_as,
 ) {
   include ff_gln_gw::bird6
