@@ -240,10 +240,39 @@ define ff_gln_gw::bird6::icvpn (
 }
 
 
+define ff_gln_gw::bird6::ibgp::setup (
+  $our_as = $ff_gln_gw::params::icvpn_as
+) {
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
+
+  file_line {
+    "bird6-ibgp-base":
+      path => '/etc/bird/bird6.conf.inc',
+      line => "include \"/etc/bird/bird6.conf.d/02-ibgp.conf\";",
+      require => File['/etc/bird/bird6.conf.inc'],
+      notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/02-ibgp.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.ibgp-base.conf.erb"),
+    require => [
+      File['/etc/bird/bird6.conf.d/'],
+      Package['bird6']
+    ],
+    notify  => [
+      Service['bird6'],
+      File_line["bird6-ibgp-base"]
+    ];
+  }
+}
+
 define ff_gln_gw::bird6::ibgp (
   $peers,
   $gre_yaml,
-  $our_as = $ff_gln_gw::params::icvpn_as
+  $our_as = $ff_gln_gw::params::icvpn_as,
+  $next_hop_self = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
@@ -270,6 +299,36 @@ define ff_gln_gw::bird6::ibgp (
   }
 }
 
+
+define ff_gln_gw::bird6::ebgp::setup (
+  $our_as = $ff_gln_gw::params::icvpn_as,
+) {
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
+
+  $ipv6_main_prefix = $ff_gln_gw::params::ipv6_main_prefix
+
+  file_line {
+    "bird6-ebgp-base":
+      path => '/etc/bird/bird6.conf.inc',
+      line => "include \"/etc/bird/bird6.conf.d/03-ebgp.conf\";",
+      require => File['/etc/bird/bird6.conf.inc'],
+      notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/03-ebgp.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.ebgp-base.conf.erb"),
+    require => [
+      File['/etc/bird/bird6.conf.d/'],
+      Package['bird6']
+    ],
+    notify  => [
+      Service['bird6'],
+      File_line["bird6-ebgp-base"]
+    ];
+  }
+}
 
 define ff_gln_gw::bird6::ebgp (
   $peers,
