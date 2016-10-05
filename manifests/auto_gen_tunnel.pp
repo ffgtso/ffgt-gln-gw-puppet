@@ -3,7 +3,7 @@ class ff_gln_gw::auto_gen_tunnel (
   $ipv6base  # "2a03:2260:117:0"
 ) {
   file {
-    '/usr/locab/bin/tun-ip.sh':
+    '/usr/local/bin/tun-ip.sh':
       ensure => file,
       mode => "0755",
       owner => root,
