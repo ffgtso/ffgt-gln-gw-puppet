@@ -102,7 +102,7 @@ protocol bgp ebgp_<%= tunnel.gsub('-', '_') %> from ebgp {
     import filter import_ebgp_<%= @type %>;
     export filter export_ebgp_<%= @type %>;
     default bgp_local_pref <%= array[1] %>;
-<% if @multihop == "yes" -%>       multihop;<% end -%>
+<% if @multihop != "" -%>       multihop;<% end -%>
 }
 <% end -%>
 <% end -%>
