@@ -28,9 +28,9 @@ function <%= @mesh_code.gsub('-', '_') %>_export_prefix() {
   return (net ~ [ <%= @range_ipv4 %>{16,24} ]);
 };
 
-# pipe between mesh and mesh_<%= @mesh_code %> table
+# pipe between mesh and mesh_<%= @mesh_code.gsub('-', '_') %> table
 # import only if not in own network.
-protocol pipe pipe_mesh_<%=@mesh_code%> {
+protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
   import all; # where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
