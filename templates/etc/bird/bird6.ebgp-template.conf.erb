@@ -24,6 +24,8 @@ protocol bgp ebgp_<%= tunnel.gsub('-', '_') %> from ebgp {
     export filter export_ebgp_<%= @type %>;
     default bgp_local_pref <%= array[1] %>;
 <% if @multihop != "" -%>       multihop;<% end -%>
+<% if @password != "" -%>       password "<%= @password %>";<% end -%>
+<% if @bgp_options != "" -%>       <%= @bgp_options %><% end -%>
 }
 <% end -%>
 <% end -%>

@@ -337,6 +337,8 @@ define ff_gln_gw::bird6::ebgp (
   $type = "peer",
   $gre_yaml,
   $multihop = "",
+  $password = "",
+  $bgp_options = "";
   $our_as = $ff_gln_gw::params::icvpn_as,
 ) {
   include ff_gln_gw::bird6
