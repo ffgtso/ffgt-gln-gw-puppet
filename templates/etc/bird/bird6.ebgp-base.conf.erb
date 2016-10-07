@@ -3,7 +3,7 @@
 # return true on any route ...
 function in_prefix_range_ebgp() {
   if net.len < 16 then return false;
-  if net.len > 56 then return false;
+  if net.len > 64 then return false;
   return true;
 }
 
