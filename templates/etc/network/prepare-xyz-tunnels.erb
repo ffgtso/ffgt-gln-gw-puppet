@@ -40,7 +40,6 @@ iface ##endpoint_name## inet static
  post-up ip rule add pref 31000 iif \$IFACE table 42
  post-up ip rule add pref 31001 iif \$IFACE unreachable
  post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 4
-if [ "<%= node['mode'] %>/" = "gre"]; then2
  pre-down ip route del ##remote_ip## dev \$IFACE src ##local_ip## table 42
  pre-down ip rule del pref 31001 iif \$IFACE unreachable
  pre-down ip rule del pref 31000 iif \$IFACE table 42
@@ -65,7 +64,6 @@ iface ##endpoint_name## inet static
  post-up ip rule add pref 31000 iif \$IFACE table 42
  post-up ip rule add pref 31001 iif \$IFACE unreachable
  post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 4
-if [ "<%= node['mode'] %>/" = "gre"]; then2
  pre-down ip route del ##remote_ip## dev \$IFACE src ##local_ip## table 42
  pre-down ip rule del pref 31001 iif \$IFACE unreachable
  pre-down ip rule del pref 31000 iif \$IFACE table 42
@@ -74,6 +72,24 @@ if [ "<%= node['mode'] %>/" = "gre"]; then2
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
  post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
+EOF
+
+cat <<EOF >/tmp/puppet-6in4-$$.txt
+auto ##endpoint_name##
+iface ##endpoint_name## inet6 v4tunnel
+ address ##local_ip6##
+ netmask 64
+ endpoint ##remote_public_ip##
+ ttl 64
+ up ip link set mtu 1280 dev \$IFACE
+ post-up ip -6 route add ##local_ip6##/128 dev \$IFACE && exit 0
+ post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE && exit 0
+ post-up ip -6 route add ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 && exit 0
+ post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 && exit 0
+ pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE && exit 0
+ pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE && exit 0
+ pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 && exit 0
+ pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 && exit 0
 EOF
 
 cat <<EOF >/tmp/puppet-$$.sh
@@ -96,8 +112,19 @@ fi
 if [ -e /etc/network/interfaces.d/<%=name%> ]; then
   (/sbin/ifdown --force <%=name%> ; exit 0)
 fi
-if [ "<%= node['mode'] %>/" = "gre"]; then
+if [ "<%= node['mode'] %>/" = "gre" -o "X<%= node['mode'] %>/" = "X"]; then
   sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+   -e 's/##endpoint_name##/<%=name%>/g' \\
+   -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
+   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
+   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
+   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
+   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
+fi
+
+if [ "<%= node['mode'] %>/" = "6in4"]; then
+  sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%> \\
    -e 's/##endpoint_name##/<%=name%>/g' \\
    -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
    -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
