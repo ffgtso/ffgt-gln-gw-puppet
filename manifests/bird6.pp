@@ -346,15 +346,39 @@ define ff_gln_gw::bird6::ebgp (
 
   $ipv6_main_prefix = $ff_gln_gw::params::ipv6_main_prefix
 
+  if $type == "special" {
+    file_line {
+      "bird6-ebgp-special-${name}":
+        path => '/etc/bird/bird6.conf.inc',
+        line => "include \"/etc/bird/bird6.conf.d/03-ebgp-A-${name}-init.conf\";",
+        replace => 'no',
+        require => File['/etc/bird/bird6.conf.inc'],
+        notify  => Service['bird6'];
+    }
+
+    file { "/etc/bird/bird6.conf.d/03-ebgp-A-${name}-init.conf":
+      mode => "0644",
+      content => template("ff_gln_gw/etc/bird/bird6.ebgp-special.conf.erb"),
+      require => [
+        File['/etc/bird/bird6.conf.d/'],
+        Package['bird6']
+      ],
+      notify  => [
+        Service['bird6'],
+        File_line["bird6-ebgp-special-${name}"]
+      ];
+    }
+  }
+
   file_line {
     "bird6-ebgp-${name}":
       path => '/etc/bird/bird6.conf.inc',
-      line => "include \"/etc/bird/bird6.conf.d/03-ebgp-${name}.conf\";",
+      line => "include \"/etc/bird/bird6.conf.d/03-ebgp-X$-{name}-main.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/03-ebgp-${name}.conf":
+  file { "/etc/bird/bird6.conf.d/03-ebgp-X-${name}-main.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.ebgp-template.conf.erb"),
     require => [
