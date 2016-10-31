@@ -103,9 +103,9 @@ fi
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
-# Skip dummy entries
-echo "<%=name%>" | grep dummy >/dev/null
-if [ \$? -eq 1 ]; then
+<% if name["dummy"] == "dummy" -%>
+# Skipped dummy entry: <%=name%>
+<% else -%>
 if [ -e /etc/network/interfaces.d/<%=name%>.cfg ]; then
   (/sbin/ifdown --force <%=name%> ; exit 0)
   /bin/rm /etc/network/interfaces.d/<%=name%>.cfg
@@ -113,6 +113,7 @@ fi
 if [ -e /etc/network/interfaces.d/<%=name%> ]; then
   (/sbin/ifdown --force <%=name%> ; exit 0)
 fi
+
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
 sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
@@ -184,6 +185,7 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%> \\
 fi
 <% end -%>
 (/sbin/ifup <%=name%> ; exit 0)
+<% end -%>
 <% end -%>
 EOF
 
