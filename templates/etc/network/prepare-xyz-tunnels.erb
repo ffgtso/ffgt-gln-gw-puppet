@@ -29,7 +29,7 @@ EOF
 cat <<EOF >/tmp/puppet-l2tp-ip-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
- pre-up /sbin/ip l2tp add tunnel name tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap ip local ##local_public_ip## remote ##remote_public_ip##
+ pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap ip local ##local_public_ip## remote ##remote_public_ip##
  pre-up /sbin/ip l2tp add session name \$IFACE tunnel_id ##src_id## session_id 1 peer_session_id 1
  address ##local_ip##
  netmask 255.255.255.254
@@ -53,7 +53,7 @@ EOF
 cat <<EOF >/tmp/puppet-l2tp-udp-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
- pre-up /sbin/ip l2tp add tunnel name tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp src_port ##src_port## dst_port ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
+ pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp src_port ##src_port## dst_port ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
  pre-up /sbin/ip l2tp add session name \$IFACE tunnel_id ##src_id## session_id 1 peer_session_id 1
  address ##local_ip##
  netmask 255.255.255.254
