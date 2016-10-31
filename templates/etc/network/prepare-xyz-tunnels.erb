@@ -124,7 +124,6 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
 <% end -%>
 <% if node['mode'] == "" -%>
 # Type: GRE (<%= node['mode'] %>)
@@ -136,7 +135,6 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
 <% end -%>
 <% if node['mode'] == "6in4" -%>
 # Type: <%= node['mode'] %>
@@ -148,7 +146,6 @@ sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
 <% end -%>
 <% if node['mode'] == "l2tp" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
@@ -167,7 +164,6 @@ sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
 <% end -%>
 <% if node['mode'] == "l2tpip" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
@@ -182,7 +178,6 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
-fi
 <% end -%>
 (/sbin/ifup <%=name%> ; exit 0)
 <% end -%>
@@ -190,4 +185,4 @@ fi
 EOF
 
 /bin/sh /tmp/puppet-$$.sh
-#/bin/rm /tmp/puppet-$$.sh /tmp/puppet-$$.txt
+/bin/rm /tmp/puppet-$$.sh /tmp/puppet-$$.txt
