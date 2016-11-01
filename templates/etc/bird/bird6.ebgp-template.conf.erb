@@ -16,7 +16,7 @@ protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
 <% @peers.each do |tunnel,args| -%>
 <% if gretun == tunnel -%>
 <% array = args.split(';') %>
-protocol bgp ebgp_<%= name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebgp<% if @type == "special" -%>_<%= @name.gsub('-', '_') %><% end -%> {
+protocol bgp ebgp_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebgp<% if @type == "special" -%>_<%= @name.gsub('-', '_') %><% end -%> {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= array[0] %>;
     import keep filtered;
