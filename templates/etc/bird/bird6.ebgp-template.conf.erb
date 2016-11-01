@@ -22,13 +22,14 @@ protocol bgp ebgp_<%= name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from e
     import keep filtered;
     import filter import_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
     export filter export_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
-<% if array[1].to_s != "" -%>    default bgp_local_pref <%= array[1] %>;<% end -%>
+<% if array[1].to_s != "" -%>    default bgp_local_pref <%= array[1] %>;
+<% end -%>
 <% if @multihop != "" -%>
 <% if @multihop == "true" -%>    multihop;
 <% else -%>    multihop <%= @multihop %>;
 <% end -%>
 <% end -%>
-<% if @password != "" -%>   password "<%= @password %>";
+<% if @password != "" -%>    password "<%= @password %>";
 <% end -%>
 <% if @bgp_options != "" -%>   <%= @bgp_options %>
 <% end -%>
