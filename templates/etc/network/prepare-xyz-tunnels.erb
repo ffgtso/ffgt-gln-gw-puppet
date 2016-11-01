@@ -23,6 +23,12 @@ iface ##endpoint_name## inet static
  post-down iptunnel del \$IFACE mode gre
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
  post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 rule add pref 31000 iif \$IFACE table 42
+ post-up ip -6 rule add pref 31000 oif \$IFACE table 42
+ post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
+ pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
 EOF
 
@@ -47,6 +53,12 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
  post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 rule add pref 31000 iif \$IFACE table 42
+ post-up ip -6 rule add pref 31000 oif \$IFACE table 42
+ post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
+ pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
 EOF
 
@@ -71,6 +83,12 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
  post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 rule add pref 31000 iif \$IFACE table 42
+ post-up ip -6 rule add pref 31000 oif \$IFACE table 42
+ post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
+ pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
 EOF
 
@@ -86,6 +104,12 @@ iface ##endpoint_name## inet6 v4tunnel
  post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE || exit 0
  post-up ip -6 route replace ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
  post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ post-up ip -6 rule add pref 31000 iif \$IFACE table 42
+ post-up ip -6 rule add pref 31000 oif \$IFACE table 42
+ post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
+ pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
+ pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
  pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE || exit 0
  pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE || exit 0
  pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
