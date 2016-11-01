@@ -13,7 +13,7 @@ iface ##endpoint_name## inet static
  up ifconfig \$IFACE multicast
  pointopoint ##remote_ip##
  post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0
+ post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
  post-up ip rule add pref 31000 iif \$IFACE table 42
  post-up ip rule add pref 31001 iif \$IFACE unreachable
  post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
@@ -21,8 +21,8 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31001 iif \$IFACE unreachable
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down iptunnel del \$IFACE mode gre
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
- post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
+ post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -42,7 +42,7 @@ iface ##endpoint_name## inet static
  pointopoint ##remote_ip##
  up ifconfig \$IFACE multicast
  post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0
+ post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
  post-up ip rule add pref 31000 iif \$IFACE table 42
  post-up ip rule add pref 31001 iif \$IFACE unreachable
  post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
@@ -51,8 +51,8 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down ip l2tp del session name \$IFACE session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
- post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
+ post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -72,7 +72,7 @@ iface ##endpoint_name## inet static
  pointopoint ##remote_ip##
  up ifconfig \$IFACE multicast
  post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0
+ post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
  post-up ip rule add pref 31000 iif \$IFACE table 42
  post-up ip rule add pref 31001 iif \$IFACE unreachable
  post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
@@ -81,8 +81,8 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down ip l2tp del session name \$IFACE session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE && sleep 1
- post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
+ post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -131,11 +131,11 @@ fi
 # Skipped dummy entry: <%=name%>
 <% else -%>
 if [ -e /etc/network/interfaces.d/<%=name%>.cfg ]; then
-  (/sbin/ifdown --force <%=name%> ; exit 0)
+  (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
   /bin/rm /etc/network/interfaces.d/<%=name%>.cfg
 fi
 if [ -e /etc/network/interfaces.d/<%=name%> ]; then
-  (/sbin/ifdown --force <%=name%> ; exit 0)
+  (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
 fi
 
 <% if node['mode'] == "gre" -%>
