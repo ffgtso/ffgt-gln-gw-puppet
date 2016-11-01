@@ -351,7 +351,7 @@ define ff_gln_gw::bird6::ebgp (
       "bird6-ebgp-special-${name}":
         path => '/etc/bird/bird6.conf.inc',
         line => "include \"/etc/bird/bird6.conf.d/03-ebgp-A-${name}-init.conf\";",
-        replace => 'no',
+        replace => 'false',
         require => File['/etc/bird/bird6.conf.inc'],
         notify  => Service['bird6'];
     }
