@@ -312,12 +312,12 @@ define ff_gln_gw::bird6::ebgp::setup (
   file_line {
     "bird6-ebgp-base":
       path => '/etc/bird/bird6.conf.inc',
-      line => "include \"/etc/bird/bird6.conf.d/03-ebgp.conf\";",
+      line => "include \"/etc/bird/bird6.conf.d/03-ebgp-A-aaabase.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/03-ebgp.conf":
+  file { "/etc/bird/bird6.conf.d/03-ebgp-A-aaabase.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.ebgp-base.conf.erb"),
     require => [
@@ -350,12 +350,12 @@ define ff_gln_gw::bird6::ebgp (
     file_line {
       "bird6-ebgp-special-${name}":
         path => '/etc/bird/bird6.conf.inc',
-        line => "include \"/etc/bird/bird6.conf.d/03-ebgp-A-${name}-init.conf\";",
+        line => "include \"/etc/bird/bird6.conf.d/03-ebgp-B-${name}-init.conf\";",
         require => File['/etc/bird/bird6.conf.inc'],
         notify  => Service['bird6'];
     }
 
-    file { "/etc/bird/bird6.conf.d/03-ebgp-A-${name}-init.conf":
+    file { "/etc/bird/bird6.conf.d/03-ebgp-B-${name}-init.conf":
       mode => "0644",
       content => template("ff_gln_gw/etc/bird/bird6.ebgp-special.conf.erb"),
       replace => false,
