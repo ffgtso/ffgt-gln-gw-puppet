@@ -203,11 +203,18 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
-/sbin/ifup <%=name%>
-sleep 2
 <% end -%>
 <% end -%>
 EOF
-
 /bin/sh /tmp/puppet-$$.sh
+<% peerings = YAML.load_file(@gre_yaml); -%>
+<% peerings.each_pair do |name,node| -%>
+<% if name["dummy"] == "dummy" -%>
+# Skipped dummy entry: <%=name%>
+<% else -%>
+echo <%=name%>
+/sbin/ifup <%=name%>
+<% end -%>
+<% end -%>
+
 /bin/rm /tmp/puppet-$$.sh /tmp/puppet-*-$$.txt
