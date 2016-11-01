@@ -203,10 +203,11 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%> \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
-(/sbin/ifup <%=name%> ; exit 0)
+/sbin/ifup <%=name%>
+sleep 2
 <% end -%>
 <% end -%>
 EOF
 
 /bin/sh /tmp/puppet-$$.sh
-/bin/rm /tmp/puppet-$$.sh /tmp/puppet-$$.txt
+/bin/rm /tmp/puppet-$$.sh /tmp/puppet-*-$$.txt
