@@ -50,9 +50,9 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31001 iif \$IFACE unreachable
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
- post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
- post-up sleep 1 ; ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ post-down ip l2tp del tunnel tunnel_id ##src_id##
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
+ post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 metric 512 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -82,7 +82,7 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
- post-up sleep 1 ; ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 metric 512 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -121,9 +121,8 @@ if [ ! -d /etc/network/interfaces.d ]; then
   mkdir /etc/network/interfaces.d
   echo >>/etc/network/interfaces
   grep "^source /etc/network/interfaces.d/\\*\$" /etc/network/interfaces || echo "source /etc/network/interfaces.d/*" >>/etc/network/interfaces
-else
-  sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
 fi
+sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/interfaces.d/*%g' /etc/network/interfaces
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
@@ -137,7 +136,7 @@ fi
 if [ -e /etc/network/interfaces.d/<%=name%> ]; then
   (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
 fi
-
+V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix (masked)/ {print \$NF;}'`"
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
 sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
