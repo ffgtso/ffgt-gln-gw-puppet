@@ -51,7 +51,7 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
 <% @peers.each do |tunnel,args| -%>
 <% array = args.split(';') -%>
 <% if array[2].to_s != "" -%>
-   if proto = local_<%= tunnel.gsub('-', '_') %>_2 then accept;
+   if net ~ <%= array[2] %> then accept;
 <% end -%>
 <% end -%>
  }
