@@ -26,7 +26,7 @@
 
 # Nagios plugin exit codes
 OK=0;
-#WARNING=1;
+WARNING=1;
 CRITICAL=2;
 #UNKNOWN=3;
 
@@ -39,8 +39,8 @@ if [ "$LATEST_KERNEL" = "$RUNNING_KERNEL" ]; then
   echo "OK - Running kernel ( $RUNNING_KERNEL ) = most recent on disk kernel ( $LATEST_KERNEL )"
   exit $OK
 else
-  echo "CRITICAL - Reboot required. Running kernel $RUNNING_KERNEL is too old, newest kernel on disk is $LATEST_KERNEL"
-  exit $CRITICAL
+  echo "WARNING - Reboot required. Running kernel $RUNNING_KERNEL is too old, newest kernel on disk is $LATEST_KERNEL"
+  exit $WARNING
 fi
 
 
