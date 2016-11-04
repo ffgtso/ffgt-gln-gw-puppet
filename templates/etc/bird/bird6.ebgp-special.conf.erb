@@ -48,7 +48,7 @@ filter import_ebgp_<%= @name.gsub('-', '_') %> {
 filter export_ebgp_<%= @name.gsub('-', '_') %> {
   if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) then {
     if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
- <% @peers.each do |tunnel,args| -%>
+<% @peers.each do |tunnel,args| -%>
 <% array = args.split(';') -%>
 <% if array[2].to_s != "" -%>
    if proto = local_<%= tunnel.gsub('-', '_') %>_2 then accept;
