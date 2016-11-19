@@ -8,37 +8,21 @@
 
 #
 #                                 YOU HAVE BEEN WARNED!
+#            (This file should be backed up along with the .pp for this host.)
 #
 
-#function rt_import(int asn; int set peer_asns; prefix set peer_nets)
-#{
-#  if ! (net ~ peer_nets) then return false;
-#  if ! (bgp_path.last ~ peer_asns) then return false;
-#  if bgp_path.first != asn then return false;
-#  if bgp_path.len > 64 then return false;
-#  if bgp_next_hop != from then return false;
-#  return true;
-#}
-
-#function rt_import_all(int asn)
-#{
-#  if net_martian() || net_local() then return false;
-#  if bgp_path.first != asn then return false;
-#  if bgp_path.len > 64 then return false;
-#  if bgp_next_hop != from then return false;
-#  return true;
-#}
-
+<% if @type == "special" -%>
 <% @peers.each do |tunnel,args| -%>
 <% array = args.split(';') -%>
 <% if array[2].to_s != "" -%>
-protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
-  table mesh;
-  route <%= array[2] %> reject;
-};
-<% end -%>
-<% end -%>
+#protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
+#  table mesh;
+#  route <%= array[2] %> reject;
+#};
 
+<% end -%>
+<% end -%>
+<% end -%>
 filter import_ebgp_<%= @name.gsub('-', '_') %> {
   if is_default() then accept;
   if is_global_unicast() then accept;
@@ -51,7 +35,10 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
 <% @peers.each do |tunnel,args| -%>
 <% array = args.split(';') -%>
 <% if array[2].to_s != "" -%>
-   if net ~ <%= array[2] %> then accept;
+<% exports = array[2].split(',') -%>
+<% exports.each do |expnet| -%>
+   if net ~ <%= expnet %> then accept;
+<% end -%>
 <% end -%>
 <% end -%>
  }
@@ -59,7 +46,7 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
 }
 
 # template for ebgp route exchange
-template bgp ebgp_<%= @name.gsub('-', '_') %> {
+template bgp e_<%= @name.gsub('-', '_') %> {
   table mesh;
   local as <%= @our_as %>;
 };

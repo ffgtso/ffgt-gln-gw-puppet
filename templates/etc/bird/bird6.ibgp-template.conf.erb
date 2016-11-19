@@ -3,11 +3,11 @@
 <% @peers.each do |tunnel,pref| -%>
 <% if gretun == tunnel -%>
 
-protocol bgp ibgp_<%= tunnel.gsub('-', '_') %> from ibgp {
+protocol bgp i_<%= tunnel.gsub('-', '_') %> from ibgp {
     source address <%= node['ipv6src'] %>;
     neighbor <%= node['ipv6dst'] %> as <%= @our_as %>;
     default bgp_local_pref <%= pref %>;
-<% if @next_hop_self != "" -%>       next hop self;<% end -%>
+<% if @next_hop_self != "" -%>    next hop self;
 }
 <% end -%>
 <% end -%>
