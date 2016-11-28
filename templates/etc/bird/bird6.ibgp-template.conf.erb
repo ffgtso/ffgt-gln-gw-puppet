@@ -10,7 +10,7 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %> as <%= @our_as %>;
   import filter {
-    bgp_local_pref <%= pref %>;
+    bgp_local_pref = <%= pref %>;
     if is_default() then accept;
     if in_prefix_range_ibgp() then accept;
     reject;
