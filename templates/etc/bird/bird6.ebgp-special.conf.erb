@@ -25,7 +25,7 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
 <% if array[2].to_s != "" -%>
 <% exports = array[2].split(',') -%>
 <% exports.each do |expnet| -%>
-   if net = <%= expnet %> then accept;
+    if net = <%= expnet %> then accept;
 <% end -%>
 <% end -%>
 <% end -%>

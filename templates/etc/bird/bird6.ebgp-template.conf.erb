@@ -14,7 +14,7 @@ protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebg
 <% if array[1].to_s != "" -%>    default bgp_local_pref <%= array[1] %>;
 <% end -%>
 <% if @multihop != "" -%>
-<% if @multihop == "true" -%>    multihop;
+<% if @multihop == "true" || @multihop == "yes" -%>    multihop;
 <% else -%>    multihop <%= @multihop %>;
 <% end -%>
 <% end -%>
