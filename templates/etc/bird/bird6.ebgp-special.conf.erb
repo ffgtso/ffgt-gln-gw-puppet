@@ -11,18 +11,6 @@
 #            (This file should be backed up along with the .pp for this host.)
 #
 
-<% if @type == "special" -%>
-<% @peers.each do |tunnel,args| -%>
-<% array = args.split(';') -%>
-<% if array[2].to_s != "" -%>
-#protocol static local_<%= tunnel.gsub('-', '_') %>_2 {
-#  table mesh;
-#  route <%= array[2] %> reject;
-#};
-
-<% end -%>
-<% end -%>
-<% end -%>
 filter import_ebgp_<%= @name.gsub('-', '_') %> {
   if is_default() then accept;
   if is_global_unicast() then accept;
@@ -37,15 +25,14 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
 <% if array[2].to_s != "" -%>
 <% exports = array[2].split(',') -%>
 <% exports.each do |expnet| -%>
-   if net ~ <%= expnet %> then accept;
+   if net = <%= expnet %> then accept;
 <% end -%>
 <% end -%>
 <% end -%>
- }
+  }
   reject;
 }
 
-# template for ebgp route exchange
 template bgp e_<%= @name.gsub('-', '_') %> {
   table mesh;
   local as <%= @our_as %>;

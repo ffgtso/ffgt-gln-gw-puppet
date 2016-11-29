@@ -5,7 +5,7 @@ protocol bgp uplink_<%= @endpoint_name.gsub('-', '_') %> {
   import where is_default();
   export where is_in_<%= @mesh_code.gsub('-', '_') %>_prefix();
   next hop self;
-  multihop 64;
+  multihop 8;
   neighbor <%= @remote_ipv6 %> as <%= @remote_as %>;
   default bgp_local_pref <%= @bgp_local_pref6 %>;
 }
