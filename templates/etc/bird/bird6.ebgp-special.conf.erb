@@ -33,7 +33,7 @@ filter export_ebgp_<%= @name.gsub('-', '_') %> {
   reject;
 }
 
-template bgp e_<%= @name.gsub('-', '_') %> {
+template bgp ebgp_<%= @name.gsub('-', '_') %> {
   table mesh;
   local as <%= @our_as %>;
 };
