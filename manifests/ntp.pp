@@ -5,10 +5,11 @@ class ff_gln_gw::ntp () {
   ff_gln_gw::monitor::nrpe::check_command {
     "ntpd":
       command => '/usr/lib/nagios/plugins/check_procs -w 2 -C ntpd';
+  }
 
   package {
     'ntp':
-      ensure => installed,
+      ensure => installed;
   }
 
   file {
