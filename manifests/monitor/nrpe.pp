@@ -57,12 +57,11 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   }
 
   file {
-    '/etc/nagios/nrpe.d/check_ntpd.cfg';
+    '/etc/nagios/nrpe.d/check_ntpd.cfg':
       ensure => file,
       mode => '0644',
       owner => 'root',
       group => 'root',
-      require => Package['time-daemon'],
       source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_ntpd.cfg";
   }
 
