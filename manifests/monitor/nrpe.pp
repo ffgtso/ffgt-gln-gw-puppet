@@ -57,6 +57,15 @@ class ff_gln_gw::monitor::nrpe ( $allowed_hosts ) {
   }
 
   file {
+    '/etc/nagios/nrpe.d/check_ntpd.cfg':
+      ensure => file,
+      mode => '0644',
+      owner => 'root',
+      group => 'root',
+      source => "puppet:///modules/ff_gln_gw/etc/nagios/nrpe.d/check_ntpd.cfg";
+  }
+
+  file {
     '/etc/nagios/nrpe.d/check_disk.cfg':
       ensure => file,
       mode => '0644',

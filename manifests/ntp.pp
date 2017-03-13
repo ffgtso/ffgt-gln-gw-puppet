@@ -2,7 +2,7 @@ class ff_gln_gw::ntp () {
 
   package {
     'ntp':
-      ensure => installed,
+      ensure => installed;
   }
 
   file {
