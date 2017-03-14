@@ -132,14 +132,16 @@ sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/in
 if [ -e /etc/network/interfaces.d/<%=name%>.cfg ]; then
   (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
   /bin/rm /etc/network/interfaces.d/<%=name%>.cfg
-fi
-if [ -e /etc/network/interfaces.d/<%=name%> ]; then
-  (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
+else
+  if [ -e /etc/network/interfaces.d/<%=name%> ]; then
+    (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
+  fi
+  /bin/mv /etc/network/interfaces.d/<%=name%> /etc/network/interfaces.d/<%=name%>.cfg
 fi
 V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix (masked)/ {print \$NF;}'`"
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
-sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##endpoint_name##/<%=name%>/g' \\
   -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
@@ -150,7 +152,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
 <% end -%>
 <% if node['mode'] == "" -%>
 # Type: GRE (<%= node['mode'] %>)
-sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##endpoint_name##/<%=name%>/g' \\
   -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
@@ -161,7 +163,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%> \\
 <% end -%>
 <% if node['mode'] == "6in4" -%>
 # Type: <%= node['mode'] %>
-sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##endpoint_name##/<%=name%>/g' \\
   -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
@@ -175,7 +177,7 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##src_port##/\${src_port}/g" \\
   -e "s/##dst_port##/\${dst_port}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
@@ -191,7 +193,7 @@ sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%> \\
 <% if node['mode'] == "l2tpip" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
-sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%> \\
+sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##src_id##/\${src_id}/g" \\
   -e "s/##dst_id##/\${dst_id}/g" \\
   -e 's/##endpoint_name##/<%=name%>/g' \\
