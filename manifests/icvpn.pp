@@ -7,7 +7,7 @@ class ff_gln_gw::icvpn (
 }
 
 define ff_gln_gw::icvpn::setup (
-  $icvpn_as,
+  $icvpn_as = $ff_gln_gw::params::icvpn_as,
   $icvpn_ipv4_address,
   $icvpn_ipv6_address,
   $icvpn_exclude_peerings = [],
@@ -16,6 +16,12 @@ define ff_gln_gw::icvpn::setup (
   ){
 
   include ff_gln_gw::resources::meta
+
+  # TODO: check for python vs. python3. *sigh*
+  # package {
+  #   'python3-yaml':
+  #     ensure => installed,
+  # }
 
   ff_gln_gw::resources::ff_gln_gw::field {
     "ICVPN": value => '1';
