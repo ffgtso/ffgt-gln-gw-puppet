@@ -1,6 +1,6 @@
 class ff_gln_gw::auto_gen_tunnel (
-  $ipv4base, # "10.234",
-  $ipv6base  # "2a03:2260:117:0"
+  $ipv4base = "10.234",          # Base of a /16 IPv4 network
+  $ipv6base = "2a06:e881:1705:0" # Base of a /52 IPv6 network
 ) {
   file {
     '/usr/local/bin/tun-ip.sh':

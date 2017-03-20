@@ -1,5 +1,5 @@
 define ff_gln_gw::gre::tunnel (
-  $gre_yaml, # YAML data file for creating GRE tunnels
+  $gre_yaml, # YAML data file for creating XYZ tunnels (GRE, L2TP)
 ) {
   file { "/tmp/prepare-gre-tunnels-${name}.sh":
     mode => "0755",
