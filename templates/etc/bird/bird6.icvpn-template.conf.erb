@@ -12,6 +12,7 @@ template bgp icvpn {
   table mesh;
   local as <%= @icvpn_as %>;
   source address <%= @icvpn_ipv6_address %>;
+  import keep filtered;
   import filter {
     <% if @allow_v6_default == "yes" %>if is_default() then accept;
     <% end %>if in_prefix_range_icvpn() && (is_ula() || is_freifunk()) then accept;
