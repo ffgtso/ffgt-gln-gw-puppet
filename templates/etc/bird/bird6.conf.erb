@@ -59,6 +59,7 @@ protocol kernel {
   scan time 20;    # Scan kernel routing table every 20 seconds
   kernel table 42; # routing table for mesh networks
   import none;     # Import no routes
+  device routes;   # Export RTS_DEVICE routes as well
   export all;      # Export all routes
 };
 
