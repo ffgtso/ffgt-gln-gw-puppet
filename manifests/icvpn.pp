@@ -13,7 +13,8 @@ define ff_gln_gw::icvpn::setup (
   $mesh_code,
   $tinc_keyfile,
   $allow_v4_default = "yes",
-  $allow_v6_default = "yes"
+  $allow_v6_default = "yes",
+  $export_prefixes = []
   ){
 
   include ff_gln_gw::resources::meta

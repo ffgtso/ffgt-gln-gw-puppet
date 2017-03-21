@@ -14,12 +14,14 @@ template bgp icvpn {
   source address <%= @icvpn_ipv6_address %>;
   import filter {
     <% if @allow_v6_default == "yes" %>if is_default() then accept;
-    <% end %>if in_prefix_range_icvpn() && (is_ula() || is_freifunk()) then accept;
+    <% end %>if in_prefix_range_icvpn() && (is_ula() || is_freifunk()) then accept;<% @ranges.each do |range| %>range <%= range %>;
+  <% end %>
   };
   export filter {
     if is_default() then reject;
     if in_prefix_range_icvpn() then {
-      if is_in_<%= @mesh_code %>_upstream_prefix() then accept;
+      <% @export_prefixes.each do |prefix| %>if (net ~ [ <%= prefix %> ]) then accept;
+      <% end %>if is_in_<%= @mesh_code %>_upstream_prefix() then accept;
       if ((source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) && (is_freifunk() || is_ula()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
     }
     reject;
