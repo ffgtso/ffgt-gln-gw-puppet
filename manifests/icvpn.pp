@@ -3,7 +3,6 @@ class ff_gln_gw::icvpn (
   $icvpn_as = $ff_gln_gw::params::icvpn_as,
 ) inherits ff_gln_gw::params {
   $tinc_name = $name
-
 }
 
 define ff_gln_gw::icvpn::setup (
@@ -13,6 +12,8 @@ define ff_gln_gw::icvpn::setup (
   $icvpn_exclude_peerings = [],
   $mesh_code,
   $tinc_keyfile,
+  $allow_v4_default = "yes",
+  $allow_v6_default = "yes"
   ){
 
   include ff_gln_gw::resources::meta
