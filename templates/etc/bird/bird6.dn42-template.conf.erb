@@ -6,5 +6,5 @@ template bgp dn42 {
   local as <%= @icvpn_as %>;
   source address <%= @icvpn_ipv6_address %>;
   import where (is_ula() || is_dn42() || is_freifunk());
-  export where ((source = RTS_BGP) || (source = RTS_STATIC_DEVICE)) && (is_ula() || is_freifunk() || is_dn42());
+  export where ((source = RTS_BGP) || (source = RTS_DEVICE)) && (is_ula() || is_freifunk() || is_dn42());
 };

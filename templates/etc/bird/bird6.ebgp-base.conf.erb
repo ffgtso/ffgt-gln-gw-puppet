@@ -79,7 +79,7 @@ filter import_ebgp_transit {
 }
 
 filter export_ebgp_transit {
-  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) then {
+  if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
     if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
   }
   reject;

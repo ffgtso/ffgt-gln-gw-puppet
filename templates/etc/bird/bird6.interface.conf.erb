@@ -35,7 +35,7 @@ protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
   import where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
-  export where (source = RTS_BGP || source = RTS_STATIC_DEVICE);
+  export where (source = RTS_BGP || source = RTS_DEVICE);
 };
 
 # template for local mesh connections

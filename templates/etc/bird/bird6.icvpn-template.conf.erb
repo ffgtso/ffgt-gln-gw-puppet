@@ -22,7 +22,7 @@ template bgp icvpn {
     if in_prefix_range_icvpn() then {
       <% @export_prefixes.each do |prefix| %>if (net ~ [ <%= prefix %> ]) then accept;
       <% end %>if is_in_<%= @mesh_code %>_upstream_prefix() then accept;
-      if ((source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) && (is_freifunk() || is_ula()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
+      if ((source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) && (is_freifunk() || is_ula()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>)) then accept;
     }
     reject;
   };
