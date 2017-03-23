@@ -249,12 +249,12 @@ define ff_gln_gw::bird6::ibgp::setup (
   file_line {
     "bird6-ibgp-base":
       path => '/etc/bird/bird6.conf.inc',
-      line => "include \"/etc/bird/bird6.conf.d/02-ibgp.conf\";",
+      line => "include \"/etc/bird/bird6.conf.d/02-ibgp-A-aaabase.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/02-ibgp.conf":
+  file { "/etc/bird/bird6.conf.d/02-ibgp-A-aaabase.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.ibgp-base.conf.erb"),
     require => [
@@ -280,12 +280,12 @@ define ff_gln_gw::bird6::ibgp (
   file_line {
     "bird6-ibgp-${name}":
       path => '/etc/bird/bird6.conf.inc',
-      line => "include \"/etc/bird/bird6.conf.d/02-ibgp-${name}.conf\";",
+      line => "include \"/etc/bird/bird6.conf.d/02-ibgp-B-${name}.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }
 
-  file { "/etc/bird/bird6.conf.d/02-ibgp-${name}.conf":
+  file { "/etc/bird/bird6.conf.d/02-ibgp-B-${name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.ibgp-template.conf.erb"),
     require => [
