@@ -190,6 +190,20 @@ define ff_gln_gw::bird6::local (
   }
 }
 
+define ff_gln_gw::bird6::local_route (
+  $local_rt,
+  $local_if
+) {
+  include ff_gln_gw::bird6
+
+  file_line {
+    "bird6-localrt-${name}":
+      path => '/etc/bird/bird6.conf.inc',
+      line => "protocol static 'localrt-${name}' { table ospf_ffgt; route ${local_rt} via \"${local_if}\"; };",
+      require => File['/etc/bird/bird6.conf.d/99-local.conf'],
+      notify  => Service['bird6'];
+  }
+}
 
 define ff_gln_gw::bird6::icvpn (
   $icvpn_as = $ff_gln_gw::params::icvpn_as,
