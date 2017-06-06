@@ -5,7 +5,7 @@ define ff_gln_gw::gre::tunnel (
     mode => "0755",
     content => template("ff_gln_gw/etc/network/prepare-xyz-tunnels.erb")
   } ->
-  exec { "prepare-gre-tunnels-${mesh_code}":
+  exec { "prepare-gre-tunnels-${name}":
     command => "/tmp/prepare-gre-tunnels-${name}.sh",
     cwd => "/tmp"
   }
