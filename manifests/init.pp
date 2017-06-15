@@ -155,7 +155,7 @@ define ff_gln_gw::gateway(
   $mesh_as = $ff_gln_gw::params::icvpn_as,
   $range_ipv4,       # ipv4 range allocated to community in cidr notation, e.g. 10.35.0.1/16
   $range_ipv6,       # ipv6 range allocated to community (public v6 prefferred)
-  $local_ipv6,
+  $local_ipv6 = $ff_gln_gw::params::loopback_ipv6,
   $mesh_peerings,    # path to the local peerings description yaml file
   $have_mesh_peerings,
 ) {
@@ -233,7 +233,7 @@ define ff_gln_gw::server(
   $mesh_name,        # Name of your community, e.g.: Freifunk Gotham City
   $mesh_code,        # Code of your community, e.g.: ffgc
   $mesh_as = $ff_gln_gw::params::icvpn_as,
-  $local_ipv6,
+  $local_ipv6 = $ff_gln_gw::params::loopback_ipv6,
 ) {
 
   # TODO We should handle parameters in a param class pattern.

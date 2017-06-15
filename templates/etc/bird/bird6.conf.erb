@@ -60,7 +60,11 @@ protocol kernel {
   kernel table 42; # routing table for mesh networks
   import none;     # Import no routes
   device routes;   # Export RTS_DEVICE routes as well
-  export all;      # Export all routes
+  #export all;      # Export all routes
+  export filter {
+    krt_prefsrc = <%= @loopback_ipv6 %>;
+    accept;
+  };
 };
 
 # export to kernel main table for local services
@@ -68,7 +72,11 @@ protocol kernel {
   table kernel_main;
   scan time 20;
   import none;
-  export all;
+  #export all;
+  export filter {
+    krt_prefsrc = <%= @loopback_ipv6 %>;
+    accept;
+  };
   persist;
 };
 

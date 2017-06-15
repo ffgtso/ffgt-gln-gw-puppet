@@ -3,7 +3,9 @@ class ff_gln_gw::bird6 (
   $icvpn_as  = $ff_gln_gw::params::icvpn_as
 ) inherits ff_gln_gw::params {
   require ff_gln_gw::resources::repos
- 
+
+  $loopback_ipv6 = $ff_gln_gw::params::loopback_ipv6
+
   ff_gln_gw::monitor::nrpe::check_command {
     "bird6":
       command => '/usr/lib/nagios/plugins/check_procs -w 1:1 -c 1:1 -C bird6';

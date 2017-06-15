@@ -10,6 +10,8 @@ class ff_gln_gw::params (
   $include_dn42_routes = "no",
   $provides_uplink = "no",
   $ipv6_main_prefix = "",
+  $loopback_ipv6 = "::1/128",
+  $loopback_ipv4 = "127.0.0.1",
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
 ) {
