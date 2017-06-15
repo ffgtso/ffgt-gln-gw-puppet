@@ -21,8 +21,8 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31001 iif \$IFACE unreachable
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down iptunnel del \$IFACE mode gre
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
- post-up sleep 1 ; ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
+ post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -52,7 +52,7 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id##
  post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
- post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 metric 512 || exit 0
+ post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -81,8 +81,8 @@ iface ##endpoint_name## inet static
  pre-down ip rule del pref 31000 iif \$IFACE table 42
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE ; sleep 1
- post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 metric 512 || exit 0
+ post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
+ post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -102,8 +102,7 @@ iface ##endpoint_name## inet6 v4tunnel
  up ip link set mtu 1280 dev \$IFACE
  post-up ip -6 route add ##local_ip6##/128 dev \$IFACE || exit 0
  post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE || exit 0
- post-up ip -6 route replace ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
- post-up ip -6 route replace ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
  post-up ip -6 rule add pref 31000 iif \$IFACE table 42
  post-up ip -6 rule add pref 31000 oif \$IFACE table 42
  post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
@@ -112,8 +111,7 @@ iface ##endpoint_name## inet6 v4tunnel
  pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
  pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE || exit 0
  pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE || exit 0
- pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
- pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE src ##local_ip6## table 42 || exit 0
+ pre-down ip -6 route del ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
 EOF
 
 cat <<EOF >/tmp/puppet-$$.sh
@@ -147,6 +145,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+  -e "s/##prefix6##/${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -158,6 +157,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+  -e "s/##prefix6##/${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -169,6 +169,7 @@ sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+  -e "s/##prefix6##/${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -187,6 +188,7 @@ sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+  -e "s/##prefix6##/${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -201,6 +203,7 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
+  -e "s/##prefix6##/${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Build for interactive use, i. e. set PATH accordingly if run via cron
+# Build for interactive use, i. e. set PATH accordingly if run via micron.d
 #
 # To facilitate "virtual remote execution" ;), enter target hostname as $1
 #
