@@ -62,7 +62,7 @@ protocol kernel {
   device routes;   # Export RTS_DEVICE routes as well
   #export all;      # Export all routes
   export filter {
-    krt_prefsrc = <%= @loopback_ipv6 %>;
+    if (! is_ula()) then { krt_prefsrc = <%= @loopback_ipv6 %>; }
     accept;
   };
 };
@@ -74,7 +74,7 @@ protocol kernel {
   import none;
   #export all;
   export filter {
-    krt_prefsrc = <%= @loopback_ipv6 %>;
+    if (source = RTS_BGP && !is_ula()) then { krt_prefsrc = <%= @loopback_ipv6 %>; }
     accept;
   };
   persist;
