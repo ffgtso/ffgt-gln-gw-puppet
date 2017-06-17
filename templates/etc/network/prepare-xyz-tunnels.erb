@@ -130,10 +130,13 @@ sed -i -e 's%^source /etc/network/interfaces.d/\\*\\.cfg$%source /etc/network/in
 if [ -e /etc/network/interfaces.d/<%=name%>.cfg ]; then
   (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
   /bin/rm /etc/network/interfaces.d/<%=name%>.cfg
-else
-  if [ -e /etc/network/interfaces.d/<%=name%> ]; then
-    (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
-  fi
+fi
+if [ -e /etc/network/interfaces.d/<%=name%>.conf ]; then
+  (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
+  /bin/rm /etc/network/interfaces.d/<%=name%>.conf
+fi
+if [ -e /etc/network/interfaces.d/<%=name%> ]; then
+  (/sbin/ifdown --force <%=name%> >/dev/null 2>/1 ; exit 0)
   /bin/mv /etc/network/interfaces.d/<%=name%> /etc/network/interfaces.d/<%=name%>.cfg
 fi
 V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix / {print \$NF;}'`"
@@ -145,7 +148,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
-  -e "s/##prefix6##/${V6SUBNET}/g" \\
+  -e "s/##prefix6##/\${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -157,7 +160,7 @@ sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
-  -e "s/##prefix6##/${V6SUBNET}/g" \\
+  -e "s/##prefix6##/\${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -169,7 +172,7 @@ sed </tmp/puppet-6in4-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
-  -e "s/##prefix6##/${V6SUBNET}/g" \\
+  -e "s/##prefix6##/\${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -188,7 +191,7 @@ sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
-  -e "s/##prefix6##/${V6SUBNET}/g" \\
+  -e "s/##prefix6##/\${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
@@ -203,7 +206,7 @@ sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
-  -e "s/##prefix6##/${V6SUBNET}/g" \\
+  -e "s/##prefix6##/\${V6SUBNET}/g" \\
   -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
   -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
