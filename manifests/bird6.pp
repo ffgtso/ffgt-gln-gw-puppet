@@ -18,6 +18,8 @@ class ff_gln_gw::bird6 (
         File['/etc/apt/preferences.d/bird'],
         Apt::Source['debian-backports']
       ];
+    'sipcalc':
+      ensure => installed;
   }
  
   file {
