@@ -44,7 +44,11 @@ function is_dn42() {
   return (net ~ [ fd00::/8{48,64} ]);
 };
 
-function check_ebgp_export(int peeras)
+function is_global_unicast() {
+  return net ~ [ 2000::/3+ ];
+}
+
+function ok_for_ebgp_export()
   prefix set martians;
   int set reserved_asn;
   prefix set our_prefixes;
@@ -53,9 +57,10 @@ function check_ebgp_export(int peeras)
     # so we mustn't filter more specific
     # 3FFE::/16 et 5F00::/8 = formerly 6bone (IPv6 tests)
     martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
-    2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
-    2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
-    3FFE::/16+, 5F00::/8+ ];
+       2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
+       2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
+       3FFE::/16+, 5F00::/8+
+    ];
 
 	# http://www.iana.org/assignments/as-numbers/as-numbers.xhtml
 	reserved_asn = [
@@ -91,7 +96,7 @@ function check_ebgp_export(int peeras)
     #if bgp_next_hop != nexthop then return false;
 
     # AS_PATH too long (max seen in real life = 54)
-    if bgp_path.len > 64 then return false;
+    #if bgp_path.len > 64 then return false;
 
     # Don't accept if path contains a reserved AS
     # Disabled because it removes legit prefixes
@@ -99,8 +104,6 @@ function check_ebgp_export(int peeras)
 
     return true;
 }
-
-
 
 # default route
 # be careful with importing default routes from arbitrary peers

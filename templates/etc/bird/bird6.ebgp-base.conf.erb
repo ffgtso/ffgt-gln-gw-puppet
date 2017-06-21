@@ -17,10 +17,6 @@ protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
 
 <% end -%>
 
-function is_global_unicast() {
-  return net ~ [ 2000::/3+ ];
-}
-
 #function rt_import(int asn; int set peer_asns; prefix set peer_nets)
 #{
 #  if ! (net ~ peer_nets) then return false;
@@ -48,7 +44,7 @@ filter import_ebgp_friend {
 
 filter export_ebgp_friend {
   if is_default() then accept;
-  if is_global_unicast() && in_prefix_range_ebgp() then accept;
+  if ok_for_ebgp_export() then accept;
   reject;
 }
 
