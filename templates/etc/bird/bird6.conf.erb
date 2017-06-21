@@ -44,6 +44,64 @@ function is_dn42() {
   return (net ~ [ fd00::/8{48,64} ]);
 };
 
+function check_ebgp_export(int peeras)
+  prefix set martians;
+  int set reserved_asn;
+  prefix set our_prefixes;
+{
+    # 2001::/23 contains for example 2001:4:112::/48, belonging to AS112
+    # so we mustn't filter more specific
+    # 3FFE::/16 et 5F00::/8 = formerly 6bone (IPv6 tests)
+    martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
+    2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
+    2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
+    3FFE::/16+, 5F00::/8+ ];
+
+	# http://www.iana.org/assignments/as-numbers/as-numbers.xhtml
+	reserved_asn = [
+		# 16-bit
+		0,                      # Reserved. RFC7607
+		23456,                  # AS_TRANS. RFC6793
+		64496..64511,           # Reserved for use in documentation and sample code. RFC5398
+		64512..65534,           # Reserved for Private Use. RFC6996
+		65535,                  # Reserved. RFC7300
+
+		# 32-bit
+		65536..65551,           # Reserved for use in documentation and sample code. RFC5398
+		65552..131071,          # Reserved.
+		4200000000..4294967294, # Reserved for Private Use. [RFC6996]
+		4294967295              # Reserved. RFC7300
+    ];
+    # Avoid too short and too long prefixes
+    if (net.len < 16) || (net.len > 48) then return false;
+
+    # Remove default route
+    #if net = ::/0 then return false;
+
+    # Avoid reserved networks
+    if net ~ martians then return false;
+
+    # Avoid bogons. IANA didn't allocate outside of 2000::/3
+    # but there are already announces there
+    if ! (net.ip ~ 2000::/3) then return false;
+
+    # Check that the next AS is our neighbour's.
+    # Same for next-hop
+    #if bgp_path.first != peeras then return false;
+    #if bgp_next_hop != nexthop then return false;
+
+    # AS_PATH too long (max seen in real life = 54)
+    if bgp_path.len > 64 then return false;
+
+    # Don't accept if path contains a reserved AS
+    # Disabled because it removes legit prefixes
+    if bgp_path ~ reserved_asn then return false;
+
+    return true;
+}
+
+
+
 # default route
 # be careful with importing default routes from arbitrary peers
 function is_default() {
