@@ -125,6 +125,13 @@ function ok_for_ebgp_export()
     return true;
 }
 
+function check_communities_ebgp_export() {
+    if ( (65535, 65281) ~ bgp_community ) then {
+        print "Reject: prefix ", net, " has the no_export community set";
+        return false;
+    }
+}
+
 # default route
 # be careful with importing default routes from arbitrary peers
 function is_default() {
