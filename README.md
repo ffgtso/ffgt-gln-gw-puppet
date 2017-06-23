@@ -55,29 +55,28 @@ Install as a puppet module, then include with node-specific parameters.
 Install Puppet and some required modules with:
 
 
-... upto Ubuntu LTS 14.04 ...
+... upto Ubuntu LTS 14.04 (versions known to work) ...
 ```
 apt-get install --no-install-recommends puppet git libaugeas-ruby
-puppet module install puppetlabs-stdlib
-puppet module install puppetlabs-apt
-puppet module install puppetlabs-vcsrepo
-puppet module install saz-sudo
-puppet module install torrancew-account
-puppet module install camptocamp-kmod
+puppet module install puppetlabs-stdlib --version 4.8.0
+puppet module install puppetlabs-apt --version 2.1.1
+puppet module install puppetlabs-vcsrepo --version 1.3.1
+puppet module install saz-sudo  --version 3.1.0
+puppet module install torrancew-account --version 0.0.5
+puppet module install camptocamp-kmod --version 2.0.11
 ```
 
-... from Ubuntu LTS 16.04 onwards:
+... from Ubuntu LTS 16.04 onwards (versions known to work with puppet 3 from that LTS release):
 
 ```
 apt-get install --no-install-recommends puppet git
-puppet module install puppetlabs-stdlib
-puppet module install puppetlabs-apt
-puppet module install puppetlabs-vcsrepo
-puppet module install saz-sudo
-puppet module install torrancew-account
-puppet module install camptocamp-kmod
+puppet module install puppetlabs-stdlib --version 4.15.0
+puppet module install puppetlabs-apt --version 2.3.0
+puppet module install puppetlabs-vcsrepo --version 1.5.0
+puppet module install saz-sudo --version 4.1.0
+puppet module install torrancew-account --version 0.1.0
+puppet module install camptocamp-kmod --version 2.1.0
 ```
-
 
 
 Then add this module (which is not in the puppet forge, so it has to be
