@@ -9,87 +9,87 @@ auto ##endpoint_name##
 iface ##endpoint_name## inet static
  address ##local_ip##
  netmask 255.255.255.255
- pre-up iptunnel add \$IFACE mode gre local ##local_public_ip## remote ##remote_public_ip## ttl 255
- up ifconfig \$IFACE multicast
+ pre-up iptunnel add ##endpoint_name## mode gre local ##local_public_ip## remote ##remote_public_ip## ttl 255
+ up ifconfig ##endpoint_name## multicast
  pointopoint ##remote_ip##
- post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
- post-up ip rule add pref 31000 iif \$IFACE table 42
- post-up ip rule add pref 31001 iif \$IFACE unreachable
- post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip route del ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip rule del pref 31001 iif \$IFACE unreachable
- pre-down ip rule del pref 31000 iif \$IFACE table 42
- post-down iptunnel del \$IFACE mode gre
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
- post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
- post-up ip -6 rule add pref 31000 iif \$IFACE table 42
- post-up ip -6 rule add pref 31000 oif \$IFACE table 42
- post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
- pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
- pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
+ post-up ip link set ##endpoint_name## mtu 1400
+ post-up sysctl -w net.ipv4.conf.##endpoint_name##.rp_filter=0 >/dev/null
+ post-up ip rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip rule add pref 31001 iif ##endpoint_name## unreachable
+ post-up ip route add ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
+ post-down iptunnel del ##endpoint_name## mode gre
+ post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
+ post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
+ pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
+ pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
 EOF
 
 cat <<EOF >/tmp/puppet-l2tp-ip-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap ip local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name \$IFACE tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
  address ##local_ip##
  netmask 255.255.255.255
  pointopoint ##remote_ip##
- up ifconfig \$IFACE multicast
- post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
- post-up ip rule add pref 31000 iif \$IFACE table 42
- post-up ip rule add pref 31001 iif \$IFACE unreachable
- post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip route del ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip rule del pref 31001 iif \$IFACE unreachable
- pre-down ip rule del pref 31000 iif \$IFACE table 42
+ up ifconfig ##endpoint_name## multicast
+ post-up ip link set ##endpoint_name## mtu 1400
+ post-up sysctl -w net.ipv4.conf.##endpoint_name##.rp_filter=0 >/dev/null
+ post-up ip rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip rule add pref 31001 iif ##endpoint_name## unreachable
+ post-up ip route add ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
- post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
- post-up ip -6 rule add pref 31000 iif \$IFACE table 42
- post-up ip -6 rule add pref 31000 oif \$IFACE table 42
- post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
- pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
- pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
+ post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
+ post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
+ pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
+ pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
 EOF
 
 cat <<EOF >/tmp/puppet-l2tp-udp-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp udp_sport ##src_port## udp_dport ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name \$IFACE tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
  address ##local_ip##
  netmask 255.255.255.255
  pointopoint ##remote_ip##
- up ifconfig \$IFACE multicast
- post-up ip link set \$IFACE mtu 1400
- post-up sysctl -w net.ipv4.conf.\$IFACE.rp_filter=0 >/dev/null
- post-up ip rule add pref 31000 iif \$IFACE table 42
- post-up ip rule add pref 31001 iif \$IFACE unreachable
- post-up ip route replace ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip route del ##remote_ip## dev \$IFACE src ##local_ip## table 42
- pre-down ip rule del pref 31001 iif \$IFACE unreachable
- pre-down ip rule del pref 31000 iif \$IFACE table 42
+ up ifconfig ##endpoint_name## multicast
+ post-up ip link set ##endpoint_name## mtu 1400
+ post-up sysctl -w net.ipv4.conf.##endpoint_name##.rp_filter=0 >/dev/null
+ post-up ip rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip rule add pref 31001 iif ##endpoint_name## unreachable
+ post-up ip route add ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
+ pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
  post-down ip l2tp del session tunnel_id ##src_id## session_id 1
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip -6 addr add ##local_ip6##/64 dev \$IFACE
- post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
- post-up ip -6 rule add pref 31000 iif \$IFACE table 42
- post-up ip -6 rule add pref 31000 oif \$IFACE table 42
- post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
- pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
- pre-down ip -6 addr del ##local_ip6##/64 dev \$IFACE
+ post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
+ post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
+ pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
+ pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
 EOF
 
 cat <<EOF >/tmp/puppet-6in4-$$.txt
@@ -99,19 +99,19 @@ iface ##endpoint_name## inet6 v4tunnel
  netmask 64
  endpoint ##remote_public_ip##
  ttl 64
- up ip link set mtu 1280 dev \$IFACE
- post-up ip -6 route add ##local_ip6##/128 dev \$IFACE || exit 0
- post-up ip -6 route add ##remote_ip6##/128 dev \$IFACE || exit 0
- post-up ip -6 route replace ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
- post-up ip -6 rule add pref 31000 iif \$IFACE table 42
- post-up ip -6 rule add pref 31000 oif \$IFACE table 42
- post-up ip -6 rule add pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31001 iif \$IFACE unreachable
- pre-down ip -6 rule del pref 31000 oif \$IFACE table 42
- pre-down ip -6 rule del pref 31000 iif \$IFACE table 42
- pre-down ip -6 route del ##local_ip6##/128 dev \$IFACE || exit 0
- pre-down ip -6 route del ##remote_ip6##/128 dev \$IFACE || exit 0
- pre-down ip -6 route del ##prefix6## dev \$IFACE src ##local_ip6## table 42 metric 256 || exit 0
+ up ip link set mtu 1280 dev ##endpoint_name##
+ post-up ip -6 route add ##local_ip6##/128 dev ##endpoint_name## || exit 0
+ post-up ip -6 route add ##remote_ip6##/128 dev ##endpoint_name## || exit 0
+ post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
+ post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31001 iif ##endpoint_name## unreachable
+ pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
+ pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
+ pre-down ip -6 route del ##local_ip6##/128 dev ##endpoint_name## || exit 0
+ pre-down ip -6 route del ##remote_ip6##/128 dev ##endpoint_name## || exit 0
+ pre-down ip -6 route del ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
 EOF
 
 cat <<EOF >/tmp/puppet-$$.sh
