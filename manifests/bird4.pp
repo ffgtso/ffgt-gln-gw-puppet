@@ -87,7 +87,7 @@ class ff_gln_gw::bird4 (
       ensure => running,
       enable => true,
       hasstatus => false,
-      restart => "/usr/bin/sort -o /etc/bird/bird.conf.inc /etc/bird/bird.conf.inc ; service birdc6 restart",
+      restart => "/usr/bin/sort -o /etc/bird/bird.conf.inc /etc/bird/bird.conf.inc ; service bird restart",
       require => Package['bird'],
       subscribe => File['/etc/bird/bird.conf.inc'];
   }
