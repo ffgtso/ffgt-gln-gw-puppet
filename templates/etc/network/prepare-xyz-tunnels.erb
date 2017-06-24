@@ -23,6 +23,7 @@ iface ##endpoint_name## inet static
  post-down iptunnel del ##endpoint_name## mode gre
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ pre-down ip -6 route del ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
@@ -53,6 +54,7 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del tunnel tunnel_id ##src_id##
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ pre-down ip -6 route del ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
@@ -83,6 +85,7 @@ iface ##endpoint_name## inet static
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 route add ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 metric 256 || exit 0
+ pre-down ip -6 route del ##prefix6## dev ##endpoint_name## src ##local_ip6## table 42 || exit 0
  post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31000 oif ##endpoint_name## table 42
  post-up ip -6 rule add pref 31001 iif ##endpoint_name## unreachable
