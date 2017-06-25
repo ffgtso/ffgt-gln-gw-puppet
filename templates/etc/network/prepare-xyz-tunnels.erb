@@ -233,30 +233,19 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-ipv6src="<%= node['ipv6src'] %>"
-ipv6dst="<%= node['ipv6dst'] %>"
-if [ ${src_id} -gt ${dst_id} ]; then
-  ipv6src="fe80::1"
-  ipv6dst="fe80::2"
-else
-  ipv6src="fe80::2"
-  ipv6dst="fe80::1"
-fi
-export ipv6src
-export ipv6dst
 sed </tmp/puppet-l2tp-udp-ll-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##src_port##/\${src_port}/g" \\
   -e "s/##dst_port##/\${dst_port}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
   -e "s/##dst_id##/\${dst_id}/g" \\
-  -e "s/##endpoint_name##/<%=name%>/g" \\
-  -e "s/##local_ip##/<%= node['ipv4src'] %>/g"\\
-  -e "s/##remote_ip##/<%= node['ipv4dst'] %>/g" \\
-  -e "s/##local_ip6##/\${ipv6src}/g" \\
-  -e "s/##remote_ip6##/\${ipv6dst}/g" \\
+  -e 's/##endpoint_name##/<%=name%>/g' \\
+  -e 's/##local_ip##/<%= node['ipv4src'] %>/g' \\
+  -e 's/##remote_ip##/<%= node['ipv4dst'] %>/g' \\
+  -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
+  -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e "s%##prefix6##%\${V6SUBNET}%g" \\
-  -e "s/##local_public_ip##/<%= node['pub4src'] %>/g" \\
-  -e "s/##remote_public_ip##/<%= node['pub4dst'] %>/g"
+  -e 's/##local_public_ip##/<%= node['pub4src'] %>/g' \\
+  -e 's/##remote_public_ip##/<%= node['pub4dst'] %>/g'
 <% end -%>
 <% if node['mode'] == "l2tpip" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
