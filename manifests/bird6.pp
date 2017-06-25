@@ -291,7 +291,7 @@ define ff_gln_gw::bird6::ibgp (
   $gre_yaml,
   $our_as = $ff_gln_gw::params::icvpn_as,
   $next_hop_self = "",
-  $bgp_option = ""
+  $bgp_options = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
