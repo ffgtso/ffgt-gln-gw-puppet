@@ -22,6 +22,8 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
   };
 <% if @next_hop_self != "" -%>  next hop self;
 <% end -%>
+<% if @bgp_option != "" -%>  <%= @bgp_option %>;
+<% end -%>
 }
 
 <% end -%>
