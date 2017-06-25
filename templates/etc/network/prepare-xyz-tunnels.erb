@@ -143,6 +143,7 @@ if [ -e /etc/network/interfaces.d/<%=name%> ]; then
   /bin/mv /etc/network/interfaces.d/<%=name%> /etc/network/interfaces.d/<%=name%>.cfg
 fi
 V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix / {print \$NF;}'`"
+export V6SUBNET
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
 sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
