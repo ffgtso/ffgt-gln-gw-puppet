@@ -75,7 +75,7 @@ protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
 <% if @have_ospf_links == "yes" %>
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
-protocol static ospf_<%=name%> {
+protocol static ospf_<%= name.gsub('-', '_') %> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
   route <%= node['ipv4src'] %>/32 via "ospf-<%=name%>";
   #route <%= node['ipv4dst'] %>/32 via "ospf-<%=name%>";
@@ -98,7 +98,7 @@ protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
   area 10 {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
-    interface "ospf-<%=name%>" {
+    interface "ospf-<%= name.gsub('-', '_') %>" {
       cost <%= node['cost'] %>;
       type pointopoint;
       hello 5; retransmit 2; wait 10; dead 20;
