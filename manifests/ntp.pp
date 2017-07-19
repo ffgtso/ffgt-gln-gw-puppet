@@ -19,7 +19,7 @@ class ff_gln_gw::ntp () {
     'ntp':
       enable => true,
       hasrestart => true,
-      ensure => running,
+#      ensure => running,
       require => [
         Package['ntp'],
         File['/etc/ntp.conf']

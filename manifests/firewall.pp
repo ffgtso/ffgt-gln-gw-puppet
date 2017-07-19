@@ -31,19 +31,19 @@ class ff_gln_gw::firewall (
 ) inherits ff_gln_gw::params {
 
   package { 
-    'iptables-persistent':
-      ensure => installed;
+#    'iptables-persistent':
+#      ensure => installed;
     'iptables':
       ensure => installed;
   }
 
-  service {
-    'iptables-persistent':
-       ensure => running,
-       hasrestart => true,
-       enable => true,
-       require => Package['iptables-persistent'];
-  }
+#  service {
+#    'iptables-persistent':
+#       ensure => running,
+#       hasrestart => true,
+#       enable => true,
+#       require => Package['iptables-persistent'];
+#  }
 
   file { 
     '/etc/iptables.d/': 
