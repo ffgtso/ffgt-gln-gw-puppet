@@ -4,7 +4,7 @@ class ff_gln_gw::resources::batman-adv () {
   Class[ff_gln_gw::resources::repos]
   -> 
   package { 
-    'batctl':; # ensure => present; # installed;
+    'batctl': ensure => '2013.4.0-1'; # installed;
     'batman-adv-dkms': ensure => installed;
   }
 }
