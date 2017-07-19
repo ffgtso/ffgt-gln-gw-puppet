@@ -3,15 +3,21 @@
 # bird OSPF configuration
 
 table ospf_<%= @mesh_code.gsub('-', '_') %>;
+<% if @announce_rid == "yes" %>
+protocol static ospf_routerid {
+  import all;
+  table ospf_<%= @mesh_code.gsub('-', '_') %>;
+  route <%=@router_id%>/32 via "br-rid";
+}<% end -%>
 
-# pipe between mesh and ospfmesh_<%= @mesh_code %> table
+# pipe between mesh and ospfmesh_<%= @mesh_code.gsub('-', '_') %> table
 # import all from mesh, export from ospf_xxxx to mesh own network and default route(s)
 protocol pipe pipe_ospf_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   peer table ospf_<%= @mesh_code.gsub('-', '_') %>;
-  import all;
+  import all; # where ! is_self_<%= @mesh_code.gsub('-', '_') %>();
   export filter {
-    if is_self_<%=@mesh_code.gsub('-', '_') %>() || is_default() then accept;
+    if is_self_ffgt() || is_default() then accept;
     reject;
   };
 }
@@ -19,17 +25,22 @@ protocol pipe pipe_ospf_<%= @mesh_code.gsub('-', '_') %> {
 <% if @have_ospf_peerings == "yes" %>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
-protocol static ospf_<%=name.gsub('-', '_')%> {
+protocol static ospf_<%= name.gsub('-', '_') %> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
-  route <%= node['ipv6src'] %>/128 via "<%=name%>";
-  #route <%= node['ipv6dst'] %>/128 via "<%=name%>";
+  route <%= node['ipv4src'] %>/32 via "<%=name%>";
+  #route <%= node['ipv4dst'] %>/32 via "<%=name%>";
 }
 <% end -%>
 
 protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
   #import all;
+  import keep filtered;
   import where !is_default();
+  #import filter {
+  #  if (is_default() && source = RTS_OSPF) then reject; # Don't learn default via OSPF
+  #  accept;
+  #}
   export filter {
     #if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
     if is_default() && source = RTS_BGP then accept;
@@ -40,7 +51,7 @@ protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
   # Backbone
   area 0 {
     networks {
-      <%= @range_ipv6 %>;
+      <%= @range_ipv4 %>;
     };
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
@@ -64,10 +75,10 @@ protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
 <% if @have_ospf_links == "yes" %>
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
-protocol static ospf_<%=name.gsub('-', '_')%> {
+protocol static ospf_<%=name%> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
-  route <%= node['ipv6src'] %>/128 via "<%=name%>";
-  #route <%= node['ipv6dst'] %>/128 via "<%=name%>";
+  route <%= node['ipv4src'] %>/32 via "<%=name%>";
+  #route <%= node['ipv4dst'] %>/32 via "<%=name%>";
 }
 <% end -%>
 
@@ -96,7 +107,7 @@ protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
     };
 
 <% end -%>
-    interface "br-<%= @mesh %>" {
+    interface "br-<%= @mesh_code %>" {
       cost 70;
       stub;
     };
