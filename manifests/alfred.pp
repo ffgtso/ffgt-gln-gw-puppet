@@ -36,6 +36,10 @@ class ff_gln_gw::alfred (
       ensure => installed;
     'ethtool':
       ensure => installed;
+    'libnl-3-dev':
+      ensure => installed;
+    'libnl-genl-3-dev'
+      ensure => installed;
   }
 
   exec { 'alfred':
