@@ -19,11 +19,13 @@ protocol pipe pipe_ospf_<%= @mesh_code.gsub('-', '_') %> {
 <% if @have_ospf_peerings == "yes" %>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
-protocol static ospf_<%=name.gsub('-', '_')%> {
+<% if node['ipv6src'] != "" -%>
+protocol static ospf_<%=name%> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
-  route <%= node['ipv6src'] %>/128 via "<%=name%>";
-  #route <%= node['ipv6dst'] %>/128 via "<%=name%>";
+  route <%= node['ipv6src'] %>/128 via "ospf-<%=name%>";
+  #route <%= node['ipv6dst'] %>/128 via "ospf-<%=name%>";
 }
+<% end -%>
 <% end -%>
 
 protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
@@ -44,7 +46,7 @@ protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
     };
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
-    interface "<%=name%>" {
+    interface "ospf-<%=name%>" {
       cost <%= node['cost'] %>;
       type pointopoint;
       hello 5; retransmit 2; wait 10; dead 20;
@@ -64,11 +66,13 @@ protocol ospf bb_<%= @mesh_code.gsub('-', '_') %> {
 <% if @have_ospf_links == "yes" %>
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
-protocol static ospf_<%=name.gsub('-', '_')%> {
+<% if node['ipv6src'] != "" -%>
+protocol static ospf_<%=name%> {
   table ospf_<%= @mesh_code.gsub('-', '_') %>;
-  route <%= node['ipv6src'] %>/128 via "<%=name%>";
-  #route <%= node['ipv6dst'] %>/128 via "<%=name%>";
+  route <%= node['ipv6src'] %>/128 via "ospf-<%=name%>";
+  #route <%= node['ipv6dst'] %>/128 via "ospf-<%=name%>";
 }
+<% end -%>
 <% end -%>
 
 protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
@@ -87,7 +91,7 @@ protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
   area 10 {
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
-    interface "<%=name%>" {
+    interface "ospf-<%=name%>" {
       cost <%= node['cost'] %>;
       type pointopoint;
       hello 5; retransmit 2; wait 10; dead 20;
@@ -96,7 +100,7 @@ protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
     };
 
 <% end -%>
-    interface "br-<%= @mesh %>" {
+    interface "br-<%= @mesh_code.gsub('-', '_') %>" {
       cost 70;
       stub;
     };
