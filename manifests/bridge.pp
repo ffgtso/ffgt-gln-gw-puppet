@@ -20,7 +20,7 @@ define ff_gln_gw::bridge( $mesh_code
 
   Class['ff_gln_gw::resources::network'] ->
   file {
-    "/etc/network/interfaces.d/${mesh_code}-bridge":
+    "/etc/network/interfaces.d/${mesh_code}-bridge.cfg":
       ensure => file, 
       content => template('ff_gln_gw/etc/network/mesh-bridge.erb');
   } -> 

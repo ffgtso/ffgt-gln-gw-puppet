@@ -5,7 +5,7 @@ define ff_gln_gw::batman-adv( $mesh_code
   include ff_gln_gw::firewall
 
   file {
-    "/etc/network/interfaces.d/${mesh_code}-batman":
+    "/etc/network/interfaces.d/${mesh_code}-batman.cfg":
     ensure => file,
     content => template('ff_gln_gw/etc/network/mesh-batman.erb'),
     require => [Package['batctl'],Package['batman-adv-dkms']];
