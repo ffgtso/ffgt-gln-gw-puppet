@@ -190,6 +190,9 @@ if [[ "\$pub4dst" =~ ^dyn:.* ]]; then
 fi
 export pub4dst
 
+pubsrcip=<% if defined?(node['pub6src']) -%><%= node['pub6src'] %><% else -%><%= node['pub4src'] %><% end %>
+pubdstip=<% if defined?(node['pub6dst']) -%><%= node['pub6dst'] %><% else -%>\${pub4dst}<% end %>
+
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
 sed </tmp/puppet-gre-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
@@ -312,4 +315,4 @@ echo <%=name%>
 <% end -%>
 <% end -%>
 
-/bin/rm /tmp/puppet-$$.sh /tmp/puppet-*-$$.txt
+#/bin/rm /tmp/puppet-$$.sh /tmp/puppet-*-$$.txt
