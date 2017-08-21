@@ -184,14 +184,15 @@ if [ -e /etc/network/interfaces.d/<%=name%> ]; then
 fi
 V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix / {print \$NF;}'`"
 export V6SUBNET
+<% if defined?(node['pub4dst']) -%>
 pub4dst="<%= node['pub4dst'] %>"
 if [[ "\$pub4dst" =~ ^dyn:.* ]]; then
   pub4dst=\$(echo "\${pub4dst}" | awk '{hostname=\$1; gsub("dyn:", "", hostname); printf("%c(/usr/bin/host -4 -t A %s 192.251.226.254 | /usr/bin/awk %c/has address/ {print %cNF;}%c)", 36, hostname, 39, 36, 39);}')
 fi
 export pub4dst
-
-pubsrcip=<% if defined?(node['pub6src']) -%><%= node['pub6src'] %><% else -%><%= node['pub4src'] %><% end %>
 pubdstip=<% if defined?(node['pub6dst']) -%><%= node['pub6dst'] %><% else -%>\${pub4dst}<% end %>
+<% end -%>
+pubsrcip=<% if defined?(node['pub6src']) -%><%= node['pub6src'] %><% else -%><%= node['pub4src'] %><% end %>
 
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
