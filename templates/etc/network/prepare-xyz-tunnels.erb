@@ -246,7 +246,7 @@ sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e "s%##prefix6##%\${V6SUBNET}%g" \\
-  -e 's!##local_public_ip##!\${pubsrcip}!g' \\
+  -e "s!##local_public_ip##!\${pubsrcip}!g" \\
   -e "s!##remote_public_ip##!\${pubdstip}!g"
 <% end -%>
 <% if node['mode'] == "l2tp-ll" -%>
@@ -265,7 +265,7 @@ sed </tmp/puppet-l2tp-udp-ll-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e "s%##prefix6##%\${V6SUBNET}%g" \\
-  -e 's!##local_public_ip##!\${pubsrcip}!g' \\
+  -e "s!##local_public_ip##!\${pubsrcip}!g" \\
   -e "s!##remote_public_ip##!\${pubdstip}!g"
 <% end -%>
 <% if node['mode'] == "l2tp-eth" -%>
@@ -284,7 +284,7 @@ sed </tmp/puppet-l2tp-udp-eth-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e 's/##local_ip6##/<%= node['ipv6src'] %>/g' \\
   -e 's/##remote_ip6##/<%= node['ipv6dst'] %>/g' \\
   -e "s%##prefix6##%\${V6SUBNET}%g" \\
-  -e 's!##local_public_ip##!\${pubsrcip}!g' \\
+  -e "s!##local_public_ip##!\${pubsrcip}!g" \\
   -e "s!##remote_public_ip##!\${pubdstip}!g"
 <% end -%>
 <% if node['mode'] == "l2tpip" -%>
