@@ -186,7 +186,7 @@ V6SUBNET="`LANG=C sipcalc <%= node['ipv6dst'] %>/64 | awk '/^Subnet prefix / {pr
 export V6SUBNET
 <% if defined?(node['pub4dst']) -%>
 pub4dst="<%= node['pub4dst'] %>"
-if [ "\$pub4dst" =~ ^dyn:.* ]; then
+if [[ "\$pub4dst" =~ ^dyn:.* ]]; then
   pub4dst=\$(echo "\${pub4dst}" | awk '{hostname=\$1; gsub("dyn:", "", hostname); printf("%c(/usr/bin/host -4 -t A %s 192.251.226.254 | /usr/bin/awk %c/has address/ {print %cNF;}%c)", 36, hostname, 39, 36, 39);}')
 fi
 export pub4dst
