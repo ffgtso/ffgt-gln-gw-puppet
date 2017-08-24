@@ -204,7 +204,7 @@ define ff_gln_gw::bird6::local_route (
   file_line {
     "bird6-localrt-${name}":
       path => '/etc/bird/bird6.conf.d/99-local.conf',
-      line => "protocol static 'localrt-${name}' { table ospf_ffgt; route ${local_rt} via \"${local_if}\"; };",
+      line => "protocol static 'localrt-${name}' { table mesh; route ${local_rt} via \"${local_if}\"; };",
       require => File['/etc/bird/bird6.conf.d/99-local.conf'],
       notify  => Service['bird6'];
   }
@@ -287,6 +287,7 @@ define ff_gln_gw::bird6::ibgp::setup (
   }
 }
 
+
 define ff_gln_gw::bird6::ibgp (
   $peers,
   $gre_yaml,
@@ -350,6 +351,7 @@ define ff_gln_gw::bird6::ebgp::setup (
     ];
   }
 }
+
 
 define ff_gln_gw::bird6::ebgp (
   $peers,

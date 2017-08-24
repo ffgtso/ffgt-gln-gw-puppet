@@ -14,8 +14,9 @@ template bgp icvpn {
   source address <%= @icvpn_ipv6_address %>;
   import keep filtered;
   import filter {
-    <% if @allow_v6_default == "yes" %>if is_default() then accept;
-    <% end %>if in_prefix_range_icvpn() && (is_ula() || is_freifunk()) then accept;
+    <% if @allow_v6_default == "yes" %>if is_default() then accept;<% end -%>
+    <% if @ula_only == "yes" %>if is_ula() then accept;<% else %>if in_prefix_range_icvpn() && (is_ula() || is_freifunk()) then accept;<% end %>
+    reject;
   };
   export filter {
     if is_default() then reject;

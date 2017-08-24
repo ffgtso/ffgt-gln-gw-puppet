@@ -14,6 +14,7 @@ define ff_gln_gw::icvpn::setup (
   $tinc_keyfile,
   $allow_v4_default = "yes",
   $allow_v6_default = "yes",
+  $ula_only = "no",
   $export_prefixes = []
   ){
 
