@@ -190,9 +190,9 @@ if [[ "\$pub4dst" =~ ^dyn:.* ]]; then
   pub4dst=\$(echo "\${pub4dst}" | awk '{hostname=\$1; gsub("dyn:", "", hostname); printf("%c(/usr/bin/host -4 -t A %s 192.251.226.254 | /usr/bin/awk %c/has address/ {print %cNF;}%c)", 36, hostname, 39, 36, 39);}')
 fi
 export pub4dst
-pubdstip=<% if defined?(node['pub6dst']) -%><%= node['pub6dst'] %><% else -%>\${pub4dst}<% end %>
+pubdstip=<% if defined?(node['pub4dst']) -%>\${pub4dst}<% else -%><%= node['pub4dst'] %><% end %>
 <% end -%>
-pubsrcip=<% if defined?(node['pub6src']) -%><%= node['pub6src'] %><% else -%><%= node['pub4src'] %><% end %>
+pubsrcip=<% if defined?(node['pub4src']) -%><%= node['pub4src'] %><% else -%><%= node['pub6src'] %><% end %>
 
 <% if node['mode'] == "gre" -%>
 # Type: <%= node['mode'] %>
