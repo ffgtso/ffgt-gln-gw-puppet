@@ -10,7 +10,7 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
   if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
-<% if @DFZ != "" -%>
+<% if @dfz != "" -%>
   if is_default() then accept;
 <% end -%>
   #if is_default() && source = RTS_BGP then accept;
@@ -30,7 +30,7 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-<% if @DFZ != "" -%>
+<% if @dfz != "" -%>
   if is_default() then accept;
 <% end -%>
 <% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;<% end %>

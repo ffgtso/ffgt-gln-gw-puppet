@@ -28,7 +28,7 @@ protocol ospf bb_<%= @name.gsub('-', '_') %> {
   table ospf_<%= @name.gsub('-', '_') %>;
   #import all;
   import filter {
-<% if @DFZ != "" -%>
+<% if @dfz != "" -%>
     if !is_default() then accept;
 <% else -%>
     accept;
@@ -36,7 +36,7 @@ protocol ospf bb_<%= @name.gsub('-', '_') %> {
   }
   export filter {
     if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
-<% if @DFZ == "" -%>
+<% if @dfz == "" -%>
     if is_default() && source = RTS_BGP then accept;
 <% end -%>
     if source = RTS_STATIC then accept; #|| is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() then accept;

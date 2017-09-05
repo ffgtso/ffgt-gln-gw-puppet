@@ -147,7 +147,7 @@ define ff_gln_gw::bird6::ospf (
   $ospf_type = "root",        # root/leaf: root reexports routes, leaf only exports statics.
   $mynets = [ $range_ipv6 ],
   $dont_export_prefix = "",
-  $DFZ = ""
+  $dfz = ""
 ) {
   include ff_gln_gw::bird6
 
@@ -297,7 +297,7 @@ define ff_gln_gw::bird6::ibgp (
   $next_hop_self = "",
   $bgp_options = "",
   $dont_export_prefix = "",
-  $DFZ = ""
+  $dfz = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
@@ -367,7 +367,7 @@ define ff_gln_gw::bird6::ebgp (
   $bgp_options = "",
   $our_as = $ff_gln_gw::params::icvpn_as,
   $dont_export_prefix = "",
-  $DFZ = ""
+  $dfz = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta

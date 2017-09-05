@@ -19,7 +19,7 @@ template bgp ibgp {
   table mesh;
   local as <%= @our_as %>;
   import filter {
-<% if @DFZ != "" -%>
+<% if @dfz != "" -%>
     if is_default() then accept;
 <% end -%>
     if in_prefix_range_ibgp() then accept;
@@ -27,7 +27,7 @@ template bgp ibgp {
   };
   export filter {
     if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ibgp() then reject;
- <% if @DFZ != "" -%>
+ <% if @dfz != "" -%>
     if is_default() then accept;
  <% end -%>
    if in_prefix_range_ibgp() then accept;

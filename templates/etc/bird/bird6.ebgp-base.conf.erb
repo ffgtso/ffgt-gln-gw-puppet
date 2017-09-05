@@ -44,14 +44,18 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() {
 }
 
 filter import_ebgp_friend {
+<% if @dfz == "" -%>
   if is_default() then accept;
+<% end -%>
   if is_global_unicast() && in_prefix_range_ebgp() then accept;
   reject;
 }
 
 filter export_ebgp_friend {
   if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
+<% if @dfz == "" -%>
   if is_default() then accept;
+<% end -%>
   if ok_for_ebgp_export() then accept;
   reject;
 }
