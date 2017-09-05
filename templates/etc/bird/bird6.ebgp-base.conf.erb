@@ -3,7 +3,7 @@
 # return true on any route ...
 function in_prefix_range_ebgp() {
   if net.len < 16 then return false;
-  if net.len > 64 then return false;
+  if net.len > 48 then return false;
   return true;
 }
 
@@ -36,6 +36,13 @@ protocol static local_<%= @mesh_code.gsub('-', '_') %>_2 {
 #  return true;
 #}
 
+function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() {
+<% if @dont_export_prefix != "" -%>
+  if (net ~ [<%= @dont_export_prefix %>]) then return false;
+<% end -%>
+  return true;
+}
+
 filter import_ebgp_friend {
   if is_default() then accept;
   if is_global_unicast() && in_prefix_range_ebgp() then accept;
@@ -43,6 +50,7 @@ filter import_ebgp_friend {
 }
 
 filter export_ebgp_friend {
+  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
   if is_default() then accept;
   if ok_for_ebgp_export() then accept;
   reject;
@@ -54,6 +62,7 @@ filter import_ebgp_friend_DFZ {
 }
 
 filter export_ebgp_friend_DFZ {
+  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
   if is_global_unicast() && in_prefix_range_ebgp() then accept;
   reject;
 }
@@ -64,17 +73,32 @@ filter import_ebgp_peer {
 }
 
 filter export_ebgp_peer {
+  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
   if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
   reject;
 }
 
 filter import_ebgp_transit {
-  if is_default() then accept;
-  if is_global_unicast() then accept;
+  if is_global_unicast() && in_prefix_range_ebgp() then accept;
   reject;
 }
 
 filter export_ebgp_transit {
+  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
+  if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
+    if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
+  }
+  reject;
+}
+
+filter import_ebgp_upstream {
+  if is_default() then accept;
+  if is_global_unicast() && in_prefix_range_ebgp() then accept;
+  reject;
+}
+
+filter export_ebgp_upstream {
+  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ebgp() then reject;
   if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
     if is_self_<%= @mesh_code.gsub('-', '_') %>() then accept;
   }

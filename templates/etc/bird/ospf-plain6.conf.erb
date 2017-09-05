@@ -7,6 +7,13 @@
 #  - ospf_links (filename or "")     -- yaml of ospf peers, if any.
 #  - prefix6 (e.g. "2001:2016::/32") -- own prefix routes within should be exchanged
 
+function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
+<% if @dont_export_prefix != "" -%>
+  if (net ~ [<%= @dont_export_prefix %>]) then return false;
+<% end -%>
+  return true;
+}
+
 <% if @ospf_peerings != "" -%>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
@@ -20,19 +27,27 @@ protocol static ospf_<%=name.gsub('-', '_') %> {
 protocol ospf bb_<%= @name.gsub('-', '_') %> {
   table ospf_<%= @name.gsub('-', '_') %>;
   #import all;
-  import where !is_default();
+  import filter {
+<% if @DFZ != "" -%>
+    if !is_default() then accept;
+<% else -%>
+    accept;
+<% end -%>
+  }
   export filter {
-    #if (is_default() && (source = RTS_OSPF && ospf_tag = 10)) then reject; # learned from int_XXXX
+    if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
+<% if @DFZ == "" -%>
     if is_default() && source = RTS_BGP then accept;
+<% end -%>
     if source = RTS_STATIC then accept; #|| is_in_<%= @mesh_code.gsub('-', '_') %>_prefix() then accept;
     reject;
   };
 
   # Backbone
   area 0 {
-    networks {
-      <%= @range_ipv6 %>;
-    };
+    #networks {
+    #  <%= @range_ipv6 %>;
+    #};
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
@@ -44,10 +59,6 @@ protocol ospf bb_<%= @name.gsub('-', '_') %> {
     };
 
 <% end -%>
-    interface "icvpn" {
-      cost 70;
-      stub;
-    };
   };
 }
 <% end %>
@@ -68,6 +79,7 @@ protocol ospf int_<%= @mesh_code.gsub('-', '_') %> {
   import <% if @ospf_type == "root" %>where !is_default()<% else %>all<% end %>;
   export filter {
     ospf_tag = 10;
+    if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
     if (is_default() && (source = RTS_BGP)) then accept;
     if source = RTS_STATIC then accept;
     if (net ~ [ <%= @prefix6 %>+ ])  then accept;
