@@ -13,19 +13,27 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% if @dfz == "" -%>
   if is_default() then accept;
 <% end -%>
-  #if is_default() && source = RTS_BGP then accept;
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;<% end %>
+<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
+<% end %>
   reject;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;<% end %>
+<% if @dfz == "" -%>
+  if is_default() then accept;
+<% end -%>
+<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
+<% end %>
   reject;
 }
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;<% end %>
+<% if @dfz == "" -%>
+  if is_default() then accept;
+<% end -%>
+<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
+<% end %>
   reject;
 }
 
@@ -33,7 +41,8 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% if @dfz == "" -%>
   if is_default() then accept;
 <% end -%>
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;<% end %>
+<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
+<% end %>
   reject;
 }
 
