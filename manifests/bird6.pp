@@ -144,7 +144,7 @@ define ff_gln_gw::bird6::ospf (
   $ospf_links,    # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
   $have_ospf_links = "no",    # Actually require & use $ospf_links
-  $ospf_type = "root",        # root/leaf: root reexports routes, leaf only exports statics.
+  $ospf_type = "root",        # root/leaf: root re-exports routes, leaf only exports statics.
   $mynets = [ $range_ipv6 ],
   $dont_export_prefix = "none",
   $dfz = ""
