@@ -367,7 +367,8 @@ define ff_gln_gw::bird6::ebgp (
   $bgp_options = "",
   $our_as = $ff_gln_gw::params::icvpn_as,
   $dont_export_prefix = "none",
-  $dfz = ""
+  $dfz = "",
+  $export_prefixes = [],
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta

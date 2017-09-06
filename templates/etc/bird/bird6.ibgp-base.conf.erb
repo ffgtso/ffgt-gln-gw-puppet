@@ -6,31 +6,3 @@ function in_prefix_range_ibgp() {
   if (net.len > 64 && net.len <= 127) then return false;
   return true;
 }
-
-function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ibgp() {
-<% if @dont_export_prefix != "none" -%>
-  if (net ~ [<%= @dont_export_prefix %>]) then return false;
-<% end -%>
-  return true;
-}
-
-# template for ibgp route exchange
-template bgp ibgp {
-  table mesh;
-  local as <%= @our_as %>;
-  import filter {
-<% if @dfz != "" -%>
-    if is_default() then accept;
-<% end -%>
-    if in_prefix_range_ibgp() then accept;
-    reject;
-  };
-  export filter {
-    if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ibgp() then reject;
- <% if @dfz != "" -%>
-    if is_default() then accept;
- <% end -%>
-   if in_prefix_range_ibgp() then accept;
-    reject;
-  };
-};

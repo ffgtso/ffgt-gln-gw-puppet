@@ -46,19 +46,19 @@ function pass_imp_ebgp_<%= @name.gsub('-', '_') %>(int dfz) {
 function pass_exp_ebgp_<%= @name.gsub('-', '_') %>(int dfz) {
   if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
     if (is_self_<%= @mesh_code.gsub('-', '_') %>() && ok_for_ebgp_export()) then return true;
-<% @peers.each do |tunnel,args| -%>
-<% array = args.split(';') -%>
-<% if array[2].to_s != "" -%>
-<% exports = array[2].split(',') -%>
-<% exports.each do |expnet| -%>
-<% if expnet.match(/{/i) -%>
-    if (net ~ [<%= expnet.gsub('_', ',')  %>] && ok_for_ebgp_export()) then return true;
-<% else -%>
-    if (net = <%= expnet %> && ok_for_ebgp_export()) then return true;
-<% end -%>
-<% end -%>
-<% end -%>
-<% end -%>
+#<% @peers.each do |tunnel,args| -%>
+#<% array = args.split(';') -%>
+#<% if array[2].to_s != "" -%>
+#<% exports = array[2].split(',') -%>
+#<% exports.each do |expnet| -%>
+#<% if expnet.match(/{/i) -%>
+#    if (net ~ [<%= expnet.gsub('_', ',')  %>] && ok_for_ebgp_export()) then return true;
+#<% else -%>
+#    if (net = <%= expnet %> && ok_for_ebgp_export()) then return true;
+#<% end -%>
+#<% end -%>
+#<% end -%>
+#<% end -%>
   }
   return false;
 }
