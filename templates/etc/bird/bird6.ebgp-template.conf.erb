@@ -21,7 +21,7 @@ protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebg
     if pass_exp_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>(<% if @dfz != ""-%>1<% else -%>0<% end -%>) then accept;
     reject;
   };
-<% if array[1].to_s != "" -%>    default bgp_local_pref <%= array[1] %>;
+<% if array[1].to_s != "" -%>  default bgp_local_pref <%= array[1] %>;
 <% end -%>
 <% if @multihop != "" -%>
 <% if @multihop == "true" || @multihop == "yes" -%>    multihop;
@@ -30,9 +30,9 @@ protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebg
 <% end -%>
 <% if @password != "" -%>    password "<%= @password %>";
 <% end -%>
-<% if @bgp_options != "" -%>   <%= @bgp_options %>
+<% if @bgp_options != "" -%>  <%= @bgp_options %>
 <% end -%>
-}
+};
 <% end -%>
 <% end -%>
 <% end -%>

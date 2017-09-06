@@ -63,7 +63,7 @@ function pass_exp_ebgp_<%= @name.gsub('-', '_') %>(int dfz) {
   return false;
 }
 
-template bgp ebgp_<%= @name.gsub('-', '_') %> {
-  table mesh;
-  local as <%= @our_as %>;
-};
+#template bgp ebgp_<%= @name.gsub('-', '_') %> {
+#  table mesh;
+#  local as <%= @our_as %>;
+#};
