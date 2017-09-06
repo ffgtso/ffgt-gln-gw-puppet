@@ -7,7 +7,7 @@
 <% array = args.split(';') %>
 protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebgp<% if @type == "special" -%>_<%= @name.gsub('-', '_') %><% end -%> {
     source address <%= node['ipv6src'] %>;
-    neighbor <%= node['ipv6dst'] %><% if node['ipv6dst']Chi%> % '<%= tunnel %>'<% end -%> as <%= array[0] %>;
+    neighbor <%= node['ipv6dst'] %><% if node['ipv6dst']%> % '<%= tunnel %>'<% end -%> as <%= array[0] %>;
     import keep filtered;
     #import filter import_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
     #export filter export_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
