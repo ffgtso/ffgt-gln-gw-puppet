@@ -369,6 +369,7 @@ define ff_gln_gw::bird6::ebgp (
   $dont_export_prefix = "none",
   $dfz = "",
   $export_prefixes = [],
+  $export_limit = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
