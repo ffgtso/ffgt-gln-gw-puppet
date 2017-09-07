@@ -197,6 +197,32 @@ define ff_gln_gw::bird6::local (
   }
 }
 
+define ff_gln_gw::bird6::local01 (
+) {
+  include ff_gln_gw::bird6
+
+  file_line { "bird6-local01-include":
+    path => '/etc/bird/bird6.conf.inc',
+    line => "include \"/etc/bird/bird6.conf.d/01-X-local.conf\";",
+    require => File['/etc/bird/bird.conf.inc'],
+    notify  => [ Exec['touch-local6-01-conf'], Service['bird'] ];
+  }
+
+  exec { "touch-local6-01-conf":
+    command => "/usr/bin/touch -a 01-X-local.conf",
+    cwd => "/etc/bird/bird6.conf.d/",
+    require => File['/etc/bird/bird6.conf.inc'],
+  }
+
+  file { "/etc/bird/bird6.conf.d/01-X-local.conf":
+    mode => "0644",
+    notify  => [
+      File_line["bird6-local01-include"],
+      Service['bird6']
+    ]
+  }
+}
+
 define ff_gln_gw::bird6::local_route (
   $local_rt,
   $local_if
@@ -369,7 +395,8 @@ define ff_gln_gw::bird6::ebgp (
   $dont_export_prefix = "none",
   $dfz = "",
   $export_prefixes = [],
-  $export_limit = ""
+  $export_limit = "",
+  $link_specific_function = ""
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta
