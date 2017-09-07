@@ -10,8 +10,6 @@ protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebg
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnel %>'<% end -%> as <%= array[0] %>;
   export limit <% if @export_limit == "" -%>24<% else -%><%=@export_limit%><% end -%> action block;
   import keep filtered;
-  #import filter import_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
-  #export filter export_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>;
   import filter {
     if pass_imp_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>(<% if @dfz != ""-%>1<% else -%>0<% end -%>) then accept;
   };
