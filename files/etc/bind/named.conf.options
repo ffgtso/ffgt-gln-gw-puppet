@@ -3,9 +3,13 @@ options {
   dump-file "/var/cache/bind/cache_dump.db";
   pid-file  "/run/named/named.pid";
   statistics-file "/var/cache/bind/named_stats.txt";
+  recursion yes;
+  allow-query-cache { any; };
   listen-on port 53 { 127.0.0.1; };
   listen-on-v6 port 53 { ::1; };
+  allow-query-cache { any; };
   allow-query { 127.0.0.1; ::1; 10.0.0.0/8; fc00::/7; 172.16.0.0/12; };
+  allow-recursion { 127.0.0.1; ::1; 10.0.0.0/8; fc00::/7; 172.16.0.0/12; fd42:ffee:ff12::/48; 10.255.0.0/20; 2001:bf7:1300::/44; 2001:bf7:170::/44;};
   avoid-v4-udp-ports { range 1 32767; };
   avoid-v6-udp-ports { range 1 32767; };
 };
