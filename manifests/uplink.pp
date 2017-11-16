@@ -158,7 +158,7 @@ class ff_gln_gw::uplink::ipv6 () inherits ff_gln_gw::params {
   file { "/etc/bird/bird6.conf.d/uplink.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.uplink.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-uplink-include"],
       Service['bird6']
@@ -418,7 +418,7 @@ define ff_gln_gw::uplink::tunnelDS (
   file { "/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.uplink.peer.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-uplink-include"],
       Service['bird6']
@@ -605,7 +605,7 @@ define ff_gln_gw::uplink::nattunnelDS (
   file { "/etc/bird/bird6.conf.d/uplink.${endpoint_name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.uplink.peer.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-uplink-include"],
       Service['bird6']
