@@ -33,7 +33,7 @@ class ff_gln_gw::bird6 (
       ensure => file,
       mode => "0644",
       content => template("ff_gln_gw/etc/bird/bird6.conf.erb"),
-      require => [Package['bird6'],File['/etc/bird/']];
+      require => [Package['bird'],File['/etc/bird/']];
     '/etc/bird6.conf':
       ensure => link,
       target => '/etc/bird/bird6.conf',
@@ -100,7 +100,7 @@ define ff_gln_gw::bird6::mesh (
   file { "/etc/bird/bird6.conf.d/01-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.interface.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-${mesh_code}-include"],
       Service['bird6']
@@ -127,7 +127,7 @@ define ff_gln_gw::bird6::srv (
   file { "/etc/bird/bird6.conf.d/05-srv-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.srv-interface.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-${mesh_code}-srv-include"],
       Service['bird6']
@@ -161,7 +161,7 @@ define ff_gln_gw::bird6::ospf (
   file { "/etc/bird/bird6.conf.d/05-ospf6-${mesh_code}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/ospf-mesh6.conf.erb"),
-    require => [File['/etc/bird/bird6.conf.d/'],Package['bird6']],
+    require => [File['/etc/bird/bird6.conf.d/'],Package['bird']],
     notify  => [
       File_line["bird6-ospf-${mesh_code}-include"],
       Service['bird']
@@ -275,7 +275,7 @@ define ff_gln_gw::bird6::icvpn (
     content => template("ff_gln_gw/etc/bird/bird6.icvpn-template.conf.erb"),
     require => [
       File['/etc/bird/bird6.conf.d/'],
-      Package['bird6'],
+      Package['bird'],
       Class['ff_gln_gw::tinc'],
     ],
     notify  => [
@@ -306,7 +306,7 @@ define ff_gln_gw::bird6::ibgp::setup (
     content => template("ff_gln_gw/etc/bird/bird6.ibgp-base.conf.erb"),
     require => [
       File['/etc/bird/bird6.conf.d/'],
-      Package['bird6']
+      Package['bird']
     ],
     notify  => [
       Service['bird6'],
@@ -341,7 +341,7 @@ define ff_gln_gw::bird6::ibgp (
     content => template("ff_gln_gw/etc/bird/bird6.ibgp-template.conf.erb"),
     require => [
       File['/etc/bird/bird6.conf.d/'],
-      Package['bird6']
+      Package['bird']
     ],
     notify  => [
       Service['bird6'],
@@ -373,7 +373,7 @@ define ff_gln_gw::bird6::ebgp::setup (
     content => template("ff_gln_gw/etc/bird/bird6.ebgp-base.conf.erb"),
     require => [
       File['/etc/bird/bird6.conf.d/'],
-      Package['bird6']
+      Package['bird']
     ],
     notify  => [
       Service['bird6'],
@@ -418,7 +418,7 @@ define ff_gln_gw::bird6::ebgp (
       replace => false,
       require => [
         File['/etc/bird/bird6.conf.d/'],
-        Package['bird6']
+        Package['bird']
       ],
       notify  => [
         Service['bird6'],
@@ -440,7 +440,7 @@ define ff_gln_gw::bird6::ebgp (
     content => template("ff_gln_gw/etc/bird/bird6.ebgp-template.conf.erb"),
     require => [
       File['/etc/bird/bird6.conf.d/'],
-      Package['bird6']
+      Package['bird']
     ],
     notify  => [
       Service['bird6'],
