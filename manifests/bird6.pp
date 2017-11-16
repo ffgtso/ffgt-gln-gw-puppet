@@ -46,7 +46,7 @@ class ff_gln_gw::bird6 (
       ensure => file,
       mode => "0644",
       content => template("ff_gln_gw/etc/bird/bird6.conf.inc.erb"),
-      require => [Package['bird6'],File['/etc/bird/']];
+      require => [Package['bird'],File['/etc/bird/']];
   }
 
   file_line { "bird6-include":
