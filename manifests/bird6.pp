@@ -12,7 +12,7 @@ class ff_gln_gw::bird6 (
   }
 
   package { 
-    'bird6':
+    'bird':
       ensure => installed,
       require => [
         File['/etc/apt/preferences.d/bird'],
