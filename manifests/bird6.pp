@@ -12,12 +12,12 @@ class ff_gln_gw::bird6 (
   }
 
   package { 
-    'bird':
-      ensure => installed,
-      require => [
-        File['/etc/apt/preferences.d/bird'],
-        Apt::Source['debian-backports']
-      ];
+#    'bird':
+#      ensure => installed,
+#      require => [
+#        File['/etc/apt/preferences.d/bird'],
+#        Apt::Source['debian-backports']
+#      ];
     'sipcalc':
       ensure => installed;
   }
