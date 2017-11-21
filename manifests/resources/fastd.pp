@@ -20,6 +20,9 @@ class ff_gln_gw::resources::fastd {
   file {
     '/usr/local/bin/calculate_fastd_threshold.sh':
       ensure => file,
+      require => [
+        Package['bc'],
+      ],
       mode => '0766',
       content => template('ff_gln_gw/etc/fastd/calculate_fastd_threshold.sh.erb');
   }
