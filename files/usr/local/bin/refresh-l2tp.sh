@@ -5,13 +5,29 @@
 # b) If client is known but remote-ip differs (/tmp/l2tp-${MAC}.lastip): take tunnel down and bring it up again to the new destination
 # c) If client hasn't connected for 5 Minutes, tear down local end of the tunnel, wipe /tmp/l2tp-${MAC}*
 #
-if [ $# -ne 2 ]; then
+if [ $# -ne 2 -a $# -ne 1 ]; then
   logger "$0: ERROR: Too few arguments ($#)"
   echo "NAK"
   exit 0
 fi
 
 MAC="$1"
+
+if [ "${MAC}" == "cleanup" ]; then
+  for file in $(find /tmp -cmin +15 -name l2tp-????????????.lastip)
+  do
+    peerfiles="$(basename $file .lastip)"
+    delpattern="${peerfiles}*"
+    if [ -e /tmp/${peerfiles}.down ]; then
+      logger "sudo /tmp/${peerfiles}.down # CLEANUP"
+      sudo /tmp/${peerfiles}.down
+    fi
+    touch /tmp/${peerfiles}.delete
+    /bin/rm /tmp/${delpattern}
+  done
+  exit 0
+fi
+
 RIP="$2"
 #LIP="$(ip -o -4 addr show dev ens3 | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
 LIP="192.251.226.19"
