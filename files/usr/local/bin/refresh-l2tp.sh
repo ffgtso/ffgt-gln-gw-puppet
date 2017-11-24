@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Expects periodic call back from the client.
+# a) If client is unknown (no /tmp/l2tp-${MAC}* files, prepare tunnel and reply with session-id, port, local- and remote IP
+# b) If client is known but remote-ip differs (/tmp/l2tp-${MAC}.lastip): take tunnel down and bring it up again to the new destination
+# c) If client hasn't connected for 5 Minutes, tear down local end of the tunnel, wipe /tmp/l2tp-${MAC}*
+#
 if [ $# -ne 2 ]; then
   logger "$0: ERROR: Too few arguments ($#)"
   echo "NAK"
