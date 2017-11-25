@@ -5,7 +5,7 @@
 # b) If client is known but remote-ip differs (/tmp/l2tp-${MAC}.lastip): take tunnel down and bring it up again to the new destination
 # c) If client hasn't connected for 5 Minutes, tear down local end of the tunnel, wipe /tmp/l2tp-${MAC}*
 #
-if [ $# -ne 2 -a $# -ne 1 ]; then
+if [ $# -ne 3 -a $# -ne 1 ]; then
   logger "$0: ERROR: Too few arguments ($#)"
   echo "NAK"
   exit 0
@@ -29,10 +29,12 @@ if [ "${MAC}" == "cleanup" ]; then
 fi
 
 RIP="$2"
+RPORT="$3"
 #LIP="$(ip -o -4 addr show dev ens3 | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
 LIP="192.251.226.19"
 PORT=10000
 SID="$(echo $MAC | awk -Wposix '{printf("%d", "0x" substr($1, 9,4));}')"
+BRIP6="$(ip -o -6 addr show dev br-l2tp | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
 
 LASTIP="127.0.0.1"
 if [ -e /tmp/l2tp-${MAC}.lastip ]; then
@@ -47,7 +49,7 @@ if [ "$LASTIP" != "$RIP" ]; then
 
   cat <<eof >/tmp/l2tp-${MAC}.up
 #!/bin/bash
-ip l2tp add tunnel tunnel_id $SID peer_tunnel_id $SID encap udp udp_sport $PORT udp_dport $PORT local $LIP remote $RIP || true
+ip l2tp add tunnel tunnel_id $SID peer_tunnel_id $SID encap udp udp_sport $PORT udp_dport $RPORT local $LIP remote $RIP || true
 ip l2tp add session name E${MAC} tunnel_id $SID session_id $SID peer_session_id $SID  || true
 ip link set E${MAC} multicast on || true
 ip link set E${MAC} mtu 1500 || true
@@ -69,5 +71,5 @@ fi
 
 echo "$RIP" >/tmp/l2tp-${MAC}.lastip
 
-echo "OK $SID $PORT $LIP $RIP"
+echo "OK $SID $PORT $LIP $RIP $BRIP6"
 exit 0
