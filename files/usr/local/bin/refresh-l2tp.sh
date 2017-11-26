@@ -32,6 +32,7 @@ RIP="$2"
 RPORT="$3"
 #LIP="$(ip -o -4 addr show dev ens3 | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
 LIP="192.251.226.19"
+LIF=ens3
 PORT=10000
 SID="$(echo $MAC | awk -Wposix '{printf("%d", "0x" substr($1, 9,4));}')"
 BRIP6="$(ip -o -6 addr show dev br-l2tp | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
@@ -49,10 +50,16 @@ if [ "$LASTIP" != "$RIP" ]; then
 
   cat <<eof >/tmp/l2tp-${MAC}.up
 #!/bin/bash
+timeout 5.0s tcpdump -n -c 3 -i $LIF host $RIP and port $PORT 2>/dev/null >/tmp/l2tp-${MAC}.dump
+REALRPORT=$(awk </tmp/l2tp-${MAC}.dump '/IP/ {split($3, x, "."); port=x[5];} END{print port;}')
+if [ ! -z $REALRPORT ]; then
+ RPORT=$REALRPORT
+fi
 ip l2tp add tunnel tunnel_id $SID peer_tunnel_id $SID encap udp udp_sport $PORT udp_dport $RPORT local $LIP remote $RIP || true
 ip l2tp add session name E${MAC} tunnel_id $SID session_id $SID peer_session_id $SID  || true
 ip link set E${MAC} multicast on || true
-ip link set E${MAC} mtu 1500 || true
+# 1392 seems to be OK for at least v4-v4 tunnels through DS-Lite (1460 MTU) AND is divisible by 2, 4, 8.
+ip link set E${MAC} mtu 1392 || true
 ip link set E${MAC} up || true
 brctl addif br-l2tp E${MAC}  || true
 eof
