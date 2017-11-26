@@ -50,6 +50,7 @@ if [ -e /sys/class/net/E${MAC}/carrier ]; then
  ping6 -q -c 5 ${REMIP6}%${BRIDGE} 2>/dev/null >/dev/null
  if [ $? -ne 0 ]; then
   RECREATETUNNEL="yes"
+  logger "Tunnel E${MAC} is not responding, recreating."
  fi
 fi
 
