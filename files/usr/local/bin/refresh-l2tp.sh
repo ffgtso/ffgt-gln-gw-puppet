@@ -32,17 +32,28 @@ RIP="$2"
 RPORT="$3"
 #LIP="$(ip -o -4 addr show dev ens3 | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
 LIP="192.251.226.19"
-LIF=ens3
+LIF="ens3"
+BRIDGE="br-l2tp"
 PORT=10000
 SID="$(echo $MAC | awk -Wposix '{printf("%d", "0x" substr($1, 9,4));}')"
-BRIP6="$(ip -o -6 addr show dev br-l2tp | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
+BRIP6="$(ip -o -6 addr show dev ${BRIDGE} | awk '{printf("%s", substr($4, 1, index($4, "/")-1));}')"
+REMIP6=" $(echo $MAC | awk '{gsub(":", "", $1); printf("fe80::%s:%sff:fe%s:%s", substr($1, 1, 4), substr($1, 5, 2), substr($1, 7, 2), substr($1, 9, 4));}')"
+RECREATETUNNEL="no"
 
 LASTIP="127.0.0.1"
 if [ -e /tmp/l2tp-${MAC}.lastip ]; then
   LASTIP="$(cat /tmp/l2tp-${MAC}.lastip)"
 fi
 
-if [ "$LASTIP" != "$RIP" ]; then
+if [ -e /sys/class/net/E${MAC}/carrier ]; then
+ # Try to ping the remote end; if it's not responding, we should recreate the tunnel.
+ ping6 -q -c 5 ${REMIP6}%${BRIDGE} 2>/dev/null >/dev/null
+ if [ $? -ne 0 ]; then
+  RECREATETUNNEL="yes"
+ fi
+fi
+
+if [ "${LASTIP}" != "${RIP}" -o "${RECREATETUNNEL} == "yes" ]; then
   if [ -e /tmp/l2tp-${MAC}.down ]; then
     logger "sudo /tmp/l2tp-${MAC}.down"
     sudo /tmp/l2tp-${MAC}.down
