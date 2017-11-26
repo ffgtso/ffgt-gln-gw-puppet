@@ -50,12 +50,14 @@ if [ "$LASTIP" != "$RIP" ]; then
 
   cat <<eof >/tmp/l2tp-${MAC}.up
 #!/bin/bash
+RPORT=\$RPORT
 timeout 5.0s tcpdump -n -c 3 -i $LIF host $RIP and port $PORT 2>/dev/null >/tmp/l2tp-${MAC}.dump
-REALRPORT=$(awk </tmp/l2tp-${MAC}.dump '/IP/ {split($3, x, "."); port=x[5];} END{print port;}')
-if [ ! -z $REALRPORT ]; then
- RPORT=$REALRPORT
+chown www-data:www-data /tmp/l2tp-${MAC}.dump
+REALRPORT="\$(awk </tmp/l2tp-${MAC}.dump '/IP/ {split($3, x, "."); port=x[5];} END{print port;}')"
+if [ ! -z \$REALRPORT ]; then
+ RPORT=\$REALRPORT
 fi
-ip l2tp add tunnel tunnel_id $SID peer_tunnel_id $SID encap udp udp_sport $PORT udp_dport $RPORT local $LIP remote $RIP || true
+ip l2tp add tunnel tunnel_id $SID peer_tunnel_id $SID encap udp udp_sport $PORT udp_dport \$RPORT local $LIP remote $RIP || true
 ip l2tp add session name E${MAC} tunnel_id $SID session_id $SID peer_session_id $SID  || true
 ip link set E${MAC} multicast on || true
 # 1392 seems to be OK for at least v4-v4 tunnels through DS-Lite (1460 MTU) AND is divisible by 2, 4, 8.
@@ -77,6 +79,5 @@ eof
 fi
 
 echo "$RIP" >/tmp/l2tp-${MAC}.lastip
-
 echo "OK $SID $PORT $LIP $RIP $BRIP6"
 exit 0
