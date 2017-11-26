@@ -55,6 +55,7 @@ if [ -e /sys/class/net/E${MAC}/carrier ]; then
 fi
 
 if [ "${LASTIP}" != "${RIP}" -o "${RECREATETUNNEL} == "yes" ]; then
+  logger "Prepare tunnel E${MAC}."
   if [ -e /tmp/l2tp-${MAC}.down ]; then
     logger "sudo /tmp/l2tp-${MAC}.down"
     sudo /tmp/l2tp-${MAC}.down
