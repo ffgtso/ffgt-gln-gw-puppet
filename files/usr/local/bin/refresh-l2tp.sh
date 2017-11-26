@@ -50,7 +50,7 @@ if [ "$LASTIP" != "$RIP" ]; then
 
   cat <<eof >/tmp/l2tp-${MAC}.up
 #!/bin/bash
-RPORT=\$RPORT
+RPORT=$RPORT
 timeout 5.0s tcpdump -n -c 3 -i $LIF host $RIP and port $PORT 2>/dev/null >/tmp/l2tp-${MAC}.dump
 chown www-data:www-data /tmp/l2tp-${MAC}.dump
 REALRPORT="\$(awk </tmp/l2tp-${MAC}.dump '/IP/ {split(\$3, x, "."); port=x[5];} END{print port;}')"
