@@ -35,7 +35,7 @@ class ff_gln_gw::resources::fastd {
       require => File['/usr/local/bin/calculate_fastd_threshold.sh'];
   }
 
-  package { ['jq','socat']:
+  package { ['jq', 'socat', 'bc']:
     ensure => installed,
     require => Class[ff_gln_gw::resources::repos];
   }
