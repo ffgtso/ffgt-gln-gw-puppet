@@ -37,7 +37,7 @@ cat <<EOF >/tmp/puppet-l2tp-ip-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap ip local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id ##sess_id## peer_session_id ##sess_id##
  address ##local_ip##
  netmask 255.255.255.255
  pointopoint ##remote_ip##
@@ -50,7 +50,7 @@ iface ##endpoint_name## inet static
  pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
  pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
  pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
- post-down ip l2tp del session tunnel_id ##src_id## session_id 1
+ post-down ip l2tp del session tunnel_id ##src_id## session_id ##sess_id##
  post-down ip l2tp del tunnel tunnel_id ##src_id##
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 route add ##prefix6## dev ##endpoint_name## table 42 metric 256 || exit 0
@@ -68,7 +68,7 @@ cat <<EOF >/tmp/puppet-l2tp-udp-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp udp_sport ##src_port## udp_dport ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id ##sess_id## peer_session_id ##sess_id##
  address ##local_ip##
  netmask 255.255.255.255
  pointopoint ##remote_ip##
@@ -81,7 +81,7 @@ iface ##endpoint_name## inet static
  pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
  pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
  pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
- post-down ip l2tp del session tunnel_id ##src_id## session_id 1
+ post-down ip l2tp del session tunnel_id ##src_id## session_id ##sess_id##
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 route add ##prefix6## dev ##endpoint_name## table 42 metric 256 || exit 0
@@ -99,7 +99,7 @@ cat <<EOF >/tmp/puppet-l2tp-udp-ll-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet static
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp udp_sport ##src_port## udp_dport ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id ##sess_id## peer_session_id ##sess_id##
  address ##local_ip##
  netmask 255.255.255.255
  pointopoint ##remote_ip##
@@ -112,7 +112,7 @@ iface ##endpoint_name## inet static
  pre-down ip route del ##remote_ip## dev ##endpoint_name## src ##local_ip## table 42
  pre-down ip rule del pref 31001 iif ##endpoint_name## unreachable
  pre-down ip rule del pref 31000 iif ##endpoint_name## table 42
- post-down ip l2tp del session tunnel_id ##src_id## session_id 1
+ post-down ip l2tp del session tunnel_id ##src_id## session_id ##sess_id##
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
  post-up ip -6 addr add ##local_ip6##/64 dev ##endpoint_name##
  post-up ip -6 rule add pref 31000 iif ##endpoint_name## table 42
@@ -128,10 +128,10 @@ cat <<EOF >/tmp/puppet-l2tp-udp-eth-$$.txt
 auto ##endpoint_name##
 iface ##endpoint_name## inet manual
  pre-up /sbin/ip l2tp add tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id## encap udp udp_sport ##src_port## udp_dport ##dst_port## local ##local_public_ip## remote ##remote_public_ip##
- pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id 1 peer_session_id 1
+ pre-up /sbin/ip l2tp add session name ##endpoint_name## tunnel_id ##src_id## session_id ##sess_id## peer_session_id ##sess_id##
  up ifconfig ##endpoint_name## multicast
  post-up ip link set ##endpoint_name## mtu 1500
- post-down ip l2tp del session tunnel_id ##src_id## session_id 1
+ post-down ip l2tp del session tunnel_id ##src_id## session_id ##sess_id##
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
 EOF
 
@@ -235,7 +235,12 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+sess_id=${src_port}
+if [ ${dst_port} -lt ${src_port}]; then
+  sess_id=${dst_port}
+fi
 sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
+  -e "s/##sess_id##/\${sess_id}/g" \\
   -e "s/##src_port##/\${src_port}/g" \\
   -e "s/##dst_port##/\${dst_port}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
@@ -254,7 +259,12 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+sess_id=${src_port}
+if [ ${dst_port} -lt ${src_port}]; then
+  sess_id=${dst_port}
+fi
 sed </tmp/puppet-l2tp-udp-ll-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
+  -e "s/##sess_id##/\${sess_id}/g" \\
   -e "s/##src_port##/\${src_port}/g" \\
   -e "s/##dst_port##/\${dst_port}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
@@ -271,9 +281,14 @@ sed </tmp/puppet-l2tp-udp-ll-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
 <% if node['mode'] == "l2tp-eth" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[1]*256+byte[4]);}'`"
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[1]*256+byte[4]);}'`"
-src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+8000);}'`"
-dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+8000);}'`"
+src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+sess_id=${src_port}
+if [ ${dst_port} -lt ${src_port}]; then
+  sess_id=${dst_port}
+fi
 sed </tmp/puppet-l2tp-udp-eth-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
+  -e "s/##sess_id##/\${sess_id}/g" \\
   -e "s/##src_port##/\${src_port}/g" \\
   -e "s/##dst_port##/\${dst_port}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
@@ -290,7 +305,14 @@ sed </tmp/puppet-l2tp-udp-eth-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
 <% if node['mode'] == "l2tpip" -%>
 src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
+src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
+sess_id=${src_port}
+if [ ${dst_port} -lt ${src_port}]; then
+  sess_id=${dst_port}
+fi
 sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
+  -e "s/##sess_id##/\${sess_id}/g" \\
   -e "s/##src_id##/\${src_id}/g" \\
   -e "s/##dst_id##/\${dst_id}/g" \\
   -e 's/##endpoint_name##/<%=name%>/g' \\
