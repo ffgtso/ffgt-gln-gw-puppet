@@ -9,41 +9,31 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
 }
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
-  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
-<% if @dfz == "" -%>
-  if is_default() then accept;
-<% end -%>
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
-<% end %>
-  reject;
+    if (source = RTS_BGP) then reject;
+    if (source = RTS_OSPF || source = RTS_STATIC || source = RTS_DEVICE) then accept;
+    reject;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
-<% if @dfz == "" -%>
-  if is_default() then accept;
-<% end -%>
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
-<% end %>
+<% if @dfz == "" -%>    if is_default() then accept;<% end -%>
+    if (net.len = 128) then accept;
+    if (net.len >= 16 && net.len <= 64) then accept;
+    reject;
   reject;
 }
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-  if !ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() then reject;
-<% if @dfz == "" -%>
-  if is_default() then accept;
-<% end -%>
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
-<% end %>
-  reject;
+<% if @dfz == "" -%>    if (is_default() && (source = RTS_BGP || source = RTS_STATIC || source = RTS_DEVICE)) then accept;<% end -%>
+    if (source = RTS_BGP) then reject;
+    if (source = RTS_OSPF || source = RTS_STATIC || source = RTS_DEVICE) then accept;
+    reject;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-<% if @dfz == "" -%>
-  if is_default() then accept;
-<% end -%>
-<% @mynets.each do |prefix| %>  if (net ~ [<%= prefix %>+]) then accept;
-<% end %>
-  reject;
+<% if @dfz == "" -%>    if is_default() then accept;<% end -%>
+    if (net.len = 128) then accept;
+    if (net.len >= 16 && net.len <= 64) then accept;
+    reject;
 }
 
 <% if @have_ospf_peerings == "yes" -%>
