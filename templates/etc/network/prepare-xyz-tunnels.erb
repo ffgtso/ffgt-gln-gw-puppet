@@ -235,9 +235,9 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-sess_id=${src_port}
-if [ ${dst_port} -lt ${src_port}]; then
-  sess_id=${dst_port}
+sess_id=\${src_port}
+if [ \${dst_port} -lt \${src_port}]; then
+  sess_id=\${dst_port}
 fi
 sed </tmp/puppet-l2tp-udp-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##sess_id##/\${sess_id}/g" \\
@@ -259,9 +259,9 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-sess_id=${src_port}
-if [ ${dst_port} -lt ${src_port}]; then
-  sess_id=${dst_port}
+sess_id=\${src_port}
+if [ \${dst_port} -lt \${src_port}]; then
+  sess_id=\${dst_port}
 fi
 sed </tmp/puppet-l2tp-udp-ll-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##sess_id##/\${sess_id}/g" \\
@@ -283,9 +283,9 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[1]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-sess_id=${src_port}
-if [ ${dst_port} -lt ${src_port}]; then
-  sess_id=${dst_port}
+sess_id=\${src_port}
+if [ \${dst_port} -lt \${src_port}]; then
+  sess_id=\${dst_port}
 fi
 sed </tmp/puppet-l2tp-udp-eth-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##sess_id##/\${sess_id}/g" \\
@@ -307,9 +307,9 @@ src_id="`echo <%= node['ipv4src'] %> | awk '{split($1, byte, "."); printf("%d", 
 dst_id="`echo <%= node['ipv4dst'] %> | awk '{split($1, byte, "."); printf("%d", byte[3]*256+byte[4]);}'`"
 src_port="`echo <%= node['ipv6src'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
 dst_port="`echo <%= node['ipv6dst'] %> | awk -Wposix '{n=split($1, word, ":"); idx= "0x" substr(word[4], 2); printf("%d\n", idx+16000);}'`"
-sess_id=${src_port}
-if [ ${dst_port} -lt ${src_port}]; then
-  sess_id=${dst_port}
+sess_id=\${src_port}
+if [ \${dst_port} -lt \${src_port}]; then
+  sess_id=\${dst_port}
 fi
 sed </tmp/puppet-l2tp-ip-$$.txt >/etc/network/interfaces.d/<%=name%>.cfg \\
   -e "s/##sess_id##/\${sess_id}/g" \\
