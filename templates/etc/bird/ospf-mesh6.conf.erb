@@ -10,7 +10,7 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
     if (source = RTS_BGP) then reject;
-    if (source = RTS_OSPF || source = RTS_STATIC || source = RTS_DEVICE) then accept;
+    if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
     reject;
 }
 
@@ -23,9 +23,9 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 }
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-<% if @dfz == "" -%>    if (is_default() && (source = RTS_BGP || source = RTS_STATIC || source = RTS_DEVICE)) then accept;<% end -%>
+<% if @dfz == "" -%>    if (is_default() && (source = RTS_BGP || source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE)) then accept;<% end -%>
     if (source = RTS_BGP) then reject;
-    if (source = RTS_OSPF || source = RTS_STATIC || source = RTS_DEVICE) then accept;
+    if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
     reject;
 }
 

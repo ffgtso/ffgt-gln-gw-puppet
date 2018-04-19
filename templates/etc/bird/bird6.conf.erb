@@ -26,6 +26,7 @@ router id <%= @router_id %>;
 table mesh;
 table kernel_main;
 
+# FIXME: Historical, moved fc00::7 to is_freifunk()
 # Filter function to check if an IPv6 Route is a ULA.
 function is_ula() {
   return (net ~ [ fc00::/7{48,64} ]);
@@ -35,33 +36,45 @@ function is_ula() {
 # a Freifunk range.
 function is_freifunk() {
   return net ~ [ 2001:0bf7::/32{32,64},        # Förderverein freie Netzwerke e.V.
-                 2a03:2260::/29{29,64}         # Freifunk Rheinland e.V.
+                 2a03:2260::/29{29,64},        # Freifunk Rheinland e.V.
+                 fc00::/7{48,64}               # ULA
                ];
 }
 
-# Filter function to check if an IPv6 Route is a dn42.
+# Filter function to check if an IPv6 route is from ChaosVPN IP range.
+# As of 2017-11-06 there is no v6 range defined, therefore add a stub.
+function is_chaos() {
+  return (net ~ [ fc00::/128 ]);
+};
+
+# Filter function to check if an IPv6 route is from dn42.net.
 function is_dn42() {
   return (net ~ [ fd00::/8{48,64} ]);
 };
 
+function avoid_martians()
+prefix set martians;
+{
+  # 2001::/23 contains for example 2001:4:112::/48, belonging to AS112
+  # so we mustn't filter more specific
+  # 3FFE::/16 et 5F00::/8 = formerly 6bone (IPv6 tests)
+  martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
+       2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
+       2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
+       3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
+
+  if net ~ martians then return false;
+
+  return true;
+}
+
 function is_global_unicast() {
-  return net ~ [ 2000::/3+ ];
+  return avoid_martians();
 }
 
 function ok_for_ebgp_export()
-  prefix set martians;
-  int set reserved_asn;
-  prefix set our_prefixes;
+int set reserved_asn;
 {
-    # 2001::/23 contains for example 2001:4:112::/48, belonging to AS112
-    # so we mustn't filter more specific
-    # 3FFE::/16 et 5F00::/8 = formerly 6bone (IPv6 tests)
-    martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
-       2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
-       2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
-       3FFE::/16+, 5F00::/8+
-    ];
-
 	# http://www.iana.org/assignments/as-numbers/as-numbers.xhtml
 	reserved_asn = [
 		# 16-bit
@@ -79,36 +92,32 @@ function ok_for_ebgp_export()
     ];
     # Avoid too short and too long prefixes
     if (net.len < 16) || (net.len > 48) then {
-        print "Reject: prefix ", net, " too short or too long";
+        #print "Reject: prefix ", net, " too short or too long";
         return false;
     }
 
     # Remove default route
-    if net = ::/0 then {
-        print "Reject: prefix ", net, " defines a default route";
-        return false;
-    }
+    #if net = ::/0 then {
+    #    #print "Reject: prefix ", net, " defines a default route";
+    #    return false;
+    #}
 
     # Avoid reserved networks
-    if net ~ martians then {
-        print "Reject: prefix ", net, " is a Martian";
+    if ! avoid_martians() then {
+        #print "Reject: prefix ", net, " is a Martian";
         return false;
     }
 
+    # Just log, not reject ...
     # Avoid bogons. IANA didn't allocate outside of 2000::/3
     # but there are already announces there
     if ! (net.ip ~ 2000::/3) then {
-        print "Reject: prefix ", net, " is a Bogon";
-        return false;
+        print "WARN (should reject): prefix ", net, " is a Bogon";
+        #return false;
     }
 
-    # Check that the next AS is our neighbour's.
-    # Same for next-hop
-    #if bgp_path.first != peeras then return false;
-    #if bgp_next_hop != nexthop then return false;
-
     # AS_PATH too long (max seen in real life = 54)
-    #if bgp_path.len > 64 then return false;
+    if bgp_path.len > 64 then return false;
 
     # Don't accept if path contains a reserved AS
     # Disabled because it removes legit prefixes
@@ -118,7 +127,7 @@ function ok_for_ebgp_export()
     }
 
     if ( (65535, 65281) ~ bgp_community ) then {
-        print "Reject: prefix ", net, " has the no_export community set";
+        #print "Reject: prefix ", net, " has the no_export community set";
         return false;
     }
 
@@ -150,7 +159,7 @@ protocol kernel {
   device routes;   # Export RTS_DEVICE routes as well
   #export all;      # Export all routes
   export filter {
-    if (! is_ula()) then { krt_prefsrc = <%= @loopback_ipv6 %>; }
+    if (avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv6 %>; }
     accept;
   };
 };
@@ -191,10 +200,15 @@ protocol pipe pipe_kernel_main_mesh {
 
 # template for local route exchange via bgp
 template bgp local_mesh {
-  import where is_ula() || is_freifunk();
+  import where is_freifunk()<% if @include_chaos == "yes" %> || is_chaos()<% end %><% if @include_dn42 == "yes" %> || is_dn42()<% end %>;
   export where source = RTS_BGP;
   direct;
   next hop self;
 };
+
+protocol static loopback {
+  table mesh;
+  route <% @loopback_ipv6 %>/128 via "<% @loopback_if %>";
+}
 
 # Include puppet generated rules

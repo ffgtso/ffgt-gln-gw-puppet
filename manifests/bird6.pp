@@ -5,6 +5,7 @@ class ff_gln_gw::bird6 (
   require ff_gln_gw::resources::repos
 
   $loopback_ipv6 = $ff_gln_gw::params::loopback_ipv6
+  $loopback_if = $ff_gln_gw::params::wan_devices[0]
 
   ff_gln_gw::monitor::nrpe::check_command {
     "bird6":
