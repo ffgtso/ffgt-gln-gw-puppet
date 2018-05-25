@@ -6,6 +6,7 @@ class ff_gln_gw::bird6 (
 
   $loopback_ipv6 = $ff_gln_gw::params::loopback_ipv6
   $loopback_if = $ff_gln_gw::params::wan_devices[0]
+  $our_as = $icvpn_as
 
   ff_gln_gw::monitor::nrpe::check_command {
     "bird6":
@@ -20,6 +21,8 @@ class ff_gln_gw::bird6 (
 #        Apt::Source['debian-backports']
 #      ];
     'sipcalc':
+      ensure => installed;
+    'bgpq3':
       ensure => installed;
   }
  
@@ -449,3 +452,41 @@ define ff_gln_gw::bird6::ebgp (
     ];
   }
 }
+
+
+define ff_gln_gw::bird6::ebgp_fltered (
+  $peers,
+  $mesh_code,
+  $gre_yaml,
+  $our_as = $ff_gln_gw::params::icvpn_as,
+  $sitelocal_prefix = "none",
+  $no_export_prefix = "none",
+) {
+  include ff_gln_gw::bird6
+  include ff_gln_gw::resources::meta
+
+  $ipv6_main_prefix = $ff_gln_gw::params::ipv6_main_prefix
+
+  file_line {
+    "bird6-ebgp-filtered-${name}":
+      path => '/etc/bird/bird6.conf.inc',
+      line => "#include \"/etc/bird/bird6.conf.d/03-ebgp-filtered-${name}.conf\";",
+      require => File['/etc/bird/bird6.conf.inc'],
+      notify  => Service['bird6'];
+  }
+
+  file { "/etc/bird/bird6.conf.d/03-ebgp-filtered-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird6.ebgp-filtered.conf.erb"),
+    replace => false,
+    require => [
+      File['/etc/bird/bird6.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird6'],
+      File_line["bird6-ebgp-filtered-${name}"]
+    ];
+  }
+}
+
