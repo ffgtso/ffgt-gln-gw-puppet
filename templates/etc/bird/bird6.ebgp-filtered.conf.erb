@@ -45,6 +45,7 @@ int set bogon_asns;
     accept;
   }
   <% end -%>
+  <% end -%>
 }
 
 filter peer_out_AS<%=node['peeras']%>
@@ -84,6 +85,7 @@ int set bogon_asns;
   if (net ~ <%=node['export6']%>_PFX) then {
     accept;
   }
+  <% end -%>
   <% end -%>
 }
 
