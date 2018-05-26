@@ -58,7 +58,7 @@ filter peer_out_<%=node['name'].gsub('-', '_')%>
 prefix set <%=node['export6']%>_PFX;
 int set bogon_asns;
 {
-<% if defined?(node['export_filter6']) -%>
+<% if (defined?(node['export_filter6']) && node['export_filter6'] != "") -%>
   include "/etc/bird/bird6.conf.d/<%=node['export_filter6']%>";
 <% end -%>
 
@@ -68,13 +68,13 @@ int set bogon_asns;
 <% if @no_export_prefix != "none" -%>
   if (net ~ [ <%=@no_export_prefix%> ] then reject;
 <% end -%>
- if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
+  if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
     bgp_path.prepend(<%=@our_as%>);
   } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (8283, 3, 0) ~ bgp_large_community) then {
     bgp_path.prepend(<%=@our_as%>);
     bgp_path.prepend(<%=@our_as%>);
   }
-  if ((<%=@our_as%>, 4, peerasn) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
+  if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
     reject;
   }
 
@@ -107,7 +107,7 @@ int set bogon_asns;
 }
 
 protocol bgp e_<%= node['name'].gsub('-', '_') %> from ebgp_filt {
-<% if defined?(node['ouras']) -%>
+<% if (defined?(node['ouras']) && node['ouras'] != "") -%>
   local as <%= node['ouras'] %>;
 <% end -%>
   source address <%= node['ipv6src'] %>;
