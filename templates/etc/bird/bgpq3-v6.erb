@@ -6,8 +6,8 @@ TMPFILE="/tmp/peerasn-v6.$(date +%Y%m%d%H%M%S)"
 
 for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
-<% if defined?(node['import6']) -%> <%=node['import6']%-><% end -%>
-<% if defined?(node['export6']) -%> <%=node['export6']%-><% end -%>
+<% if defined?(node['import6']) -%> <%=node['import6']-%><% end -%>
+<% if defined?(node['export6']) -%> <%=node['export6']-%><% end -%>
 <% end -%> ; do echo $i | grep -v ANY ; done | sort -u >$TMPFILE
 
 for i in $(cat $TMPFILE) ; do /usr/bin/bgpq3 -b -6 -l ${i}_PFX ${i} >/etc/bird/bird6.conf.d/${i}_PFX6.inc ; done
