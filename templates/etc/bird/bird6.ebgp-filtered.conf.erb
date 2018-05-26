@@ -13,7 +13,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
 filter peer_in_AS<%=tunnelname%>
-prefix set <%= node['import6'] %>_PFX;
+prefix set <%=node['import6']%>_PFX;
 int set bogon_asns;
 {
   # Scrub BLACKHOLE Community from peering partners
@@ -25,7 +25,8 @@ int set bogon_asns;
     print "Reject: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
   }
-<% if defined?(node['import6']) -%><% if node['import6'] == "ANY" -%>
+<% if defined?(node['import6']) -%>
+<% if node['import6'] == "ANY" -%>
   if avoid_martians() then {
     if (net ~ 2000::/3{12,48}) then {
       accept;
@@ -33,7 +34,7 @@ int set bogon_asns;
   }
 <% else -%>
   include "<%= node['import6'] %>_PFX6.inc";
-  if (net ~ <%= node['import6'] %>_PFX) then {
+  if (net ~ <%= node['import6'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
     bgp_med = 0;
     bgp_local_pref = 100;
     # Scrub BGP Communities (RFC 7454 Section 11)
@@ -44,6 +45,8 @@ int set bogon_asns;
     accept;
   }
 <% end -%>
+<% else -%>
+  # No import6: line found
 <% end -%>
 }
 
@@ -80,10 +83,12 @@ int set bogon_asns;
   }
 <% else -%>
   include "<%=node['export6']%>_PFX6.inc";
-  if (net ~ <%=node['export6']%>_PFX) then {
+  if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
     accept;
   }
 <% end -%>
+<% else -%>
+  # No export6: line found
 <% end -%>
 }
 
