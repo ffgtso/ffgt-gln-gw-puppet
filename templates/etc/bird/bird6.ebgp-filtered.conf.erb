@@ -8,59 +8,97 @@ template bgp ebgp_filt {
   next hop self;
 }
 
+define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
-<% peerings.each_pair do |gretun,node| -%>
-<% @peers.each do |tunnel,args| -%>
-<% if gretun == tunnel -%>
-<% array = args.split(';') %>
-protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebgp<% if @type == "special" -%>_<%= @name.gsub('-', '_') %><% end -%> {
-  source address <%= node['ipv6src'] %>;
-  neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnel %>'<% end -%> as <%= array[0] %>;
-  <% if @export_limit != "off" -%>export limit <% if @export_limit == "" -%>24<% else -%><%=@export_limit%><% end -%> action block;<% end -%>
-  import keep filtered;
-  import filter {
-    if pass_imp_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>(<% if @dfz != ""-%>1<% else -%>0<% end -%>) then accept;
-  };
-  export filter {
-<% if @dont_export_prefix != "none"-%>
-    if (net ~ [<%= @dont_export_prefix %>]) then reject;
+<% peerings.each_pair do |tunnelname,node| -%>
+filter peer_in_AS<%=node['peeras']%>
+prefix set <%=node['import6']%>_PFX;
+int set bogon_asns;
+{
+  # Scrub BLACKHOLE Community from peering partners
+  bgp_community.delete((65535, 666));
 
-<% end -%>
-    if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
-      if !ok_for_ebgp_export() then reject;
-<% if @link_specific_function != ""-%>
-    if !<%@link_specific_function%>() then reject;
-<% end -%>
-<% @peers.each do |tunnel,args| -%>
-<% array = args.split(';') -%>
-<% if array[2].to_s != "" -%>
-<% exports = array[2].split(',') -%>
-<% exports.each do |expnet| -%>
-<% if expnet.match(/{/i) -%>
-      if (net ~ [<%= expnet.gsub('_', ',')  %>]) then accept;
-<% else -%>
-      if (net = <%= expnet %>) then accept;
-<% end -%>
-<% end -%>
-<% end -%>
-<% end -%>
-      if pass_exp_ebgp_<% if @type == "special" -%><%= @name.gsub('-', '_') %><% else %><%= @type %><% end -%>(<% if @dfz != ""-%>1<% else -%>0<% end -%>) then accept;
-    }
+  # ignore bogon AS_PATHs
+  bogon_asns = BOGON_ASNS;
+  if ( bgp_path ~ bogon_asns ) then {
+    print "Reject: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
-  };
-<% if array[1].to_s != "" -%>  default bgp_local_pref <%= array[1] %>;
+  }
+  <% if defined?(node['import6']) -%>
+  <% if node['import6'] == "ANY" -%>
+  if avoid_martians() then {
+    if (net ~ 2000::/3{12,48}) then {
+      accept;
+    }
+  }
+  <% else -%>
+  include "<%=node['import6']%>_PFX6.inc";
+  if (net ~ <%=node['import6']%>_PFX) then {
+    bgp_med = 0;
+    bgp_local_pref = 100;
+    # Scrub BGP Communities (RFC 7454 Section 11)
+    bgp_community.delete([(<%=@our_as%>, *)]);
+    bgp_large_community.delete([(<%=@our_as%>, *, *)]);
+    bgp_community.add((<%=@our_as%>,1)); /* mark peering routes as peering routes */
+    bgp_large_community.add((<%=@our_as%>, 0, 1)); /* mark peering routes as peering routes */
+    accept;
+  }
+  <% end -%>
+}
+
+filter peer_out_AS<%=node['peeras']%>
+prefix set <%=node['export6']%>_PFX;
+int set bogon_asns;
+{
+  if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
+    bgp_path.prepend(<%=@our_as%>);
+  } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (8283, 3, 0) ~ bgp_large_community) then {
+    bgp_path.prepend(<%=@our_as%>);
+    bgp_path.prepend(<%=@our_as%>);
+  }
+  if ((<%=@our_as%>, 4, peerasn) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
+    reject;
+  }
+
+
+  # ignore bogon AS_PATHs
+  bogon_asns = BOGON_ASNS;
+  if ( bgp_path ~ bogon_asns ) then {
+    print "Reject: bogon AS_PATH: ", net, " ", bgp_path;
+    reject;
+  }
+  <% if defined?(node['export6']) -%>
+  <% if node['export6'] == "ANY" -%>
+  martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
+       2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
+       2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
+       3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
+
+  if net ~ martians then reject;
+  if (net ~ 2000::/3{12,48}) then {
+    accept;
+  }
+  <% else -%>
+  include "<%=node['export6']%>_PFX6.inc";
+  if (net ~ <%=node['export6']%>_PFX) then {
+    accept;
+  }
+  <% end -%>
+}
+
+protocol bgp e_<%= node['name'].gsub('-', '_') %> from ebgp_filt {
+<% if defined?(node['ouras']) -%>
+  local as <%= node['ouras'] %>
 <% end -%>
-<% if @multihop != "" -%>
-<% if @multihop == "true" || @multihop == "yes" -%>    multihop;
-<% else -%>    multihop <%= @multihop %>;
-<% end -%>
-<% end -%>
-<% if @password != "" -%>    password "<%= @password %>";
-<% end -%>
-<% if @bgp_options != "" -%>  <%= @bgp_options %>
-<% end -%>
+  source address <%= node['ipv6src'] %>;
+  neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnelname %>'<% end -%> as <%= node['peeras'] %>;
+  import keep filtered;
+  import filter peer_in_AS<%=node['peeras']%>;
+  export filter peer_out_AS<%=node['peeras']%>;
+<% if defined?(node['multihop']) -%>  multihop <%= node['multihop'] %>;<% end -%>
+<% if defined?(node['passwd']) -%>  password "<%= node['passwd'] %>";<% end -%>
 };
-<% end -%>
-<% end -%>
+
+
 <% end -%>

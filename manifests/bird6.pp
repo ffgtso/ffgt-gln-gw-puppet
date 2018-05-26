@@ -488,5 +488,14 @@ define ff_gln_gw::bird6::ebgp_fltered (
       File_line["bird6-ebgp-filtered-${name}"]
     ];
   }
+
+  file { "/etc/bird/bird6.conf.d/bgpq3-${name}.sh":
+    mode => "0755",
+    content => template("ff_gln_gw/etc/bird/bgpq3-v6.erb")
+  } ->
+  exec { "gen-prefixes-${name}":
+    command => "/etc/bird/bird6.conf.d/bgpq3-${name}.sh",
+    cwd => "/etc/bird/bird6.conf.d/"
+  }
 }
 

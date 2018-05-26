@@ -43,11 +43,89 @@ function is_chaos() {
   ]);
 };
 
-# Filter function to check if an IPv4 route is from DN42 IP range.
-# as of https://dn42.net/services-whois
+# Filter function to check if an IPv4 route is from DN42.net IP range.
 function is_dn42() {
   return (net ~ [ 172.20.0.0/14{14,24} ]);
 };
+
+function avoid_martians()
+prefix set martians;
+{
+  martians = [ 169.254.0.0/16+, 172.16.0.0/12+, 100.64.0.0/10+,
+        192.168.0.0/16+, 10.0.0.0/8+, 127.0.0.0/8+,
+        224.0.0.0/4+, 240.0.0.0/4+, 192.0.0.0/24+,
+        192.88.99.0/24+, 198.18.0.0/15+, 198.51.100.0/24+,
+        203.0.113.0/24+, 0.0.0.0/32-, 0.0.0.0/0{31,32}, 0.0.0.0/0{0,7} ];
+
+  if net ~ martians then return false;
+
+  return true;
+}
+
+function is_global_unicast() {
+  return avoid_martians();
+}
+
+function ok_for_ebgp_export()
+int set reserved_asn;
+{
+	# http://www.iana.org/assignments/as-numbers/as-numbers.xhtml
+	reserved_asn = [
+		# 16-bit
+		0,                      # Reserved. RFC7607
+		23456,                  # AS_TRANS. RFC6793
+		64496..64511,           # Reserved for use in documentation and sample code. RFC5398
+		64512..65534,           # Reserved for Private Use. RFC6996
+		65535,                  # Reserved. RFC7300
+
+		# 32-bit
+		65536..65551,           # Reserved for use in documentation and sample code. RFC5398
+		65552..131071,          # Reserved.
+		4200000000..4294967294, # Reserved for Private Use. [RFC6996]
+		4294967295              # Reserved. RFC7300
+    ];
+    # Avoid too short and too long prefixes
+    if (net.len < 8) || (net.len > 24) then {
+        #print "Reject: prefix ", net, " too short or too long";
+        return false;
+    }
+
+    # Remove default route
+    #if net = 0.0.0.0/0 then {
+    #    #print "Reject: prefix ", net, " defines a default route";
+    #    return false;
+    #}
+
+    # Avoid reserved networks
+    if ! avoid_martians() then {
+        #print "Reject: prefix ", net, " is a Martian";
+        return false;
+    }
+
+    # AS_PATH too long (max seen in real life = 54)
+    if bgp_path.len > 64 then return false;
+
+    # Don't accept if path contains a reserved AS
+    # Disabled because it removes legit prefixes
+    if bgp_path ~ reserved_asn then {
+        print "Reject: prefix ", net, " contains a reserved ASN in it's BGP path ", bgp_path;
+        return false;
+    }
+
+    if ( (65535, 65281) ~ bgp_community ) then {
+        #print "Reject: prefix ", net, " has the no_export community set";
+        return false;
+    }
+
+    return true;
+}
+
+function check_communities_ebgp_export() {
+    if ( (65535, 65281) ~ bgp_community ) then {
+        print "Reject: prefix ", net, " has the no_export community set";
+        return false;
+    }
+}
 
 # Check for the IPv4 default route and it's more specific nephew
 function is_default() {
@@ -63,7 +141,11 @@ protocol kernel {
   scan time 20;    # Scan kernel routing table every 20 seconds
   kernel table 42; # routing table for mesh networks
   import none;     # Import no routes
-  export all;      # Export all routes
+  #export all;      # Export all routes
+  export filter {
+    if (avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
+    accept;
+  };
 };
 
 # export to kernel main table for local services
@@ -71,7 +153,10 @@ protocol kernel {
   table kernel_main;
   scan time 20;
   import none;
-  export all;
+  #export all;
+  export filter {
+    if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
+  };
   persist;
 };
 
