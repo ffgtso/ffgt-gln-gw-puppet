@@ -12,7 +12,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
-filter peer_in_AS<%=node['peeras']%>
+filter peer_in_<%=node['name'].gsub('-', '_')%>
 prefix set <%=node['import6']%>_PFX;
 int set bogon_asns;
 {
@@ -54,7 +54,7 @@ int set bogon_asns;
 <% end -%>
 }
 
-filter peer_out_AS<%=node['peeras']%>
+filter peer_out_<%=node['name'].gsub('-', '_')%>
 prefix set <%=node['export6']%>_PFX;
 int set bogon_asns;
 {
@@ -113,8 +113,8 @@ protocol bgp e_<%= node['name'].gsub('-', '_') %> from ebgp_filt {
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnelname %>'<% end -%> as <%= node['peeras'] %>;
   import keep filtered;
-  import filter peer_in_AS<%=node['peeras']%>;
-  export filter peer_out_AS<%=node['peeras']%>;
+  import filter peer_in_<%=node['name'].gsub('-', '_')%>;
+  export filter peer_out_<%=node['name'].gsub('-', '_')%>;
 <% if defined?(node['multihop']) -%>  multihop <%= node['multihop'] %>;
 <% end -%>
 <% if defined?(node['passwd']) -%>  password "<%= node['passwd'] %>";
