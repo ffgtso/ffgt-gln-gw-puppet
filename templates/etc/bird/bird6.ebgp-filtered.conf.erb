@@ -93,8 +93,8 @@ int set bogon_asns;
 }
 
 protocol bgp e_<%= node['name'].gsub('-', '_') %> from ebgp_filt {
-<% if defined?(node['ouras']) -%>
-  local as <%= node['ouras'] %>
+<% if defined?(node['ouras'] && node['ouras'] != "") -%>
+  local as <%= node['ouras'] %>;
 <% end -%>
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnelname %>'<% end -%> as <%= node['peeras'] %>;
