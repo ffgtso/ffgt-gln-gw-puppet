@@ -454,7 +454,7 @@ define ff_gln_gw::bird6::ebgp (
 }
 
 
-define ff_gln_gw::bird6::ebgp_fltered (
+define ff_gln_gw::bird6::ebgp_filtered (
   $peers,
   $mesh_code,
   $gre_yaml,
