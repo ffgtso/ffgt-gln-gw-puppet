@@ -477,7 +477,7 @@ define ff_gln_gw::bird6::ebgp_filtered (
   file { "/etc/bird/bird6.conf.d/03-ebgp-filtered-${name}.conf":
     mode => "0644",
     content => template("ff_gln_gw/etc/bird/bird6.ebgp-filtered.conf.erb"),
-    replace => false,
+    replace => true,
     require => [
       File['/etc/bird/bird6.conf.d/'],
       Package['bird']
