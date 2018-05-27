@@ -60,7 +60,7 @@ filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
 {
-  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC) then {
+  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || RTS_DEVICE) then {
 <% if defined?(node['export_filter6']) && node['export_filter6'] -%>
     include "/etc/bird/bird6.conf.d/<%=node['export_filter6']%>";
 <% end -%>
