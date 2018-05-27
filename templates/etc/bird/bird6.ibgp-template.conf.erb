@@ -32,6 +32,7 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
       if in_prefix_range_ibgp() && ok_to_export_<%= @name.gsub('-', '_') %>_ibgp() then accept;
       reject;
     }
+    reject;
   };
 <% if @next_hop_self != "" -%>  next hop self;
 <% end -%>
