@@ -15,7 +15,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 
 
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
-prefix set <%=node['import6']%>_PFX;
+prefix set <%=node['import6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
 {
   # Scrub BLACKHOLE Community from peering partners
@@ -34,7 +34,7 @@ int set bogon_asns;
 <% if defined?(node['import6']) && node['import6'] -%>
 <% if node['import6'] == "ANY" -%>
   if avoid_martians() then {
-    if (net ~ 2000::/3{12,48}) then {
+    if (net ~ [2000::/3{12,48}]) then {
       accept;
     }
   }
@@ -57,7 +57,7 @@ int set bogon_asns;
 }
 
 filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
-prefix set <%=node['export6']%>_PFX;
+prefix set <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
 {
 <% if defined?(node['export_filter6']) && node['export_filter6'] -%>
@@ -93,7 +93,7 @@ int set bogon_asns;
        3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
 
   if net ~ martians then reject;
-  if (net ~ 2000::/3{12,48}) then {
+  if (net ~ [2000::/3{12,48}]) then {
     accept;
   }
 <% else -%>

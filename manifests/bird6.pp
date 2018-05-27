@@ -469,7 +469,7 @@ define ff_gln_gw::bird6::ebgp_filtered (
   file_line {
     "bird6-ebgp-filtered-${name}":
       path => '/etc/bird/bird6.conf.inc',
-      line => "#include \"/etc/bird/bird6.conf.d/03-ebgp-filtered-${name}.conf\";",
+      line => "include \"/etc/bird/bird6.conf.d/03-ebgp-filtered-${name}.conf\";",
       require => File['/etc/bird/bird6.conf.inc'],
       notify  => Service['bird6'];
   }
