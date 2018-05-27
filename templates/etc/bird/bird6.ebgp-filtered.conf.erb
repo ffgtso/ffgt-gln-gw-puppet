@@ -12,7 +12,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
-filter peer_in_<%=node['name'].gsub('-', '_')%>
+filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import6']%>_PFX;
 int set bogon_asns;
 {
@@ -29,7 +29,7 @@ int set bogon_asns;
     print "Reject: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
   }
-<% if defined?(node['import6']) -%>
+<% if defined?(node['import6']) && node['import6'] -%>
 <% if node['import6'] == "ANY" -%>
   if avoid_martians() then {
     if (net ~ 2000::/3{12,48}) then {
@@ -54,14 +54,13 @@ int set bogon_asns;
 <% end -%>
 }
 
-filter peer_out_<%=node['name'].gsub('-', '_')%>
+filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['export6']%>_PFX;
 int set bogon_asns;
 {
 <% if defined?(node['export_filter6']) && node['export_filter6'] -%>
   include "/etc/bird/bird6.conf.d/<%=node['export_filter6']%>";
 <% end -%>
-
 <% if @sitelocal_prefix != "none" -%>
   if (net ~ [ <%=@sitelocal_prefix%> ] then accept;
 <% end -%>
@@ -84,7 +83,7 @@ int set bogon_asns;
     print "Reject: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
   }
-<% if defined?(node['export6']) -%>
+<% if defined?(node['export6']) && node['export6'] -%>
 <% if node['export6'] == "ANY" -%>
   martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
        2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
@@ -106,20 +105,20 @@ int set bogon_asns;
 <% end -%>
 }
 
-protocol bgp e_<%= node['name'].gsub('-', '_') %> from ebgp_filt_<%=@name.gsub('-', '_')%> {
+protocol bgp e_<%=@name.gsub('-', '_')%>_<%= node['name'].gsub('-', '_') %> from ebgp_filt_<%=@name.gsub('-', '_')%> {
 <% if (defined?(node['ouras']) && node['ouras']) -%>
   local as <%= node['ouras'] %>;
 <% end -%>
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnelname %>'<% end -%> as <%= node['peeras'] %>;
   import keep filtered;
-  import filter peer_in_<%=node['name'].gsub('-', '_')%>;
-  export filter peer_out_<%=node['name'].gsub('-', '_')%>;
-<% if defined?(node['multihop']) -%>  multihop <%= node['multihop'] %>;
+  import filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
+  export filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
+<% if defined?(node['multihop']) && node['multihop'] -%>  multihop <%= node['multihop'] %>;
 <% end -%>
-<% if defined?(node['passwd']) -%>  password "<%= node['passwd'] %>";
+<% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
 <% end -%>
-<% if defined?(node['export_limit6']) -%>  export limit <%=node['export_limit6']%> action block;
+<% if defined?(node['export_limit6']) && node['export_limit6'] -%>  export limit <%=node['export_limit6']%> action block;
 <% end -%>
 };
 
