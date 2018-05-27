@@ -107,7 +107,7 @@ int set bogon_asns;
 <% end -%>
 }
 
-protocol bgp e_<%= node['name'].gsub('-', '_')_<%=@name.gsub('-', '_')%> %> from ebgp_filt_<%=@name.gsub('-', '_')%> {
+protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from ebgp_filt_<%=@name.gsub('-', '_')%> {
 <% if (defined?(node['ouras']) && node['ouras']) -%>
   local as <%= node['ouras'] %>;
 <% end -%>
