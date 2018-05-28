@@ -14,8 +14,8 @@ filter im_ospf_<%= @name.gsub('-', '_')_ds {
 }
 
 filter ex_ospf_<%= @name.gsub('-', '_')_ds {
-    if (is_default() && (source = RTS_BGP || source = RTS_STATIC || source = RTS_DEVICE)) then accept;
     if (source = RTS_BGP) then reject;
+    if (is_default() && (source = RTS_BGP || source = RTS_STATIC || source = RTS_DEVICE)) then accept;
     if (source = RTS_OSPF || source = RTS_STATIC || source = RTS_DEVICE) then accept;
     reject;
 }

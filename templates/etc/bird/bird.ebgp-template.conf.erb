@@ -18,7 +18,7 @@ protocol bgp e_<%= @name.gsub('-', '_') %>_<%= tunnel.gsub('-', '_') %> from ebg
     if (net ~ [<%= @dont_export_prefix %>]) then reject;
 
 <% end -%>
-    if (source = RTS_BGP || source = RTS_DEVICE || source = RTS_STATIC) then {
+    if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || source = RTS_DEVICE) then {
       if !ok_for_ebgp_export() then reject;
 <% if @link_specific_function != ""-%>
     if !<%@link_specific_function%>() then reject;
