@@ -158,7 +158,7 @@ define ff_gln_gw::bird4::srv (
 }
 
 
-define ff_gln_gw::bird4::ospf (
+define ff_gln_gw::bird4::Xospf (
   $mesh_code,
   $range_ipv4,
   $router_id = $ff_gln_gw::params::router_id,
@@ -186,6 +186,39 @@ define ff_gln_gw::bird4::ospf (
         unless  => "/bin/ip link show dev br-rid | grep 'DOWN|br-rid' 2> /dev/null";
     }
   }
+
+  file_line { "bird-ospf-${mesh_code}-include":
+    path => '/etc/bird/bird.conf.inc',
+    line => "include \"/etc/bird/bird.conf.d/05-ospf-${mesh_code}.conf\";",
+    require => File['/etc/bird/bird.conf.inc'],
+    notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/05-ospf-${mesh_code}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/ospf-mesh.conf.erb"),
+    require => [File['/etc/bird/bird.conf.d/'],Package['bird']],
+    notify  => [
+      File_line["bird-ospf-${mesh_code}-include"],
+      Service['bird']
+    ]
+  }
+}
+
+define ff_gln_gw::bird4::ospf (
+  $mesh_code,
+  $range_ipv4,
+  $router_id = $ff_gln_gw::params::router_id,
+  $ospf_peerings, # YAML data file for local backbone peerings
+  $ospf_links,    # YAML data file for local interconnects
+  $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
+  $have_ospf_links = "no",    # Actually require & use $ospf_links
+  $ospf_type = "root",        # root/leaf: root re-exports routes, leaf only exports statics.
+  $mynets = [ $range_ipv4 ],
+  $dont_export_prefix = "none",
+  $dfz = ""
+) {
+  include ff_gln_gw::bird4
 
   file_line { "bird-ospf-${mesh_code}-include":
     path => '/etc/bird/bird.conf.inc',
@@ -352,7 +385,7 @@ define ff_gln_gw::bird4::anycast (
 }
 
 
-define ff_gln_gw::bird4::ibgp (
+define ff_gln_gw::bird4::Xibgp (
   $peers,
   $gre_yaml
 ) {
@@ -383,7 +416,71 @@ define ff_gln_gw::bird4::ibgp (
 }
 
 
-define ff_gln_gw::bird4::ebgp (
+define ff_gln_gw::bird4::ibgp::setup (
+  $our_as = $ff_gln_gw::params::icvpn_as
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  file_line {
+    "bird-ibgp-base":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/02-ibgp-A-aaabase.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/02-ibgp-A-aaabase.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ibgp-base.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ibgp-base"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::ibgp (
+  $peers,
+  $gre_yaml,
+  $our_as = $ff_gln_gw::params::icvpn_as,
+  $next_hop_self = "",
+  $bgp_options = "",
+  $dont_export_prefix = "none",
+  $dfz = ""
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  file_line {
+    "bird-ibgp-${name}":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/02-ibgp-B-${name}.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/02-ibgp-B-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ibgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ibgp-${name}"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::Xebgp (
   $peers,
   $mesh_code,
   $type = "peer",
@@ -414,3 +511,148 @@ define ff_gln_gw::bird4::ebgp (
     ];
   }
 }
+
+
+define ff_gln_gw::bird4::ebgp::setup (
+  $mesh_code,
+  $our_as = $ff_gln_gw::params::icvpn_as,
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  $ipv4_main_prefix = $ff_gln_gw::params::ipv4_main_prefix
+
+  file_line {
+    "bird-ebgp-base":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/03-ebgp-A-aaabase.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/03-ebgp-A-aaabase.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ebgp-base.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ebgp-base"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::ebgp (
+  $peers,
+  $mesh_code,
+  $type = "peer",
+  $gre_yaml,
+  $multihop = "",
+  $password = "",
+  $bgp_options = "",
+  $our_as = $ff_gln_gw::params::icvpn_as,
+  $dont_export_prefix = "none",
+  $dfz = "",
+  $export_prefixes = [],
+  $export_limit = "",
+  $link_specific_function = ""
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  $ipv4_main_prefix = $ff_gln_gw::params::ipv4_main_prefix
+
+  if $type == "special" {
+    file_line {
+      "bird-ebgp-special-${name}":
+        path => '/etc/bird/bird.conf.inc',
+        line => "include \"/etc/bird/bird.conf.d/03-ebgp-B-${name}-init.conf\";",
+        require => File['/etc/bird/bird.conf.inc'],
+        notify  => Service['bird'];
+    }
+
+    file { "/etc/bird/bird.conf.d/03-ebgp-B-${name}-init.conf":
+      mode => "0644",
+      content => template("ff_gln_gw/etc/bird/bird.ebgp-special.conf.erb"),
+      replace => false,
+      require => [
+        File['/etc/bird/bird.conf.d/'],
+        Package['bird']
+      ],
+      notify  => [
+        Service['bird'],
+        File_line["bird-ebgp-special-${name}"]
+      ];
+    }
+  }
+
+  file_line {
+    "bird-ebgp-${name}":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/03-ebgp-X-${name}-main.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/03-ebgp-X-${name}-main.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ebgp-template.conf.erb"),
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ebgp-${name}"]
+    ];
+  }
+}
+
+
+define ff_gln_gw::bird4::ebgp_filtered (
+  $mesh_code,
+  $gre_yaml,
+  $our_as = $ff_gln_gw::params::icvpn_as,
+  $sitelocal_prefix = "none",
+  $no_export_prefix = "none",
+) {
+  include ff_gln_gw::bird4
+  include ff_gln_gw::resources::meta
+
+  $ipv4_main_prefix = $ff_gln_gw::params::ipv4_main_prefix
+
+  file_line {
+    "bird-ebgp-filtered-${name}":
+      path => '/etc/bird/bird.conf.inc',
+      line => "include \"/etc/bird/bird.conf.d/03-ebgp-filtered-${name}.conf\";",
+      require => File['/etc/bird/bird.conf.inc'],
+      notify  => Service['bird'];
+  }
+
+  file { "/etc/bird/bird.conf.d/03-ebgp-filtered-${name}.conf":
+    mode => "0644",
+    content => template("ff_gln_gw/etc/bird/bird.ebgp-filtered.conf.erb"),
+    replace => true,
+    require => [
+      File['/etc/bird/bird.conf.d/'],
+      Package['bird']
+    ],
+    notify  => [
+      Service['bird'],
+      File_line["bird-ebgp-filtered-${name}"]
+    ];
+  }
+
+  file { "/etc/bird/bird.conf.d/bgpq3-${name}.sh":
+    mode => "0755",
+    content => template("ff_gln_gw/etc/bird/bgpq3-v4.erb")
+  } ->
+  exec { "gen-prefixes-${name}":
+    command => "/etc/bird/bird.conf.d/bgpq3-${name}.sh",
+    cwd => "/etc/bird/bird.conf.d/"
+  }
+}
+
