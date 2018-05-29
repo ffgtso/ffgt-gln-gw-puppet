@@ -158,7 +158,7 @@ define ff_gln_gw::bird4::srv (
 }
 
 
-define ff_gln_gw::bird4::Xospf (
+define ff_gln_gw::bird4::old_ospf (
   $mesh_code,
   $range_ipv4,
   $router_id = $ff_gln_gw::params::router_id,
@@ -204,6 +204,7 @@ define ff_gln_gw::bird4::Xospf (
     ]
   }
 }
+
 
 define ff_gln_gw::bird4::ospf (
   $mesh_code,
@@ -385,7 +386,7 @@ define ff_gln_gw::bird4::anycast (
 }
 
 
-define ff_gln_gw::bird4::Xibgp (
+define ff_gln_gw::bird4::old_ibgp (
   $peers,
   $gre_yaml
 ) {
@@ -480,7 +481,7 @@ define ff_gln_gw::bird4::ibgp (
 }
 
 
-define ff_gln_gw::bird4::Xebgp (
+define ff_gln_gw::bird4::old_ebgp (
   $peers,
   $mesh_code,
   $type = "peer",
