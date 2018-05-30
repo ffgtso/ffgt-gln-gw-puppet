@@ -174,7 +174,7 @@ protocol kernel {
     if (source = RTS_BGP && !is_ula()) then { krt_prefsrc = <%= @loopback_ipv6 %>; }
     accept;
   };
-  persist;
+  #persist;
 };
 
 # This pseudo-protocol watches all interface up/down events.
