@@ -64,8 +64,8 @@ iface ##endpoint_name## inet static
  pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
  pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
- post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
- pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
+ #post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
+ #pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
 EOF
 
 cat <<EOF >/tmp/puppet-l2tp-udp-$$.txt
@@ -97,8 +97,8 @@ iface ##endpoint_name## inet static
  pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
  pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
- post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
- pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
+ #post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
+ #pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
 EOF
 
 cat <<EOF >/tmp/puppet-l2tp-udp-ll-$$.txt
@@ -128,8 +128,8 @@ iface ##endpoint_name## inet static
  pre-down ip -6 rule del pref 31000 oif ##endpoint_name## table 42
  pre-down ip -6 rule del pref 31000 iif ##endpoint_name## table 42
  pre-down ip -6 addr del ##local_ip6##/64 dev ##endpoint_name##
- post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
- pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
+ #post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
+ #pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
 EOF
 
 cat <<EOF >/tmp/puppet-l2tp-udp-eth-$$.txt
@@ -141,8 +141,8 @@ iface ##endpoint_name## inet manual
  post-up ip link set ##endpoint_name## mtu 1500
  post-down ip l2tp del session tunnel_id ##src_id## session_id ##sess_id##
  post-down ip l2tp del tunnel tunnel_id ##src_id## peer_tunnel_id ##dst_id##
- post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
- pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
+ #post-up ip route show table 1 | grep default >/dev/null && ip -4 rule add to ##remote_public_ip## lookup 1 ||:
+ #pre-down ip -4 rule del to ##remote_public_ip## lookup 1 2>/dev/null ||:
 EOF
 
 cat <<EOF >/tmp/puppet-6in4-$$.txt
