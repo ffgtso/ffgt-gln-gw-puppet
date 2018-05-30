@@ -651,7 +651,7 @@ define ff_gln_gw::bird4::ebgp_filtered (
     mode => "0755",
     content => template("ff_gln_gw/etc/bird/bgpq3-v4.erb")
   } ->
-  exec { "gen-prefixes-${name}":
+  exec { "gen-prefixes4-${name}":
     command => "/etc/bird/bird.conf.d/bgpq3-${name}.sh",
     cwd => "/etc/bird/bird.conf.d/"
   }
