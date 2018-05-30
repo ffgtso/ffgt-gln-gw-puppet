@@ -141,6 +141,7 @@ protocol kernel {
   scan time 20;    # Scan kernel routing table every 20 seconds
   kernel table 42; # routing table for mesh networks
   import none;     # Import no routes
+  device routes;   # Export RTS_DEVICE routes as well
   #export all;      # Export all routes
   export filter {
     if (avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
@@ -153,6 +154,7 @@ protocol kernel {
   table kernel_main;
   scan time 20;
   import none;
+  #export all;
   #export all;
   export filter {
     if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
