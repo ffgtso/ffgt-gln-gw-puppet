@@ -18,7 +18,7 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% if @dfz == "" -%>    if is_default() then accept;<% end -%>
   if (net.len = 32) then accept;
-  if (net.len >= 4 && net.len <= 24) then accept;
+  if (net.len >= 1 && net.len <= 32) then accept;
   reject;
 }
 
@@ -32,7 +32,7 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% if @dfz == "" -%>    if is_default() then accept;<% end -%>
     if (net.len = 32) then accept;
-    if (net.len >= 4 && net.len <= 24) then accept;
+    if (net.len >= 1 && net.len <= 32) then accept;
     reject;
 }
 
