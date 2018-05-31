@@ -41,7 +41,7 @@ int set bogon_asns;
     bgp_med = 0;
     bgp_local_pref = 100;
     # Scrub BGP Communities (RFC 7454 Section 11)
-<% if @our_as < 65536 -%>
+<% if Integer(@our_as) < 65536 -%>
     bgp_community.delete([(<%=@our_as%>, *)]);
     bgp_community.add((<%=@our_as%>,1)); /* mark peering routes as peering routes */
 <% end -%>
