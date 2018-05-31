@@ -34,13 +34,10 @@ int set bogon_asns;
 <% if defined?(node['import4']) && node['import4'] -%>
 <% if node['import4'] == "ANY" -%>
   if avoid_martians() then {
-    if (avoid_martians()) then {
-      accept;
-    }
-  }
 <% else -%>
   include "/etc/bird/bird.conf.d/<%= node['import4'] %>_PFX4.inc";
   if (net ~ <%= node['import4'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
+<% end -%>
     bgp_med = 0;
     bgp_local_pref = 100;
     # Scrub BGP Communities (RFC 7454 Section 11)
@@ -50,7 +47,6 @@ int set bogon_asns;
     bgp_large_community.add((<%=@our_as%>, 0, 1)); /* mark peering routes as peering routes */
     accept;
   }
-<% end -%>
 <% else -%>
   # No import4: line found
 <% end -%>
@@ -61,49 +57,47 @@ filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
 {
-  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || source = RTS_DEVICE) then {
 <% if defined?(node['export_filter4']) && node['export_filter4'] -%>
-    include "/etc/bird/bird.conf.d/<%=node['export_filter4']%>";
+  include "/etc/bird/bird.conf.d/<%=node['export_filter4']%>";
 <% end -%>
 <% if @sitelocal_prefix != "none" -%>
-    if (net ~ [ <%=@sitelocal_prefix%> ]) then {
-      print "Forced export: bogon AS_PATH: ", net, " ", bgp_path;
-      accept;
-    }
+  if (net ~ [ <%=@sitelocal_prefix%> ]) then {
+    print "Forced export: bogon AS_PATH: ", net, " ", bgp_path;
+    accept;
+  }
 <% end -%>
 <% if @no_export_prefix != "none" -%>
-    if (net ~ [ <%=@no_export_prefix%> ]) then  {
-      print "Blocked export: bogon AS_PATH: ", net, " ", bgp_path;
-      reject;
-    }
+  if (net ~ [ <%=@no_export_prefix%> ]) then  {
+    print "Blocked export: bogon AS_PATH: ", net, " ", bgp_path;
+    reject;
+  }
 <% end -%>
 
 <% if defined?(node['export4']) && node['export4'] -%>
 <% if node['export4'] == "ANY" -%>
-    if (avoid_martians()) then {
+  if (avoid_martians()) then {
 <% else -%>
-    include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
-    if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+  include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
+  if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
 <% end -%>
-      # ignore bogon AS_PATHs
-      bogon_asns = BOGON_ASNS;
-      if ( bgp_path ~ bogon_asns ) then {
-        print "Export reject: bogon AS_PATH: ", net, " ", bgp_path;
-        reject;
-      }
-
-      if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
-        bgp_path.prepend(<%=@our_as%>);
-      } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 3, 0) ~ bgp_large_community) then {
-        bgp_path.prepend(<%=@our_as%>);
-        bgp_path.prepend(<%=@our_as%>);
-      }
-      if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
-        reject;
-      }
-
-      accept;
+    # ignore bogon AS_PATHs
+    bogon_asns = BOGON_ASNS;
+    if ( bgp_path ~ bogon_asns ) then {
+      print "Export reject: bogon AS_PATH: ", net, " ", bgp_path;
+      reject;
     }
+
+    if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=@our_as%>);
+    } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 3, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=@our_as%>);
+      bgp_path.prepend(<%=@our_as%>);
+    }
+    if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
+      reject;
+    }
+
+    accept;
   }
 <% else -%>
   # No export4: line found

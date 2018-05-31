@@ -33,14 +33,11 @@ int set bogon_asns;
   }
 <% if defined?(node['import6']) && node['import6'] -%>
 <% if node['import6'] == "ANY" -%>
-  if avoid_martians() then {
-    if (net ~ [2000::/3{12,48}]) then {
-      accept;
-    }
-  }
+  if avoid_martians() && (net ~ [2000::/3{12,48}]) then {
 <% else -%>
   include "/etc/bird/bird6.conf.d/<%= node['import6'] %>_PFX6.inc";
   if (net ~ <%= node['import6'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
+<% end -%>
     bgp_med = 0;
     bgp_local_pref = 100;
     # Scrub BGP Communities (RFC 7454 Section 11)
@@ -50,7 +47,6 @@ int set bogon_asns;
     bgp_large_community.add((<%=@our_as%>, 0, 1)); /* mark peering routes as peering routes */
     accept;
   }
-<% end -%>
 <% else -%>
   # No import6: line found
 <% end -%>
@@ -61,55 +57,53 @@ filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
 {
-  if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || source = RTS_DEVICE) then {
 <% if defined?(node['export_filter6']) && node['export_filter6'] -%>
-    include "/etc/bird/bird6.conf.d/<%=node['export_filter6']%>";
+  include "/etc/bird/bird6.conf.d/<%=node['export_filter6']%>";
 <% end -%>
 <% if @sitelocal_prefix != "none" -%>
-    if (net ~ [ <%=@sitelocal_prefix%> ]) then {
-      print "Forced export: bogon AS_PATH: ", net, " ", bgp_path;
-      accept;
-    }
+  if (net ~ [ <%=@sitelocal_prefix%> ]) then {
+    print "Forced export: bogon AS_PATH: ", net, " ", bgp_path;
+    accept;
+  }
 <% end -%>
 <% if @no_export_prefix != "none" -%>
-    if (net ~ [ <%=@no_export_prefix%> ]) then  {
-      print "Blocked export: bogon AS_PATH: ", net, " ", bgp_path;
-      reject;
-    }
+  if (net ~ [ <%=@no_export_prefix%> ]) then  {
+    print "Blocked export: bogon AS_PATH: ", net, " ", bgp_path;
+    reject;
+  }
 <% end -%>
 
 <% if defined?(node['export6']) && node['export6'] -%>
 <% if node['export6'] == "ANY" -%>
-    martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
-       2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
-       2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
-       3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
+  martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
+     2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
+     2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
+     3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
 
-    if net ~ martians then reject;
-    if (net ~ [2000::/3{12,48}]) then {
+  if net ~ martians then reject;
+  if (net ~ [2000::/3{12,48}]) then {
 <% else -%>
-    include "/etc/bird/bird6.conf.d/<%=node['export6']%>_PFX6.inc";
-    if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+  include "/etc/bird/bird6.conf.d/<%=node['export6']%>_PFX6.inc";
+  if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
 <% end -%>
-      # ignore bogon AS_PATHs
-      bogon_asns = BOGON_ASNS;
-      if ( bgp_path ~ bogon_asns ) then {
-        print "Export reject: bogon AS_PATH: ", net, " ", bgp_path;
-        reject;
-      }
-
-      if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
-        bgp_path.prepend(<%=@our_as%>);
-      } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 3, 0) ~ bgp_large_community) then {
-        bgp_path.prepend(<%=@our_as%>);
-        bgp_path.prepend(<%=@our_as%>);
-      }
-      if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
-        reject;
-      }
-
-      accept;
+    # ignore bogon AS_PATHs
+    bogon_asns = BOGON_ASNS;
+    if ( bgp_path ~ bogon_asns ) then {
+      print "Export reject: bogon AS_PATH: ", net, " ", bgp_path;
+      reject;
     }
+
+    if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=@our_as%>);
+    } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 3, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=@our_as%>);
+      bgp_path.prepend(<%=@our_as%>);
+    }
+    if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
+      reject;
+    }
+
+    accept;
   }
 <% else -%>
   # No export6: line found
