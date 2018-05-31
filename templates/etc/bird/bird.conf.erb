@@ -159,8 +159,8 @@ protocol kernel {
   #export all;
   export filter {
     #if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
-    krt_prefsrc = <%= @loopback_ipv4 %>;a
-    ccept;
+    krt_prefsrc = <%= @loopback_ipv4 %>;
+    accept;
   };
   #persist;
 };
