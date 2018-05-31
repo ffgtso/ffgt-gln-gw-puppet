@@ -4,11 +4,11 @@
 
 table mesh_<%= @mesh_code.gsub('-', '_') %>;
 
-protocol static static_<%= @mesh_code.gsub('-', '_') %> {
-  table mesh_<%= @mesh_code.gsub('-', '_') %>;
-  # reject route if announced from external
-  route <%= @range_ipv4 %> via "lo";
-};
+#protocol static static_<%= @mesh_code.gsub('-', '_') %> {
+#  table mesh_<%= @mesh_code.gsub('-', '_') %>;
+#  # reject route if announced from external
+#  route <%= @range_ipv4 %> reject;
+#};
 
 #function is_self_<%= @mesh_code.gsub('-', '_') %> () {
 #  return (proto = "static_<%= @mesh_code.gsub('-', '_') %>");
@@ -30,17 +30,17 @@ function <%= @mesh_code.gsub('-', '_') %>_export_prefix() {
 
 # pipe between mesh and mesh_<%= @mesh_code.gsub('-', '_') %> table
 # import only if not in own network.
-protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
-  table mesh;
-  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
-  import all; # where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
-  export where source = RTS_BGP || source = RTS_STATIC;
-};
+#protocol pipe pipe_mesh_<%= @mesh_code.gsub('-', '_') %> {
+#  table mesh;
+#  peer table mesh_<%= @mesh_code.gsub('-', '_') %>;
+#  import all; # where ! is_self_<%=@mesh_code.gsub('-', '_') %>();
+#  export where source = RTS_BGP || source = RTS_STATIC;
+#};
 
 # template for local mesh connections
 # extend local_mesh template
 template bgp local_mesh_<%= @mesh_code.gsub('-', '_') %> from local_mesh {
-  table mesh_<%= @mesh_code.gsub('-', '_') %>;
+  table mesh; #_<%= @mesh_code.gsub('-', '_') %>;
   local as <%=@icvpn_as%>;
 };
 <% if @have_mesh_peerings == "yes" %>
