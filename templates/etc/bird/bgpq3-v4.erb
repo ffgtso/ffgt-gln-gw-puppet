@@ -10,5 +10,12 @@ for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 <% if defined?(node['export4']) -%> <%=node['export4']-%><% end -%>
 <% end -%> ; do echo $i | grep -v ANY ; done | sort -u >$TMPFILE
 
-for i in $(cat $TMPFILE) ; do birdname="$(echo $i | sed -e s/:/__/g -e s/-/_/g)" ; /usr/bin/bgpq3 -b -4 -l ${birdname}_PFX ${i} >/etc/bird/bird.conf.d/${i}_PFX4.inc ; done
+for i in $(cat $TMPFILE)
+do
+  birdname="$(echo $i | sed -e s/:/__/g -e s/-/_/g)"
+  /usr/bin/bgpq3 -b -4 -l ${birdname}_PFX ${i} >/etc/bird/bird.conf.d/${i}_PFX4.inc
+  if [$(wc -l /etc/bird/bird.conf.d/${i}_PFX4.inc) -eq 2]; then
+    echo >/etc/bird/bird.conf.d/${i}_PFX4.inc "${birdname}_PFX = [ 100.100.100.100/32 ];"
+  fi
+done
 /bin/rm $TMPFILE
