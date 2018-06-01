@@ -80,13 +80,13 @@ int set bogon_asns;
 <% end -%>
 <% if @sitelocal_prefix != "none" -%>
   if (net ~ [ <%=@sitelocal_prefix%> ]) then {
-    print "Forced export: bogon AS_PATH: ", net, " ", bgp_path;
+    print "Forced export: ", net, " ", bgp_path;
     accept;
   }
 <% end -%>
 <% if @no_export_prefix != "none" -%>
   if (net ~ [ <%=@no_export_prefix%> ]) then  {
-    print "Blocked export: bogon AS_PATH: ", net, " ", bgp_path;
+    print "Blocked export: ", net, " ", bgp_path;
     reject;
   }
 <% end -%>
