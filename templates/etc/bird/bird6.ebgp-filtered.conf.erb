@@ -38,6 +38,16 @@ int set bogon_asns;
   include "/etc/bird/bird6.conf.d/<%= node['import6'] %>_PFX6.inc";
   if (net ~ <%= node['import6'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
 <% end -%>
+<% if defined?(node['export6']) && node['export6']  -%>
+<% if node['export6'] != "ANY" -%>
+    # Don't import our prefixes we'll export
+    include "/etc/bird/bird6.conf.d/<%=node['export6']%>_PFX6.inc";
+    if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+      print "Import of own prefix reject: ", net, " via ", bgp_path;
+      reject;
+    }
+
+<% end -%>
     bgp_med = 0;
     bgp_local_pref = 100;
     # Scrub BGP Communities (RFC 7454 Section 11)
