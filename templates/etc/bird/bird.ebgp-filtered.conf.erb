@@ -13,7 +13,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
 
-
+<% if defined?(node['ipv4dst']) && node['ipv4dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 int set bogon_asns;
@@ -125,4 +125,5 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
 };
 
 
+<% end -%>
 <% end -%>
