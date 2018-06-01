@@ -14,7 +14,7 @@ for i in $(cat $TMPFILE)
 do
   birdname="$(echo $i | sed -e s/:/__/g -e s/-/_/g)"
   /usr/bin/bgpq3 -b -6 -l ${birdname}_PFX ${i} >/etc/bird/bird6.conf.d/${i}_PFX6.inc
-  if [$(wc -l </etc/bird/bird6.conf.d/${i}_PFX6.inc) -eq 2]; then
+  if [ $(wc -l </etc/bird/bird6.conf.d/${i}_PFX6.inc) -eq 2 ]; then
     echo >/etc/bird/bird6.conf.d/${i}_PFX6.inc "${birdname}_PFX = [ deca:fbad::15:bad1/128 ];"
   fi
 done
