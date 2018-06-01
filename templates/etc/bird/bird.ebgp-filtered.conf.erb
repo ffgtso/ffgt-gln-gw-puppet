@@ -16,6 +16,10 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% if defined?(node['ipv4dst']) && node['ipv4dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import4'].gsub('-', '_').gsub(':', '__')%>_PFX;
+<% if defined?(node['export4']) && node['export4']  -%>
+<% if node['export4'] != "ANY" -%>
+prefix set <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX;
+<% end -%>
 int set bogon_asns;
 {
   # Scrub BLACKHOLE Community from peering partners
@@ -28,7 +32,7 @@ int set bogon_asns;
   # ignore bogon AS_PATHs
   bogon_asns = BOGON_ASNS;
   if ( bgp_path ~ bogon_asns ) then {
-    print "Import reject: bogon AS_PATH: ", net, " ", bgp_path;
+    print "Import rejected: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
   }
 <% if defined?(node['import4']) && node['import4'] -%>
@@ -43,7 +47,7 @@ int set bogon_asns;
     # Don't import our prefixes we'll export
     include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
     if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
-      print "Import of own prefix reject: ", net, " via ", bgp_path;
+      print "Import of own prefix rejected: ", net, " via ", bgp_path;
       reject;
     }
 
@@ -96,7 +100,7 @@ int set bogon_asns;
     # ignore bogon AS_PATHs
     bogon_asns = BOGON_ASNS;
     if ( bgp_path ~ bogon_asns ) then {
-      print "Export reject: bogon AS_PATH: ", net, " ", bgp_path;
+      print "Export rejected: bogon AS_PATH: ", net, " ", bgp_path;
       reject;
     }
 
