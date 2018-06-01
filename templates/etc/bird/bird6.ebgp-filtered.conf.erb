@@ -20,6 +20,7 @@ prefix set <%=node['import6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% if node['export6'] != "ANY" -%>
 prefix set <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
+<% end -%>
 int set bogon_asns;
 {
   # Scrub BLACKHOLE Community from peering partners
