@@ -93,13 +93,7 @@ int set bogon_asns;
 
 <% if defined?(node['export6']) && node['export6'] -%>
 <% if node['export6'] == "ANY" -%>
-  martians = [ ::1/128, ::/128, ::ffff:0:0/96+, 100::/64+,
-     2001:db8::/32+, 2001::/23, 2001:2::/48+, 64:ff9b::/96{96,128},
-     2001:10::/28+, 2002::/17+, fc00::/7, fe80::/10, ff00::/8+,
-     3FFE::/16+, 5F00::/8+, ::/0{0,15}, ::/0{49,128} ];
-
-  if net ~ martians then reject;
-  if (net ~ [2000::/3{12,48}]) then {
+  if avoid_martians() && (net ~ [2000::/3{12,48}]) then {
 <% else -%>
   include "/etc/bird/bird6.conf.d/<%=node['export6']%>_PFX6.inc";
   if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
