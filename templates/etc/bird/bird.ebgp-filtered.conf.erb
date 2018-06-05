@@ -103,7 +103,7 @@ int set bogon_asns;
   if is_default() then {
 <% else -%>
   include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
-  if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+  if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX && in_prefix_range_ebgp()) then {
 <% end -%>
 <% end -%>
     # ignore bogon AS_PATHs
