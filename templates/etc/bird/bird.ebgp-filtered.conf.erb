@@ -17,7 +17,7 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% if defined?(node['export4']) && node['export4']  -%>
-<% if node['export4'] != "ANY" -%>
+<% if node['export4'] != "ANY" && node['export4'] != "DEFONLY" -%>
 prefix set <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 <% end -%>
@@ -40,11 +40,15 @@ int set bogon_asns;
 <% if node['import4'] == "ANY" -%>
   if avoid_martians() then {
 <% else -%>
+<% if node['import4'] == "DEFONLY" -%>
+  if is_default() then {
+<% else -%>
   include "/etc/bird/bird.conf.d/<%= node['import4'] %>_PFX4.inc";
   if (net ~ <%= node['import4'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
 <% end -%>
+<% end -%>
 <% if defined?(node['export4']) && node['export4']  -%>
-<% if node['export4'] != "ANY" -%>
+<% if node['export4'] != "ANY" && node['export4'] != "DEFONLY" -%>
     # Don't import our prefixes we'll export
     include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
     if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
@@ -93,10 +97,14 @@ int set bogon_asns;
 
 <% if defined?(node['export4']) && node['export4'] -%>
 <% if node['export4'] == "ANY" -%>
-  if (avoid_martians()) then {
+  if avoid_martians() then {
+<% else -%>
+<% if node['export4'] == "DEFONLY" -%>
+  if is_default() then {
 <% else -%>
   include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
   if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+<% end -%>
 <% end -%>
     # ignore bogon AS_PATHs
     bogon_asns = BOGON_ASNS;
