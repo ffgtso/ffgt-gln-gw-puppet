@@ -144,14 +144,16 @@ define ff_gln_gw::bird6::ospf (
   $mesh_code,
   $range_ipv6,
   $router_id = $ff_gln_gw::params::router_id,
-  $ospf_peerings, # YAML data file for local backbone peerings
-  $ospf_links,    # YAML data file for local interconnects
+  $ospf_peerings = "/dev/null", # YAML data file for local backbone peerings
+  $ospf_links = "/dev/null",  # YAML data file for local interconnects
   $have_ospf_peerings = "no", # Actually require & use $ospf_peerings
   $have_ospf_links = "no",    # Actually require & use $ospf_links
   $ospf_type = "root",        # root/leaf: root re-exports routes, leaf only exports statics.
   $mynets = [ $range_ipv6 ],
   $dont_export_prefix = "none",
-  $dfz = ""
+  $dfz = "",
+  $ospf_export_filter = "",
+  $ospf_import_filter = ""
 ) {
   include ff_gln_gw::bird6
 
