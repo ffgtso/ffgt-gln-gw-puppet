@@ -142,6 +142,8 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
   export filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
 <% if defined?(node['multihop']) && node['multihop'] -%>  multihop <%= node['multihop'] %>;
 <% end -%>
+<% if defined?(node['direct']) && node['direct'] -%>  direct;
+<% end -%>
 <% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
 <% end -%>
 <% if defined?(node['export_limit6']) && node['export_limit6'] -%>  export limit <%=node['export_limit6']%> action block;
