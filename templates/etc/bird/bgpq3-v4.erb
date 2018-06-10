@@ -8,13 +8,13 @@ for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
 <% if defined?(node['import4']) -%> <%=node['import4']-%><% end -%>
 <% if defined?(node['export4']) -%> <%=node['export4']-%><% end -%>
-<% end -%> ; do echo $i | grep -v 'DEFONLY|ANY' ; done | sort -u >$TMPFILE
+<% end -%> ; do echo $i | egrep -v 'DEFONLY|ANY' ; done | sort -u >$TMPFILE
 
 for i in $(cat $TMPFILE)
 do
   birdname="$(echo $i | sed -e s/:/__/g -e s/-/_/g)"
   /usr/bin/bgpq3 -b -4 -l ${birdname}_PFX ${i} >/etc/bird/bird.conf.d/${i}_PFX4.inc
-  if [ $(wc -l </etc/bird/bird.conf.d/${i}_PFX4.inc) -eq 2 ]; then
+  if [ $(wc -l </etc/bird/bird.conf.d/${i}_PFX4.inc) -le 2 ]; then
     echo >/etc/bird/bird.conf.d/${i}_PFX4.inc "${birdname}_PFX = [ 100.100.100.100/32 ];"
   fi
 done
