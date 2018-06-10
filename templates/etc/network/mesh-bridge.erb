@@ -6,7 +6,9 @@ iface br-<%= @mesh_code %> inet6 static
   pre-up    /sbin/ip -6 rule add pref 31001 iif $IFACE unreachable
   post-down /sbin/ip -6 rule del pref 31000 iif $IFACE table 42
   post-down /sbin/ip -6 rule del pref 31001 iif $IFACE unreachable
-  post-up    /sbin/ip -6 route replace <%= @mesh_ipv6_prefix %>/<%= @mesh_ipv6_prefixlen %> dev $IFACE table 42
+  post-up   /sbin/iptables -I FORWARD -i $IFACE -p tcp --dport 25 -j REJECT
+  pre-down  /sbin/iptables -D FORWARD -i $IFACE -p tcp --dport 25 -j REJECT ||:
+  post-up   /sbin/ip -6 route replace <%= @mesh_ipv6_prefix %>/<%= @mesh_ipv6_prefixlen %> dev $IFACE table 42
   address <%= @mesh_ipv6_address %>
   # TODO bits configurable
   netmask <%= @mesh_ipv6_prefixlen %>
@@ -15,6 +17,8 @@ iface br-<%= @mesh_code %> inet static
   pre-up    /sbin/ip rule add pref 31001 iif $IFACE unreachable
   post-down /sbin/ip rule del pref 31000 iif $IFACE table 42
   post-down /sbin/ip rule del pref 31001 iif $IFACE unreachable
-  post-up    /sbin/ip route add <%= @mesh_ipv4_prefix %>/<%= @mesh_ipv4_prefixlen %> dev $IFACE table 42
+  post-up   /sbin/ip route add <%= @mesh_ipv4_prefix %>/<%= @mesh_ipv4_prefixlen %> dev $IFACE table 42
+  post-up   /sbin/ip6tables -I FORWARD -i $IFACE -p tcp --dport 25 -j REJECT
+  pre-down  /sbin/ip6tables -D FORWARD -i $IFACE -p tcp --dport 25 -j REJECT ||:
   address <%= @mesh_ipv4_address %>
   netmask <%= @mesh_ipv4_netmask %>
