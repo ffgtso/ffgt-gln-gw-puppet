@@ -47,10 +47,12 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   include "/etc/bird/bird6.conf.d/<%=@ospf_import_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>    if is_default() then accept;<% end -%>
-    if (net.len = 128) then accept;
-    if (net.len >= 16 && net.len <= 64) then accept;
-    reject;
+<% if @dfz == "" -%>
+  if is_default() then accept;
+<% end -%>
+  if (net.len = 128) then accept;
+  if (net.len >= 16 && net.len <= 64) then accept;
+  reject;
 }
 
 <% if @have_ospf_peerings == "yes" -%>
