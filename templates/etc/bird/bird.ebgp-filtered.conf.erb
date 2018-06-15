@@ -146,7 +146,7 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
 <% end -%>
 <% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
 <% end -%>
-<% if defined?(node['export_limit4']) && node['export_limit4'] -%>  export limit <%=node['export_limit4']%> action block;
+<% if defined?(node['exportlimit4']) && node['exportlimit4'] -%>  export limit <%=node['exportlimit4']%> action block;
 <% end -%>
 };
 
