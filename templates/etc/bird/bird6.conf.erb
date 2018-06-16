@@ -112,8 +112,10 @@ int set reserved_asn;
     # Avoid bogons. IANA didn't allocate outside of 2000::/3
     # but there are already announces there
     if ! (net.ip ~ 2000::/3) then {
-        print "WARN (should reject): prefix ", net, " is a Bogon";
-        #return false;
+        #print "WARN (should reject): prefix ", net, " is a Bogon";
+        if !is_ula() then {
+          return false;
+        }
     }
 
     # AS_PATH too long (max seen in real life = 54)
