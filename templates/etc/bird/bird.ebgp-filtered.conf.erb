@@ -12,6 +12,8 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
+<% if (defined?(node['ouras']) && node['ouras']) then local_ouras=node['ouras']; else local_ouras=@our_as; end -%>
+  # local_ouras=<%= local_ouras %>
 
 <% if defined?(node['ipv4dst']) && node['ipv4dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
