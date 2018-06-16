@@ -18,11 +18,13 @@ do
   destfile="/etc/bird/bird6.conf.d/${i}_PFX6.inc"
   if [ -e ${destfile} ] ; then
     FILEAGE=$(stat --printf=%Y ${destfile})
-    if [ $FILEAGE -lt $AGETHRESHOLD ]; then
-      /usr/bin/bgpq3 -b -4 -l ${birdname}_PFX ${i} >${destfile}
-      if [ $(wc -l <${destfile}) -le 2 ]; then
-        echo >${destfile} "${birdname}_PFX = [ deca:fbad::15:bad1/128 ];"
-      fi
+  else
+    FILEAGE=$AGETHRESHOLD
+  fi
+  if [ ! -e ${destfile} -o $FILEAGE -lt $AGETHRESHOLD ]; then
+    /usr/bin/bgpq3 -b -6 -l ${birdname}_PFX ${i} >${destfile}
+    if [ $(wc -l <${destfile}) -le 2 ]; then
+      echo >${destfile} "${birdname}_PFX = [ deca:fbad::15:bad1/128 ];"
     fi
   fi
 done
