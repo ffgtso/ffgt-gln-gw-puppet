@@ -13,7 +13,6 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |tunnelname,node| -%>
 <% if (defined?(node['ouras']) && node['ouras']) then local_ouras=node['ouras']; else local_ouras=@our_as; end -%>
-  # local_ouras=<%= local_ouras %>
 
 <% if defined?(node['ipv4dst']) && node['ipv4dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
@@ -67,12 +66,12 @@ int set bogon_asns;
     bgp_local_pref = 100;
 <% end -%>
     # Scrub BGP Communities (RFC 7454 Section 11)
-<% if Integer(@our_as) < 65536 -%>
-    bgp_community.delete([(<%=@our_as%>, *)]);
-    bgp_community.add((<%=@our_as%>,1)); /* mark peering routes as peering routes */
+<% if Integer(local_ouras) < 65536 -%>
+    bgp_community.delete([(<%=local_ouras%>, *)]);
+    bgp_community.add((<%=local_ouras%>,1)); /* mark peering routes as peering routes */
 <% end -%>
-    bgp_large_community.delete([(<%=@our_as%>, *, *)]);
-    bgp_large_community.add((<%=@our_as%>, 0, 1)); /* mark peering routes as peering routes */
+    bgp_large_community.delete([(<%=local_ouras%>, *, *)]);
+    bgp_large_community.add((<%=local_ouras%>, 0, 1)); /* mark peering routes as peering routes */
     accept;
   }
 <% else -%>
@@ -97,7 +96,7 @@ int set bogon_asns;
 <% if (numprep<1) then numprep=1; end -%>
 <% if (numprep>5) then numprep=5; end -%>
 <% for i in 1..numprep do -%>
-    bgp_path.prepend(<%=@our_as%>);
+    bgp_path.prepend(<%=local_ouras%>);
 <% end -%>
 <% end -%>
     accept;
@@ -128,13 +127,13 @@ int set bogon_asns;
       reject;
     }
 
-    if ((<%=@our_as%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 2, 0) ~ bgp_large_community) then {
-      bgp_path.prepend(<%=@our_as%>);
-    } else if ((<%=@our_as%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 3, 0) ~ bgp_large_community) then {
-      bgp_path.prepend(<%=@our_as%>);
-      bgp_path.prepend(<%=@our_as%>);
+    if ((<%=local_ouras%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 2, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=local_ouras%>);
+    } else if ((<%=local_ouras%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 3, 0) ~ bgp_large_community) then {
+      bgp_path.prepend(<%=local_ouras%>);
+      bgp_path.prepend(<%=local_ouras%>);
     }
-    if ((<%=@our_as%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=@our_as%>, 4, 0) ~ bgp_large_community) then {
+    if ((<%=local_ouras%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 4, 0) ~ bgp_large_community) then {
       reject;
     }
 
@@ -144,7 +143,7 @@ int set bogon_asns;
 <% if (numprep<1) then numprep=1; end -%>
 <% if (numprep>5) then numprep=5; end -%>
 <% for i in 1..numprep do -%>
-    bgp_path.prepend(<%=@our_as%>);
+    bgp_path.prepend(<%=local_ouras%>);
 <% end -%>
 <% end -%>
     accept;
@@ -156,9 +155,7 @@ int set bogon_asns;
 }
 
 protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from ebgp_filt_<%=@name.gsub('-', '_')%> {
-<% if (defined?(node['ouras']) && node['ouras']) -%>
-  local as <%= node['ouras'] %>;
-<% end -%>
+  local as <%=local_ouras%>;
   source address <%= node['ipv4src'] %>;
   neighbor <%= node['ipv4dst'] %> as <%= node['peeras'] %>;
   import keep filtered;
