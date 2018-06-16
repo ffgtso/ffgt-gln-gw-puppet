@@ -124,7 +124,7 @@ int set bogon_asns;
     }
 
 <% if defined?(node['bgpprepend']) && node['bgpprepend'] -%>
-  # Path Prepending: <%=node['bgpprepend']%> times (1<=n<=5)
+    # Path Prepending: <%=node['bgpprepend']%> times (1<=n<=5)
 <% numprep=Integer(node['bgpprepend']) -%>
 <% if (numprep<1) then numprep=1; end -%>
 <% if (numprep>5) then numprep=5; end -%>
@@ -149,7 +149,7 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
   import keep filtered;
   import filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
   export filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
-<% if defined?(node['bgppref']) && node['bgppref'] -%> bgp_local_pref = <%= node['bgppref'] %>;
+<% if defined?(node['bgppref']) && node['bgppref'] -%>  default bgp_local_pref = <%= node['bgppref'] %>;
 <% end -%>
 <% if defined?(node['multihop']) && node['multihop'] -%>  multihop <%= node['multihop'] %>;
 <% end -%>
