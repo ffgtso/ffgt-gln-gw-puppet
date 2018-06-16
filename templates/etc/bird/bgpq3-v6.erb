@@ -3,6 +3,8 @@
 # Helper script to update the peer AS prefixes
 
 TMPFILE="/tmp/peerasn-v6.$(date +%Y%m%d%H%M%S)"
+AGETHRESHOLD=$(date +%s)
+AGETHRESHOLD=$(expr $AGETHRESHOLD - 3600)
 
 for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
@@ -13,9 +15,15 @@ for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 for i in $(cat $TMPFILE)
 do
   birdname="$(echo $i | sed -e s/:/__/g -e s/-/_/g)"
-  /usr/bin/bgpq3 -b -6 -l ${birdname}_PFX ${i} >/etc/bird/bird6.conf.d/${i}_PFX6.inc
-  if [ $(wc -l </etc/bird/bird6.conf.d/${i}_PFX6.inc) -le 2 ]; then
-    echo >/etc/bird/bird6.conf.d/${i}_PFX6.inc "${birdname}_PFX = [ deca:fbad::15:bad1/128 ];"
+  destfile="/etc/bird/bird6.conf.d/${i}_PFX6.inc"
+  if [ -e ${destfile} ] ; then
+    FILEAGE=$(stat --printf=%Y ${destfile})
+    if [ $FILEAGE -lt $AGETHRESHOLD ]; then
+      /usr/bin/bgpq3 -b -4 -l ${birdname}_PFX ${i} >${destfile}
+      if [ $(wc -l <${destfile}) -le 2 ]; then
+        echo >${destfile} "${birdname}_PFX = [ deca:fbad::15:bad1/128 ];"
+      fi
+    fi
   fi
 done
 /bin/rm $TMPFILE
