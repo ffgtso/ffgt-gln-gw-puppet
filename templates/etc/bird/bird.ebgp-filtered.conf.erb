@@ -53,8 +53,8 @@ int set bogon_asns;
     # Don't import our prefixes we'll export
     include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
     if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
-      print "WARN: Import of own prefix: ", net, " via ", bgp_path;
-      #reject;
+      print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
+      reject;
     }
 
 <% end -%>
