@@ -17,9 +17,9 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% if defined?(node['ipv4dst']) && node['ipv4dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import4'].gsub('-', '_').gsub(':', '__')%>_PFX;
-<% if defined?(node['export4']) && node['export4']  -%>
-<% if node['export4'] != "ANY" && node['export4'] != "DEFONLY" -%>
-prefix set <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX;
+<% if defined?(node['reimport_filter4']) && node['reimport_filter4']  -%>
+<% if node['reimport_filter4'] != "ANY" && node['reimport_filter4'] != "DEFONLY" -%>
+prefix set <%=node['reimport_filter4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 <% end -%>
 int set bogon_asns;
@@ -48,11 +48,11 @@ int set bogon_asns;
   if (net ~ <%= node['import4'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
 <% end -%>
 <% end -%>
-<% if defined?(node['export4']) && node['export4']  -%>
-<% if node['export4'] != "ANY" && node['export4'] != "DEFONLY" -%>
+<% if defined?(node['reimport_filter4']) && node['reimport_filter4']  -%>
+<% if node['reimport_filter4'] != "ANY" && node['reimport_filter4'] != "DEFONLY" -%>
     # Don't import our prefixes we'll export
-    include "/etc/bird/bird.conf.d/<%=node['export4']%>_PFX4.inc";
-    if (net ~ <%=node['export4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+    include "/etc/bird/bird.conf.d/<%=node['reimport_filter']%>_PFX4.inc";
+    if (net ~ <%=node['reimport_filter4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
       print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
       reject;
     }

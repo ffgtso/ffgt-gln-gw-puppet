@@ -17,9 +17,9 @@ define BOGON_ASNS = [0, 23456, 64496..131071, 4200000000..4294967295];
 <% if defined?(node['ipv6dst']) && node['ipv6dst'] -%>
 filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>
 prefix set <%=node['import6'].gsub('-', '_').gsub(':', '__')%>_PFX;
-<% if defined?(node['export6']) && node['export6']  -%>
-<% if node['export6'] != "ANY" && node['export6'] != "DEFONLY" -%>
-prefix set <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX;
+<% if defined?(node['reimport_filter6']) && node['reimport_filter6']  -%>
+<% if node['reimport_filter6'] != "ANY" && node['reimport_filter6'] != "DEFONLY" -%>
+prefix set <%=node['reimport_filter6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 <% end -%>
 int set bogon_asns;
@@ -48,11 +48,11 @@ int set bogon_asns;
   if (net ~ <%= node['import6'].gsub('-', '_').gsub(':', '__') %>_PFX) then {
 <% end -%>
 <% end -%>
-<% if defined?(node['export6']) && node['export6'] -%>
-<% if node['export6'] != "ANY" && node['export6'] != "DEFONLY" -%>
+<% if defined?(node['reimport_filter6']) && node['reimport_filter6'] -%>
+<% if node['reimport_filter6'] != "ANY" && node['reimport_filter6'] != "DEFONLY" -%>
     # Don't import our prefixes we'll export
-    include "/etc/bird/bird6.conf.d/<%=node['export6']%>_PFX6.inc";
-    if (net ~ <%=node['export6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
+    include "/etc/bird/bird6.conf.d/<%=node['reimport_filter6']%>_PFX6.inc";
+    if (net ~ <%=node['reimport_filter6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
       print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
       reject;
     }
@@ -161,8 +161,6 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
   import keep filtered;
   import filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
   export filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
-<% if defined?(node['bgppref']) && node['bgppref'] -%>  default bgp_local_pref <%= node['bgppref'] %>;
-<% end -%>
 <% if defined?(node['multihop']) && node['multihop'] -%>  multihop <%= node['multihop'] %>;
 <% end -%>
 <% if defined?(node['direct']) && node['direct'] -%>  direct;

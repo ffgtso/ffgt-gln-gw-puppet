@@ -10,6 +10,7 @@ for i in <% peerings = YAML.load_file(@gre_yaml); -%>
 <% peerings.each_pair do |name,node| -%>
 <% if defined?(node['import4']) -%> <%=node['import4']-%><% end -%>
 <% if defined?(node['export4']) -%> <%=node['export4']-%><% end -%>
+<% if defined?(node['reimport_filter4']) -%> <%=node['reimport_filter4']-%><% end -%>
 <% end -%> ; do echo $i | egrep -v 'DEFONLY|ANY' ; done | sort -u >$TMPFILE
 
 for i in $(cat $TMPFILE)
@@ -28,5 +29,4 @@ do
     fi
   fi
 done
-
 /bin/rm $TMPFILE
