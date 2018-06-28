@@ -51,7 +51,7 @@ int set bogon_asns;
 <% if defined?(node['reimport_filter4']) && node['reimport_filter4']  -%>
 <% if node['reimport_filter4'] != "ANY" && node['reimport_filter4'] != "DEFONLY" -%>
     # Don't import our prefixes we'll export
-    include "/etc/bird/bird.conf.d/<%=node['reimport_filter']%>_PFX4.inc";
+    include "/etc/bird/bird.conf.d/<%=node['reimport_filter4']%>_PFX4.inc";
     if (net ~ <%=node['reimport_filter4'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
       print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
       reject;
