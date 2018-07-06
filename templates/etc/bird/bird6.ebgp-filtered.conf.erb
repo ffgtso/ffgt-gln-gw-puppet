@@ -28,6 +28,7 @@ int set bogon_asns;
   bgp_community.delete((65535, 666));
 
 <% if defined?(node['import_filter6']) && node['import_filter6'] -%>
+  # Initially, to do special-case rejects
   include "/etc/bird/bird6.conf.d/<%=node['import_filter6']%>";
 
 <% end -%>
@@ -65,6 +66,12 @@ int set bogon_asns;
 <% else -%>
     bgp_local_pref = 100;
 <% end -%>
+<% if defined?(node['import_filter6']) && node['import_filter6'] -%>
+
+  # Again; this time to modify route attributes.
+  include "/etc/bird/bird6.conf.d/<%=node['import_filter6']%>";
+<% end -%>
+
     # Scrub BGP Communities (RFC 7454 Section 11)
 <% if Integer(local_ouras) < 65536 -%>
     bgp_community.delete([(<%=local_ouras%>, *)]);
