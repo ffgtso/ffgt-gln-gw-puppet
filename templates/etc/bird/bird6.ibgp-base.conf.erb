@@ -3,6 +3,6 @@
 # Do not accept anything smaller than /16 or larger /64 (except for host routes, /128).
 function in_prefix_range_ibgp() {
   if net.len < 16 then return false;
-  if (net.len > 64 && net.len <= 127) then return false;
+  if (net.len > 64 && net.len <127) then return false;
   return true;
 }
