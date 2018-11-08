@@ -22,7 +22,8 @@ class ff_gln_gw::resources::repos (
     include  => {
       'src' => false,
       'deb' => true,
-    }
+    },
+    ensure => absent
   }
 
   package { 'debian-keyring':
