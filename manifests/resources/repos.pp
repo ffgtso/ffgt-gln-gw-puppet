@@ -15,14 +15,17 @@ class ff_gln_gw::resources::repos (
     }
   }
 
- apt::source { 'debian.draic.info':
-    location    => 'http://debian.draic.info/',
-    release     => 'wheezy',
-    repos       => 'main',
-    include  => {
-      'src' => false,
-      'deb' => true,
-    },
+# apt::source { 'debian.draic.info':
+#    location    => 'http://debian.draic.info/',
+#    release     => 'wheezy',
+#    repos       => 'main',
+#    include  => {
+#      'src' => false,
+#      'deb' => true,
+#    },
+#    ensure => absent
+#  }
+  file { "/etc/apt/sources.list.d/debian.draic.info.list":
     ensure => absent
   }
 
