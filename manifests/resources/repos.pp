@@ -15,6 +15,20 @@ class ff_gln_gw::resources::repos (
     }
   }
 
+  apt::source { 'cz_nic-labs-ubuntu-bird-xenial':
+    location   => 'http://ppa.launchpad.net/cz.nic-labs/bird/ubuntu/',
+    release    => 'xenial',
+    repos      => 'main',
+    key        => {
+      'id'     => 'F2331238F9C59A45',
+      'server' => 'pool.sks-keyservers.net',
+    },
+    include    => {
+      'src' => false,
+      'deb' => true,
+    }
+  }
+
 # apt::source { 'debian.draic.info':
 #    location    => 'http://debian.draic.info/',
 #    release     => 'wheezy',
