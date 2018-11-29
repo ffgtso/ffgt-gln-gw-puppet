@@ -208,9 +208,4 @@ template bgp local_mesh {
   next hop self;
 };
 
-protocol static loopback {
-  table mesh;
-  route <%= @loopback_ipv6 %>/128 via "<%= @loopback_if %>";
-}
-
 # Include puppet generated rules
