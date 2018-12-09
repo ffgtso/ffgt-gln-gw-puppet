@@ -24,7 +24,7 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
   include "/etc/bird/bird6.conf.d/<%=@ospf_import_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>    if is_default() then accept;
+<% if @dfz == "" -%>  if is_default() then accept;
 <% end -%>
     if (net.len = 128) then accept;
     if (net.len >= 16 && net.len <= 64) then accept;
@@ -37,7 +37,7 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   include "/etc/bird/bird6.conf.d/<%=@ospf_export_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>    if is_default() then accept;
+<% if @dfz == "" -%>  if is_default() then accept;
 <% end -%>
     if (source = RTS_BGP) then reject;
     #if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
