@@ -89,10 +89,19 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
   import keep filtered;
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
   export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
+<% if @ospf_instance_id == "" -%>
   instance id 10;
+<% else -%>
+  instance id <%=@ospf_instance_id%>;
+<% end -%>
 
   # Links between bgp? & gw??
+<% if @ospf_int_area == "" -%>
   area 10 {
+<% else -%>
+  area <%=@ospf_int_area%> {
+<% end -%>
+  }
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {

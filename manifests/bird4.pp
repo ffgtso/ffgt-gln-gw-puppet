@@ -219,7 +219,9 @@ define ff_gln_gw::bird4::ospf (
   $dont_export_prefix = "none",
   $dfz = "",
   $ospf_export_filter = "",
-  $ospf_import_filter = ""
+  $ospf_import_filter = "",
+  $ospf_instance_id = "",
+  $ospf_leaf_area = ""
 ) {
   include ff_gln_gw::bird4
 
