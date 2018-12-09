@@ -65,7 +65,7 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
   export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
 <% if @ospf_instance_id == "" -%>
-  instance id 10;
+  instance id 0;
 <% else -%>
   instance id <%=@ospf_instance_id%>;
 <% end -%>
