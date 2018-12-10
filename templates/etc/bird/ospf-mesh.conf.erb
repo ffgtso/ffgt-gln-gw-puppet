@@ -105,7 +105,6 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
   area <%=@ospf_int_area%> {
 <% end -%>
-  }
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
