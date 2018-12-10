@@ -221,7 +221,7 @@ define ff_gln_gw::bird4::ospf (
   $ospf_export_filter = "",
   $ospf_import_filter = "",
   $ospf_instance_id = "",
-  $ospf_leaf_area = ""
+  $ospf_int_area = ""
 ) {
   include ff_gln_gw::bird4
 
