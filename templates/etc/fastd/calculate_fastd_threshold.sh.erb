@@ -1,10 +1,12 @@
 #!/bin/bash
 #
-# Calculate if fastd should accept more connections.
+# Calculate if fastd should accept more connections, but only after the
+# system reached an uptime of at least 301 seconds (i. e. 5 minutes).
 #
 # We use "batctl o" as current network size (NETWORKSIZE)
 # We use "batctl gwl" as current number of GWs (NUMGATEWAYS)
 # We add 50 to NETWORKSIZE, then do MAXPEERS=NETWORKSIZE/NUMGATEWAYS.
+# A static MAXPEERS setting can be written to /etc/fastd-limit.
 # Finally we check the number of current fastd connections against MAXPEERS.
 # If we have more connections, we'll just touch /var/run/FASTD-<%= @mesh_code %>_FULL,
 # otherwise, we delete it.
@@ -17,13 +19,22 @@ if [ ! -e /var/run/fastd-status.<%= @mesh_code %>.sock ]; then
   exit 0
 fi
 
-NETWORKSIZE="`/usr/sbin/batctl -m bat-<%= @mesh_code %> o | /usr/bin/wc -l`"
-NUMGATEWAYS="`/usr/sbin/batctl -m bat-<%= @mesh_code %> gwl | /usr/bin/wc -l`"
+UPTIME=$(awk </proc/uptime '{printf("%.0f", $1);}')
+if [ ${UPTIME} -lt 301 ]; then
+  /usr/bin/logger "$0: Sleeping until 301 seconds have passed after boot. Currently passed: ${UPTIME}."
+  exit 0
+fi
+
+NETWORKSIZE="`/usr/sbin/batctl -m bat-<%= @mesh_code %> o 2>/dev/null | /usr/bin/wc -l`"
+NUMGATEWAYS="`/usr/sbin/batctl -m bat-<%= @mesh_code %> gwl 2>/dev/null | /usr/bin/wc -l`"
 NETWORKSIZE="`/usr/bin/expr ${NETWORKSIZE} + 50`"
 if [ ${NUMGATEWAYS} -eq 0 ]; then
     NUMGATEWAYS=1
 fi
 MAXPEERS="`/usr/bin/expr ${NETWORKSIZE} / ${NUMGATEWAYS}`"
+if [ -e /etc/fastd-limit ]; then
+  MAXPEERS="$(cat /etc/fastd-limit)"
+fi
 CURPEERS="`FASTD_SOCKET=/var/run/fastd-status.<%= @mesh_code %>.sock /usr/local/bin/fastd-query connections`"
 if [ "X${CURPEERS}" = "X" ]; then
     /usr/bin/logger "$0: WARNING: empty string reading <%= @mesh_code %> fastd connections"

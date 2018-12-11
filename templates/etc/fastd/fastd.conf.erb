@@ -7,8 +7,8 @@ method "salsa2012+umac";    # since fastd v15
 method "salsa2012+gmac";
 method "xsalsa20-poly1305"; # deprecated
 bind any:<%= @fastd_port %>;
-hide ip addresses yes;
-hide mac addresses yes;
+hide ip addresses no;
+hide mac addresses no;
 include "secret.conf";
 mtu <%= @mesh_mtu %>; # 1492 - IPv{4,6} Header - fastd Header...
 status socket "/var/run/fastd-status.<%= @mesh_code %>.sock";
