@@ -21,6 +21,7 @@ fi
 
 UPTIME=$(awk </proc/uptime '{printf("%.0f", $1);}')
 if [ ${UPTIME} -lt 301 ]; then
+  echo "Grace period after boot, ${UPTIME} <= 300 seconds ..." > /var/run/FASTD-<%= @mesh_code %>_FULL
   /usr/bin/logger "$0: Sleeping until 301 seconds have passed after boot. Currently passed: ${UPTIME}."
   exit 0
 fi
