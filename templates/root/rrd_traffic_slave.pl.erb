@@ -14,9 +14,9 @@ my $slavedatadir="/tmp/rrd_traffic_data";
 # in slavedata mode, what's the filename?
 my $SLAVEDATAFILE="/dev/null";
 # define location of rrdtool databases
-my $rrd = '/data2/rrds';
+my $rrd = '/var/local/rrd-traffic-rrds';
 # define location of images
-my $img = '/data2/www-sites/ffgt/noc/rrd';
+my $img = '/var/www/rrd-traffic/images';
 my $hostname=`/bin/uname -n`;
 chomp($hostname);
 
@@ -107,7 +107,7 @@ sub ProcessInterface
 	    {
 		    print "creating rrd database for $hostname $_[0] interface...\n";
 		    RRDs::create "$rrd/$hostname-$_[0].rrd",
-			    "-s 300",
+			    "--step", "300",
 			    "DS:in:DERIVE:600:0:125000000",
 			    "DS:out:DERIVE:600:0:125000000",
 			    "DS:inp:DERIVE:600:0:1250000",
@@ -117,6 +117,10 @@ sub ProcessInterface
 			    "RRA:AVERAGE:0.5:24:732",
 			    "RRA:AVERAGE:0.5:144:1460";
 	    }
+        if ($ERROR = RRDs::error) {
+            print "$0: unable to create rrd file $rrd/$hostname-$interface.rrd: $ERROR\n" if $ERROR;
+            die "Fatal: $ERROR\n" if $ERROR;
+        }
 
 	    # insert values into rrd
 	    RRDs::update "$rrd/$hostname-$_[0].rrd",
