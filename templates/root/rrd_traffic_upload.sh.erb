@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Use something like this to populate/create a rrd-traffic.yaml file ..
+#
+# for i in $(ip link show | awk '/mtu/ {if(!index($0, "state DOWN")) {gsub(":", "", $2); printf("%s\n", $2);}}'|egrep -v '^(one-|lo)') ; do echo -e "$i:\n    desc: \"HAM2_${i}\"\n"; done >rrd-traffic.yaml
+
+
 pwd="`pwd`"
 tmpfile="/tmp/upload-$$"
 
