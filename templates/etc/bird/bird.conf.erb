@@ -144,8 +144,8 @@ protocol kernel {
   device routes;   # Export RTS_DEVICE routes as well
   #export all;      # Export all routes
   export filter {
-    #if (avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
-    krt_prefsrc = <%= @loopback_ipv4 %>;
+    if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
+    #krt_prefsrc = <%= @loopback_ipv4 %>;
     accept;
   };
 };
@@ -158,8 +158,8 @@ protocol kernel {
   #export all;
   #export all;
   export filter {
-    #if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
-    krt_prefsrc = <%= @loopback_ipv4 %>;
+    if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
+    #krt_prefsrc = <%= @loopback_ipv4 %>;
     accept;
   };
   #persist;
