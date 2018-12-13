@@ -24,8 +24,8 @@ prefix set <%=node['reimport_filter4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 int set bogon_asns;
 {
-<% if defined?(node['bgpmaxpfxlen']) && node['bgpmaxpfxlen']
-     bgp_max_pfx_len = Integer(node['bgpmaxpfxlen'])
+<% if defined?(node['bgpmaxpfxlen4']) && node['bgpmaxpfxlen4']
+     bgp_max_pfx_len = Integer(node['bgpmaxpfxlen4'])
    else
      bgp_max_pfx_len = 24
    end -%>
@@ -50,7 +50,7 @@ int set bogon_asns;
   }
 <% if defined?(node['import4']) && node['import4'] -%>
 <% if node['import4'] == "ANY" -%>
-  if (avoid_martians() && bgp_path.len <= <%= bgp_max_pfx_len %>}) then {
+  if (avoid_martians() && bgp_path.len <= <%= bgp_max_pfx_len %>) then {
 <% else -%>
 <% if node['import4'] == "DEFONLY" -%>
   if (is_default()) then {
