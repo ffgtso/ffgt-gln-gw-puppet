@@ -29,6 +29,11 @@ int set bogon_asns;
    else
      bgp_max_pfx_len = 48
    end -%>
+<% if defined?(node['community_in']) && node['community_in']
+     community_in = Integer(node['community_in'])
+   else
+     community_in = 0
+   end -%>
   # Scrub BLACKHOLE Community from peering partners
   bgp_community.delete((65535, 666));
 
