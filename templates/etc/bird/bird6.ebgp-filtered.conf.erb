@@ -45,7 +45,7 @@ int set bogon_asns;
   }
 <% if defined?(node['import6']) && node['import6'] -%>
 <% if node['import6'] == "ANY" -%>
-  if (avoid_martians() && (net ~ [2000::/3{12,<%= bgp_max_pfx_len %>])) then {
+  if (avoid_martians() && (net ~ [2000::/3{12,<%= bgp_max_pfx_len %>}])) then {
 <% else -%>
 <% if node['import6'] == "DEFONLY" -%>
   if (is_default()) then {
