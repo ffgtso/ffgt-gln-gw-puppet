@@ -3,7 +3,8 @@ class ff_gln_gw::bird4 (
   $icvpn_as  = $ff_gln_gw::params::icvpn_as,
   $include_chaos = $ff_gln_gw::params::include_chaos_routes,
   $include_dn42  = $ff_gln_gw::params::include_dn42_routes,
-  $provides_uplink = $ff_gln_gw::params::provides_uplink
+  $provides_uplink = $ff_gln_gw::params::provides_uplink,
+  $no_krt_src_for_private_space = ""
 ) inherits ff_gln_gw::params {
   require ff_gln_gw::resources::repos
  

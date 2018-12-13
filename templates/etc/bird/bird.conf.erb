@@ -144,8 +144,11 @@ protocol kernel {
   device routes;   # Export RTS_DEVICE routes as well
   #export all;      # Export all routes
   export filter {
+<% if @no_krt_src_for_private_space == "" -%>
+    krt_prefsrc = <%= @loopback_ipv4 %>;
+<% else -%>
     if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
-    #krt_prefsrc = <%= @loopback_ipv4 %>;
+<% end -%>
     accept;
   };
 };
@@ -158,8 +161,11 @@ protocol kernel {
   #export all;
   #export all;
   export filter {
+<% if @no_krt_src_for_private_space == "" -%>
+    krt_prefsrc = <%= @loopback_ipv4 %>;
+<% else -%>
     if (source = RTS_BGP && avoid_martians()) then { krt_prefsrc = <%= @loopback_ipv4 %>; }
-    #krt_prefsrc = <%= @loopback_ipv4 %>;
+<% end -%>
     accept;
   };
   #persist;
