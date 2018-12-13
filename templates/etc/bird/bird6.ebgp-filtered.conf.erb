@@ -24,6 +24,11 @@ prefix set <%=node['reimport_filter6'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 int set bogon_asns;
 {
+<% if defined?(node['bgpmaxpfxlen']) && node['bgpmaxpfxlen']
+     bgp_max_pfx_len = Integer(node['bgpmaxpfxlen'])
+   else
+     bgp_max_pfx_len = 48
+   end -%>
   # Scrub BLACKHOLE Community from peering partners
   bgp_community.delete((65535, 666));
 
@@ -40,7 +45,7 @@ int set bogon_asns;
   }
 <% if defined?(node['import6']) && node['import6'] -%>
 <% if node['import6'] == "ANY" -%>
-  if (avoid_martians() && (net ~ [2000::/3{12,48}])) then {
+  if (avoid_martians() && (net ~ [2000::/3{12,<%= bgp_max_pfx_len %>}])) then {
 <% else -%>
 <% if node['import6'] == "DEFONLY" -%>
   if (is_default()) then {
@@ -172,7 +177,10 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
 <% end -%>
 <% if defined?(node['direct']) && node['direct'] -%>  direct;
 <% end -%>
+<% if defined?(node['passwd6']) && node['passwd6'] -%>  password "<%= node['passwd6'] %>";
+<% else -%>
 <% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
+<% end -%>
 <% end -%>
 <% if defined?(node['exportlimit6']) && node['exportlimit6'] -%>  export limit <%=node['exportlimit6']%> action block;
 <% end -%>

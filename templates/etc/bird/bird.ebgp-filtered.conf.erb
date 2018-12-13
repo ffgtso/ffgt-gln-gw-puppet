@@ -24,6 +24,16 @@ prefix set <%=node['reimport_filter4'].gsub('-', '_').gsub(':', '__')%>_PFX;
 <% end -%>
 int set bogon_asns;
 {
+<% if defined?(node['bgpmaxpfxlen']) && node['bgpmaxpfxlen']
+     bgp_max_pfx_len = Integer(node['bgpmaxpfxlen'])
+   else
+     bgp_max_pfx_len = 24
+   end -%>
+<% if defined?(node['community_in']) && node['community_in']
+     community_in = Integer(node['community_in'])
+   else
+     community_in = 0
+   end -%>
   # Scrub BLACKHOLE Community from peering partners
   bgp_community.delete((65535, 666));
 
@@ -40,7 +50,7 @@ int set bogon_asns;
   }
 <% if defined?(node['import4']) && node['import4'] -%>
 <% if node['import4'] == "ANY" -%>
-  if (avoid_martians()) then {
+  if (avoid_martians() && bgp_path.len <= <%= bgp_max_pfx_len %>}) then {
 <% else -%>
 <% if node['import4'] == "DEFONLY" -%>
   if (is_default()) then {
@@ -74,11 +84,12 @@ int set bogon_asns;
 
     # Scrub BGP Communities (RFC 7454 Section 11)
 <% if Integer(local_ouras) < 65536 -%>
-    bgp_community.delete([(<%=local_ouras%>, *)]);
-    bgp_community.add((<%=local_ouras%>,1)); /* mark peering routes as peering routes */
+    bgp_community.delete([(<%=local_ouras%>, 3000)..(<%=local_ouras%>, 3500)]);
+    bgp_community.add((<%=local_ouras%>, <%=community_in%>)); /* mark peering routes as peering routes */
 <% end -%>
-    bgp_large_community.delete([(<%=local_ouras%>, *, *)]);
-    bgp_large_community.add((<%=local_ouras%>, 0, 1)); /* mark peering routes as peering routes */
+    bgp_large_community.delete([(<%=local_ouras%>, 0, *), [(<%=local_ouras%>, 5, *), [(<%=local_ouras%>, 6, *)]);
+    bgp_large_community.add((<%=local_ouras%>, 0, <%=community_in%>)); /* mark peering routes as peering routes */
+    bgp_large_community.add((<%=local_ouras%>, 0, <%= node['peeras'] %>));
     accept;
   }
 <% else -%>
@@ -172,7 +183,10 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
 <% end -%>
 <% if defined?(node['direct']) && node['direct'] -%>  direct;
 <% end -%>
+<% if defined?(node['passwd4']) && node['passwd4'] -%>  password "<%= node['passwd4'] %>";
+<% else -%>
 <% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
+<% end -%>
 <% end -%>
 <% if defined?(node['exportlimit4']) && node['exportlimit4'] -%>  export limit <%=node['exportlimit4']%> action block;
 <% end -%>
