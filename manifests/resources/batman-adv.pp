@@ -11,7 +11,7 @@ class ff_gln_gw::resources::batman-adv () {
   } else {
     package {
       'batctl': ensure => 'latest'; # installed;
-      #'batman-adv-dkms': ensure => installed;
+      'batman-adv-dkms': ensure => absent;
     }
   }
 }
