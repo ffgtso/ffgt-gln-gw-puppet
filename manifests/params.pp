@@ -14,5 +14,6 @@ class ff_gln_gw::params (
   $loopback_ipv4 = $router_id,
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
+  $batman_compat = "14",
 ) {
 }
