@@ -55,6 +55,8 @@ Install as a puppet module, then include with node-specific parameters.
 Install Puppet and some required modules with:
 
 
+Note: Ubuntu 14.04 is no longer considered a valid option, starting 2019-02-17.
+
 ... upto Ubuntu LTS 14.04 (versions known to work) ...
 ```
 apt-get install --no-install-recommends puppet git libaugeas-ruby
@@ -76,7 +78,14 @@ puppet module install puppetlabs-vcsrepo --version 1.5.0
 puppet module install saz-sudo --version 4.1.0
 puppet module install torrancew-account --version 0.1.0
 puppet module install camptocamp-kmod --version 2.1.0
+puppet module install stankevich-python --version 1.19.0
 ```
+
+(Newer puppet versions might need
+```
+puppet module install puppet-python --version 2.2.2
+```
+instead.)
 
 
 Then add this module (which is not in the puppet forge, so it has to be
