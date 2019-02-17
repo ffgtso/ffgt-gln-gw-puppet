@@ -14,7 +14,7 @@ class ff_gln_gw::tunneldigger(
   $verbosity='DEBUG',
   $log_ip_addresses='true',
   $templates_dir='tunneldigger',
-  $functions='bridge_functions.sh',
+  $functions='',
   $session_up='setup_interface.sh',
   $session_pre_down='teardown_interface.sh',
   $session_down='',
