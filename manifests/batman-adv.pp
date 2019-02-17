@@ -4,11 +4,20 @@ define ff_gln_gw::batman-adv( $mesh_code
   include ff_gln_gw::resources::batman-adv
   include ff_gln_gw::firewall
 
-  file {
-    "/etc/network/interfaces.d/${mesh_code}-batman.cfg":
-    ensure => file,
-    content => template('ff_gln_gw/etc/network/mesh-batman.erb'),
-    require => [Package['batctl'],Package['batman-adv-dkms']];
+  if ($ff_gln_gw::params::batman_compat == "14") {
+    file {
+      "/etc/network/interfaces.d/${mesh_code}-batman.cfg":
+      ensure => file,
+      content => template('ff_gln_gw/etc/network/mesh-batman.erb'),
+      require => [Package['batctl'],Package['batman-adv-dkms']];
+    }
+  } else {
+    file {
+      "/etc/network/interfaces.d/${mesh_code}-batman.cfg":
+      ensure => file,
+      content => template('ff_gln_gw/etc/network/mesh-batman.erb'),
+      require => [Package['batctl']];
+    }
   }
 
   file_line {
