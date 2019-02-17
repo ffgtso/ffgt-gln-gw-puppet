@@ -75,7 +75,7 @@ class ff_gln_gw::tunneldigger(
     "start_td_bridge_interface_${mesh_code}":
       command => "/sbin/ifup br-tdig-${mesh_code}",
       unless  => "/bin/ip link show dev br-tdig-${mesh_code} 2> /dev/null",
-      before  => Ff_gln_gw::Monitor::Vnstat::Device["br-tdig-${mesh_code}"],
+      #before  => Ff_gln_gw::Monitor::Vnstat::Device["br-tdig-${mesh_code}"],
       require => [ File_Line["/etc/iproute2/rt_tables"]
                  , Class[ff_gln_gw::resources::sysctl]
                  ];
