@@ -98,7 +98,7 @@ class ff_gln_gw::tunneldigger(
   if $functions {
     file { "${scripts}/${functions}":
       ensure    => file,
-      content   => template("${templates_dir}/${functions}.erb"),
+      content   => template("ff_gln_gw/${templates_dir}/${functions}.erb"),
       require   => Exec['setup'],
     }
   }
@@ -106,7 +106,7 @@ class ff_gln_gw::tunneldigger(
   if $session_up {
     file { "${scripts}/${session_up}":
       ensure    => file,
-      content   => template("${templates_dir}/${session_up}.erb"),
+      content   => template("ff_gln_gw/${templates_dir}/${session_up}.erb"),
       require   => Exec['setup'],
     }
   }
@@ -114,7 +114,7 @@ class ff_gln_gw::tunneldigger(
   if $session_pre_down {
     file { "${scripts}/${session_pre_down}":
       ensure    => file,
-      content   => template("${templates_dir}/${session_pre_down}.erb"),
+      content   => template("ff_gln_gw/${templates_dir}/${session_pre_down}.erb"),
       mode      => '744',
       require   => Exec['setup'],
     }
@@ -123,7 +123,7 @@ class ff_gln_gw::tunneldigger(
   if $session_down {
     file { "${scripts}/${session_down}":
       ensure    => file,
-      content   => template("${templates_dir}/${session_down}.erb"),
+      content   => template("ff_gln_gw/${templates_dir}/${session_down}.erb"),
       mode      => '744',
       require   => Exec['setup'],
     }
@@ -132,7 +132,7 @@ class ff_gln_gw::tunneldigger(
   if $session_mtu_changed {
     file { "${scripts}/${session_mtu_changed}":
       ensure    => file,
-      content   => template("${templates_dir}/${session_mtu_changed}.erb"),
+      content   => template("ff_gln_gw/${templates_dir}/${session_mtu_changed}.erb"),
       mode      => '744',
       require   => Exec['setup'],
     }
