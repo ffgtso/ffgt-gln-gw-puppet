@@ -34,7 +34,7 @@ class ff_gln_gw::tunneldigger(
   }
 
   package { [
-    'iproute',
+    'iproute2',
     'git',
     'libnetfilter-conntrack-dev',
     'libnfnetlink-dev',
