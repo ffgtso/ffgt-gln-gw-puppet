@@ -65,10 +65,30 @@ class ff_gln_gw::tunneldigger(
     cwd => "${install_dir}/broker",
   }
 
+  file {
+    "/etc/network/interfaces.d/${mesh_code}-tunneldigger.cfg":
+      ensure => file,
+      content => template('ff_gln_gw/etc/network/tunneldigger-bridge.erb');
+  } ->
+  exec {
+    "start_td_bridge_interface_${mesh_code}":
+      command => "/sbin/ifup br-tdig-${mesh_code}",
+      unless  => "/bin/ip link show dev br-tdig-${mesh_code} 2> /dev/null",
+      before  => Ff_gln_gw::Monitor::Vnstat::Device["br-tdig-${mesh_code}"],
+      require => [ File_Line["/etc/iproute2/rt_tables"]
+                 , Class[ff_gln_gw::resources::sysctl]
+                 ];
+  } ->
+  ff_gln_gw::firewall::device { "br-tdig-${mesh_code}":
+    chain => "mesh"
+  } ->
+  ff_gln_gw::firewall::forward { "br-tdig-${mesh_code}":
+    chain => "mesh"
+  }
 
   file { "${install_dir}/broker/l2tp_broker.cfg":
     ensure    => file,
-    content   => template('tunneldigger/l2tp_broker.cfg.erb'),
+    content   => template('ff_gln_gw/tunneldigger/l2tp_broker.cfg.erb'),
     require   => Exec['setup'],
   }
 
@@ -119,14 +139,14 @@ class ff_gln_gw::tunneldigger(
 
   file { "${install_dir}/broker/scripts/tunneldigger-broker":
     ensure    => file,
-    content   => template('tunneldigger/tunneldigger-broker.erb'),
+    content   => template('ff_gln_gw/tunneldigger/tunneldigger-broker.erb'),
     require   => Exec['setup'],
   }
 
   if $systemd == '1' {
     file { '/etc/systemd/system/tunneldigger.service':
       ensure    => file,
-      content   => template('tunneldigger/tunneldigger.service.erb'),
+      content   => template('ff_gln_gw/tunneldigger/tunneldigger.service.erb'),
       require   => Exec['setup'],
       notify    => Service['tunneldigger'],
     }
@@ -139,7 +159,7 @@ class ff_gln_gw::tunneldigger(
 
   file { '/etc/modules-load.d/tunneldigger.conf':
     ensure      => file,
-    content     => template('tunneldigger/modules.conf.erb'),
+    content     => template('ff_gln_gw/tunneldigger/modules.conf.erb'),
     require     => Exec['setup'],
   }
 
