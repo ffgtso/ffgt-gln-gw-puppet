@@ -1,4 +1,4 @@
-class tunneldigger(
+class ff_gln_gw::tunneldigger(
   $install_dir='/srv/tunneldigger/tunneldigger',
   $revision='master',
   $virtualenv="/srv/tunneldigger/env_tunneldigger",
