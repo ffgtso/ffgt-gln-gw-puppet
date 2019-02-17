@@ -120,7 +120,7 @@ class ff_gln_gw::tunneldigger(
     }
   }
 
-  if $session_down {
+  if $session_down != '' {
     file { "${scripts}/${session_down}":
       ensure    => file,
       content   => template("ff_gln_gw/${templates_dir}/${session_down}.erb"),
@@ -129,7 +129,7 @@ class ff_gln_gw::tunneldigger(
     }
   }
 
-  if $session_mtu_changed {
+  if $session_mtu_changed != '' {
     file { "${scripts}/${session_mtu_changed}":
       ensure    => file,
       content   => template("ff_gln_gw/${templates_dir}/${session_mtu_changed}.erb"),
