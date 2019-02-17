@@ -21,7 +21,8 @@ class ff_gln_gw::tunneldigger(
   $session_mtu_changed='',
   $bridge_mac,
   $bridge_mtu='1364',
-  $systemd='1'
+  $systemd='1',
+  $mesh_name
 ) {
 
   class { 'python':
