@@ -95,7 +95,7 @@ class ff_gln_gw::tunneldigger(
 
   $scripts = "${install_dir}/broker/scripts"
 
-  if $functions!='' {
+  if 1==0 && $functions {
     file { "${scripts}/${functions}":
       ensure    => file,
       content   => template("ff_gln_gw/${templates_dir}/${functions}.erb"),
