@@ -19,6 +19,6 @@ if /bin/grep -Fq $UUID /srv/tunneldigger/blacklist.txt; then
 else
       log_message "New client with UUID=$UUID connected, adding to tunneldigger bridge interface"
       ip link set dev $INTERFACE up mtu 1364
-      ip link show dev br-tdig-<%= @mesh_name %> || (ifup br-tdig-<%= @mesh_name %> || true)
-      brctl addif br-tdig-<%= @mesh_name %> $INTERFACE
+      ip link show dev br-tdig-<%= @mesh_code %> || (ifup br-tdig-<%= @mesh_code %> || true)
+      brctl addif br-tdig-<%= @mesh_code %> $INTERFACE
 fi

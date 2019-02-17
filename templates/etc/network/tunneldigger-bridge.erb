@@ -1,6 +1,6 @@
-# Tunneldigger bridge "<%= @mesh_name %>"
-auto br-tdig-<%= @mesh_name %>
-iface br-tdig-<%= @mesh_name %> inet manual
+# Tunneldigger bridge "<%= @mesh_code %>"
+auto br-tdig-<%= @mesh_code %>
+iface br-tdig-<%= @mesh_code %> inet manual
   ## Bring up interface
   pre-up brctl addbr $IFACE ||:
   pre-up ip link set address <%= @bridge_mac %> dev $IFACE
@@ -8,9 +8,9 @@ iface br-tdig-<%= @mesh_name %> inet manual
   pre-up ip link set $IFACE promisc on
   up ip link set dev $IFACE up
   post-up ebtables -A FORWARD --logical-in $IFACE -j DROP
-  post-up batctl -m bat-<%= @mesh_name %> if add $IFACE
+  post-up batctl -m bat-<%= @mesh_code %> if add $IFACE
   ## Shutdown interface
-  pre-down batctl -m bat-<%= @mesh_name %> if del $IFACE
+  pre-down batctl -m bat-<%= @mesh_code %> if del $IFACE
   pre-down ebtables -D FORWARD --logical-in $IFACE -j DROP
   down ip link set dev $IFACE down
   post-down brctl delbr $IFACE
