@@ -95,13 +95,13 @@ class ff_gln_gw::tunneldigger(
 
   $scripts = "${install_dir}/broker/scripts"
 
-  if 1==0 && $functions {
-    file { "${scripts}/${functions}":
-      ensure    => file,
-      content   => template("ff_gln_gw/${templates_dir}/${functions}.erb"),
-      require   => Exec['setup'],
-    }
-  }
+  #if $functions {
+  #  file { "${scripts}/${functions}":
+  #    ensure    => file,
+  #    content   => template("ff_gln_gw/${templates_dir}/${functions}.erb"),
+  #    require   => Exec['setup'],
+  #  }
+  #}
 
   if $session_up {
     file { "${scripts}/${session_up}":
