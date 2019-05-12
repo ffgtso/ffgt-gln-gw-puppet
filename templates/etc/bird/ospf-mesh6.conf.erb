@@ -14,8 +14,11 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
   include "/etc/bird/bird6.conf.d/<%=@ospf_export_filter%>";
 
 <% end -%>
-    if (source = RTS_BGP) then reject;
-    if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
+  if (source = RTS_BGP) then reject;
+  if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
+<% if @have_ospf_links == "yes" -%>
+  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then accept;
+<% end -%>
     reject;
 }
 
@@ -26,9 +29,8 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% end -%>
 <% if @dfz == "" -%>  if is_default() then accept;
 <% end -%>
-    if (net.len = 128) then accept;
-    if (net.len >= 16 && net.len <= 64) then accept;
-    reject;
+  if (net.len = 128) then accept;
+  if (net.len >= 16 && net.len <= 64) then accept;
   reject;
 }
 
@@ -62,8 +64,8 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
-  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
+  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
+  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
 <% if @ospf_instance_id == "" -%>
   instance id 0;
 <% else -%>
@@ -92,8 +94,8 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
-  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_<%=@ospf_type%>;
+  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
+  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
 <% if @ospf_instance_id == "" -%>
   instance id 10;
 <% else -%>
