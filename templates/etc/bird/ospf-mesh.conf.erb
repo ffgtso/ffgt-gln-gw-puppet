@@ -41,8 +41,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% end -%>
 <% if @dfz == "" -%>  if is_default() then accept;
 <% end -%>
-    if (source = RTS_BGP) then reject;
-    accept;
+  if (source = RTS_BGP) then reject;
+  accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {

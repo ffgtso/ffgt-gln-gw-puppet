@@ -19,7 +19,7 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% if @have_ospf_links == "yes" -%>
   if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then accept;
 <% end -%>
-    reject;
+  reject;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
@@ -41,10 +41,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% end -%>
 <% if @dfz == "" -%>  if is_default() then accept;
 <% end -%>
-    if (source = RTS_BGP) then reject;
-    #if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
-    #reject;
-    accept;
+  if (source = RTS_BGP) then reject;
+  accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
