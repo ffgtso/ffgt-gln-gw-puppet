@@ -28,7 +28,7 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
     reject;
   };
   export filter {
-    if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || RTS_DEVICE) then {
+    if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || source = RTS_DEVICE) then {
 <% if @dfz != "" -%>
       if is_default() then accept;
 <% end -%>
