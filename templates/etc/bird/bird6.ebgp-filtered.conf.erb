@@ -150,6 +150,11 @@ int set bogon_asns;
       reject;
     }
 
+    if ((65535, 65282) ~ bgp_community) then {
+      print "Export rejected: no-advertise community set: ", net, " ", bgp_path;
+      reject;
+    }
+
     if ((<%=local_ouras%>, 2, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 2, 0) ~ bgp_large_community) then {
       bgp_path.prepend(<%=local_ouras%>);
     } else if ((<%=local_ouras%>, 3, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 3, 0) ~ bgp_large_community) then {
