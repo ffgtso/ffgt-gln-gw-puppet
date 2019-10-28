@@ -70,8 +70,8 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
       cost <%= node['cost'] %>;
-<% if defined?(node['mode']) && node['mode'] -%>
-      type <%= node['mode'] %>;
+<% if defined?(node['type']) && node['type'] -%>
+      type <%= node['type'] %>;
 <% else -%>
       type pointopoint;
 <% end -%>
@@ -105,8 +105,8 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
       cost <%= node['cost'] %>;
-<% if defined?(node['mode']) && node['mode'] -%>
-      type <%= node['mode'] %>;
+<% if defined?(node['type']) && node['type'] -%>
+      type <%= node['type'] %>;
 <% else -%>
       type pointopoint;
 <% end -%>
