@@ -2,7 +2,6 @@
 # bird6 OSPF configuration
 
 function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
-  if (source = RTS_BGP) then return false;
 <% if @dont_export_prefix != "none" -%>
   if (net ~ [<%= @dont_export_prefix %>]) then return false;
 <% end -%>
@@ -15,11 +14,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 
 <% end -%>
   if (source = RTS_BGP) then reject;
-  if (source = RTS_STATIC || source = RTS_DEVICE || source = RTS_STATIC_DEVICE) then accept;
-<% if @have_ospf_links == "yes" -%>
-  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then accept;
-<% end -%>
-  reject;
+  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then reject;
+  accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
@@ -27,11 +23,7 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
   include "/etc/bird/bird6.conf.d/<%=@ospf_import_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>  if is_default() then accept;
-<% end -%>
-  if (net.len = 128) then accept;
-  if (net.len >= 16 && net.len <= 64) then accept;
-  reject;
+  accept;
 }
 
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
@@ -39,9 +31,11 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   include "/etc/bird/bird6.conf.d/<%=@ospf_export_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>  if is_default() then accept;
+<% if @dfz == "" -%>
+  if is_default() then accept;
 <% end -%>
   if (source = RTS_BGP) then reject;
+  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then reject;
   accept;
 }
 
@@ -53,9 +47,7 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% if @dfz == "" -%>
   if is_default() then accept;
 <% end -%>
-  if (net.len = 128) then accept;
-  if (net.len >= 16 && net.len <= 64) then accept;
-  reject;
+  accept;
 }
 
 <% if @have_ospf_peerings == "yes" -%>
@@ -78,10 +70,13 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
       cost <%= node['cost'] %>;
+<% if defined?(node['mode']) && node['mode'] -%>
+      type <%= node['mode'] %>;
+<% else -%>
       type pointopoint;
+<% end -%>
       hello 5; retransmit 2; wait 10; dead 20;
       check link;
-      authentication none;
     };
 <% end -%>
   };
@@ -110,10 +105,13 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
       cost <%= node['cost'] %>;
+<% if defined?(node['mode']) && node['mode'] -%>
+      type <%= node['mode'] %>;
+<% else -%>
       type pointopoint;
+<% end -%>
       hello 5; retransmit 2; wait 10; dead 20;
       check link;
-      authentication none;
     };
 
 <% end -%>
