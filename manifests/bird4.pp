@@ -459,6 +459,7 @@ define ff_gln_gw::bird4::ibgp (
   $bgp_options = "",
   $dont_export_prefix = "none",
   $dfz = ""
+  $mesh_code = $ff_gln_gw::params::mesh_code,
 ) {
   include ff_gln_gw::bird4
   include ff_gln_gw::resources::meta

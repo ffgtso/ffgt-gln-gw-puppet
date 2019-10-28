@@ -15,5 +15,6 @@ class ff_gln_gw::params (
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
   $batman_compat = "14",
+  $mesh_code = "",
 ) {
 }
