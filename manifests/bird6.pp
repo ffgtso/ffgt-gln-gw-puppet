@@ -332,7 +332,8 @@ define ff_gln_gw::bird6::ibgp (
   $next_hop_self = "",
   $bgp_options = "",
   $dont_export_prefix = "none",
-  $dfz = ""
+  $dfz = "",
+  $mesh_code = $ff_gln_gw::params::mesh_code,
 ) {
   include ff_gln_gw::bird6
   include ff_gln_gw::resources::meta

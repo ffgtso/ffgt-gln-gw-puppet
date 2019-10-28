@@ -458,7 +458,7 @@ define ff_gln_gw::bird4::ibgp (
   $next_hop_self = "",
   $bgp_options = "",
   $dont_export_prefix = "none",
-  $dfz = ""
+  $dfz = "",
   $mesh_code = $ff_gln_gw::params::mesh_code,
 ) {
   include ff_gln_gw::bird4
