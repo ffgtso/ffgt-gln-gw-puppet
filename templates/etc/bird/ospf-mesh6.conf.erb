@@ -14,8 +14,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 
 <% end -%>
   if (source = RTS_BGP) then reject;
-  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then reject;
-  accept;
+  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then accept; #reject;
+  reject; #accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
@@ -35,8 +35,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   if is_default() then accept;
 <% end -%>
   if (source = RTS_BGP) then reject;
-  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then reject;
-  accept;
+  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then accept; #reject;
+  reject; #accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
@@ -55,7 +55,7 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
-  export filter none; # ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
+  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
 <% if @ospf_instance_id == "" -%>
   instance id 0;
 <% else -%>
@@ -88,7 +88,7 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
-  export none; # filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
+  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
 <% if @ospf_instance_id == "" -%>
   instance id 10;
 <% else -%>
