@@ -75,7 +75,7 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      #hello 5; retransmit 2; wait 10; dead 20;
+      hello 5; retransmit 2; wait 10; dead 20;
       #check link;
     };
 <% end -%>
@@ -110,7 +110,7 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      #hello 5; retransmit 2; wait 10; dead 20;
+      hello 5; retransmit 2; wait 10; dead 20;
       #check link;
     };
 
