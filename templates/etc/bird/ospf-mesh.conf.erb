@@ -55,7 +55,7 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
+  export none; # filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
 <% if @ospf_instance_id == "" -%>
   instance id 0;
 <% else -%>
@@ -75,8 +75,8 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      hello 5; retransmit 2; wait 10; dead 20;
-      check link;
+      #hello 5; retransmit 2; wait 10; dead 20;
+      #check link;
     };
 <% end -%>
   };
@@ -88,7 +88,7 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
   import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
+  export none; # filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
 <% if @ospf_instance_id == "" -%>
   instance id 10;
 <% else -%>
@@ -110,8 +110,8 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      hello 5; retransmit 2; wait 10; dead 20;
-      check link;
+      #hello 5; retransmit 2; wait 10; dead 20;
+      #check link;
     };
 
 <% end -%>
