@@ -8,14 +8,15 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
   return true;
 }
 
+<% if @have_ospf_peerings == "yes" -%>
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% if @ospf_export_filter != "" -%>
   include "/etc/bird/bird6.conf.d/<%=@ospf_export_filter%>";
 
 <% end -%>
   if (source = RTS_BGP) then reject;
-  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then accept; #reject;
-  reject; #accept;
+  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then reject;
+  accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
@@ -25,7 +26,9 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
 <% end -%>
   accept;
 }
+<% end -%>
 
+<% if @have_ospf_links == "yes" -%>
 filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% if @ospf_export_filter != "" -%>
   include "/etc/bird/bird6.conf.d/<%=@ospf_export_filter%>";
@@ -35,8 +38,8 @@ filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   if is_default() then accept;
 <% end -%>
   if (source = RTS_BGP) then reject;
-  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then accept; #reject;
-  reject; #accept;
+  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then reject;
+  accept;
 }
 
 filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
@@ -49,6 +52,7 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
 <% end -%>
   accept;
 }
+<% end -%>
 
 <% if @have_ospf_peerings == "yes" -%>
 protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
