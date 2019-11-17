@@ -47,9 +47,9 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
   include "/etc/bird/bird.conf.d/<%=@ospf_import_filter%>";
 
 <% end -%>
-<% if @dfz == "" -%>
+#<% if @dfz == "" -%>
   if is_default() then accept;
-<% end -%>
+#<% end -%>
   accept;
 }
 <% end -%>
