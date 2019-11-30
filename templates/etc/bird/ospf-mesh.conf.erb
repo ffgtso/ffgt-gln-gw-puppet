@@ -8,18 +8,19 @@ function ok_to_export_<%= @mesh_code.gsub('-', '_') %>_ospf() {
   return true;
 }
 
-<% if @have_ospf_peerings == "yes" -%>
-filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
+<% if @have_ospf_peerings == "yes" || @have_ospf_links == "yes" -%>
+filter ex_ospf_<%= @mesh_code.gsub('-', '_') %> {
 <% if @ospf_export_filter != "" -%>
   include "/etc/bird/bird.conf.d/<%=@ospf_export_filter%>";
 
 <% end -%>
-  if (source = RTS_BGP) then reject;
-  if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then reject;
-  accept;
+  if (source = RTS_STATIC) then accept;
+  if (source = RTS_DEVICE) then accept;
+  if (source = RTS_STATIC_DEVICE) then accept;
+  reject;
 }
 
-filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
+filter im_ospf_<%= @mesh_code.gsub('-', '_') %> {
 <% if @ospf_import_filter != "" -%>
   include "/etc/bird/bird.conf.d/<%=@ospf_import_filter%>";
 
@@ -27,11 +28,11 @@ filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root {
   accept;
 }
 
-protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
+protocol ospf o_<%= @mesh_code.gsub('-', '_') %> {
   table mesh;
   import keep filtered;
-  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_root;
+  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>;
+  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>;
 <% if @ospf_instance_id == "" -%>
   instance id 0;
 <% else -%>
@@ -39,9 +40,7 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% end -%>
 
   area 0 {
-#    networks {
-#<% @mynets.each do |prefix| %>  <%= prefix %>;<% end %>
-#    };
+<% if @have_ospf_peerings == "yes" -%>
 <% peerings = YAML.load_file(@ospf_peerings); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
@@ -51,56 +50,14 @@ protocol ospf o_p_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      hello 5; retransmit 2; wait 10; dead 20;
-      #check link;
+<% if defined?(node['options']) && node['options'] -%>
+      <%= node['options'] %>;
+<% end -%>
     };
-<% end -%>
-  };
-}
-<% end -%>
 
+<% end -%>
+<% end -%>
 <% if @have_ospf_links == "yes" -%>
-filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-<% if @ospf_export_filter != "" -%>
-  include "/etc/bird/bird.conf.d/<%=@ospf_export_filter%>";
-
-<% end -%>
-#<% if @dfz == "" -%>
-  if is_default() then accept;
-#<% end -%>
-  if (source = RTS_BGP) then reject;
-  if (proto = "o_l_<%= @mesh_code.gsub('-', '_') %>") then reject;
-  accept;
-}
-
-filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf {
-<% if @ospf_import_filter != "" -%>
-  include "/etc/bird/bird.conf.d/<%=@ospf_import_filter%>";
-
-<% end -%>
-#<% if @dfz == "" -%>
-  if is_default() then accept;
-#<% end -%>
-  accept;
-}
-
-protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
-  table mesh;
-  import keep filtered;
-  import filter im_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
-  export filter ex_ospf_<%= @mesh_code.gsub('-', '_') %>_leaf;
-<% if @ospf_instance_id == "" -%>
-  instance id 10;
-<% else -%>
-  instance id <%=@ospf_instance_id%>;
-<% end -%>
-
-  # Links between bgp? & gw??
-<% if @ospf_int_area == "" -%>
-  area 10 {
-<% else -%>
-  area <%=@ospf_int_area%> {
-<% end -%>
 <% peerings = YAML.load_file(@ospf_links); -%>
 <% peerings.each_pair do |name,node| -%>
     interface "<%=name%>" {
@@ -110,11 +67,12 @@ protocol ospf o_l_<%= @mesh_code.gsub('-', '_') %> {
 <% else -%>
       type pointopoint;
 <% end -%>
-      hello 5; retransmit 2; wait 10; dead 20;
-      #check link;
-    };
-
+<% if defined?(node['options']) && node['options'] -%>
+      <%= node['options'] %>;
 <% end -%>
-  };
+    };
+<% end -%>
+<% end -%>
+  }:
 }
 <% end -%>
