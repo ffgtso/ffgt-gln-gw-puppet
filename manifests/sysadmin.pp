@@ -20,6 +20,7 @@ class ff_gw::sysadmin($zabbixserver = '127.0.0.1', $muninserver = '127.0.0.1', $
     location => 'http://ftp.de.debian.org/debian/',
     release  => 'wheezy-backports',
     repos    => 'main',
+    ensure   => absent,
   }
   # batman repo
   apt::source { 'universe-factory':
@@ -28,12 +29,15 @@ class ff_gw::sysadmin($zabbixserver = '127.0.0.1', $muninserver = '127.0.0.1', $
     repos      => 'main',
     key        => '16EF3F64CB201D9C',
     key_server => 'pool.sks-keyservers.net',
+    ensure   => absent,
   }
+  # FIXME: Replace by "add-apt-repository ppa:cz.nic-labs/bird"
   # bird repo // TODO: no PGP key
   apt::source { 'bird-network':
     location   => 'http://bird.network.cz/debian/',
     release    => 'wheezy',
     repos      => 'main',
+    ensure   => absent,
   }
 
   # then install some basic packages
