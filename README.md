@@ -1,5 +1,8 @@
 # Freifunk (Gütersloh) Gluon Gateway Module
 
+DEPRECATION NOTE: We're switching from Puppet to Ansible, thus
+future work will happen at https://github.com/freifunkowl/ffowl-ansible-roles
+
 Based on https://github.com/ffnord/ffnord-puppet-gateway --
 forked due to different goals; while the aim is "works for us"
 initially, any bugfixes, additions etc. to make this a complete
@@ -505,4 +508,3 @@ the node name is equivalent to the peers filename:
 ```
 # fastd-query-ffgc peers name gc-gw0 
 ```
-
