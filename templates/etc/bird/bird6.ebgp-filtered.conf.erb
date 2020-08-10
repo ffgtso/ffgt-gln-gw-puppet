@@ -89,7 +89,7 @@ int set bogon_asns;
 <% end -%>
     bgp_large_community.delete([(<%=local_ouras%>, 0, *), (<%=local_ouras%>, 5, *), (<%=local_ouras%>, 6, *)]);
     bgp_large_community.add((<%=local_ouras%>, <%=community_in%>, <%= node['peeras'] %>));
-    bgp_large_community.add((<%=local_ouras%>, <%=community_in%>, 0);
+    bgp_large_community.add((<%=local_ouras%>, <%=community_in%>, 0));
     accept;
   }
 <% else -%>

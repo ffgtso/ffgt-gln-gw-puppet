@@ -42,6 +42,7 @@ IXPs:
     03   ECIX HAM
     04   DECIX HAM
     05   DECIX FRA (remote)
+    06   DECIX DUS
     07   DECIX DUS (remote)
     08   DECIX MUC (remote)
     09   BCIX
