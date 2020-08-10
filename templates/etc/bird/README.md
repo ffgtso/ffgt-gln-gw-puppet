@@ -1,10 +1,14 @@
-=== Communities
+# bird configurstion #
+
+## tbd ##
+
+### Communities ###
 
 (65535:65281)              NO_EXPORT
 (65535:65282)              NO_ADVERTISE
 (65535:666)                BLACKHOLE
 
-=== Large Communities
+### Large Communities ###
 
 (206813:2:REMOTE_ASN)      Prepend 206813 to REMOTE_ASN
 (206813:2:0)               Prepend 206813 generally
@@ -43,9 +47,9 @@ IXPs:
 12   KleyRex
 
 
-== Configuration example
+## Configuration example ##
 
-=== bgp-ha02.4830.org
+### bgp-ham02.4830.org ###
 
     root@chimaera:~# cat ebgp_ham02.yaml
     #…
