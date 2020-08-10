@@ -21,10 +21,13 @@
 
 Read-only:
 
-    (206813:100:REMOTE_ASN)    Route learned from REMOTE_ASN
+    (206813:0:REMOTE_ASN)      Route learned from REMOTE_ASN (legacy)
     (206813:1xx:REMOTE_ASN)    Route learned from REMOTE_ASN at IXP xx
+    (206813:200:0)             Route learned from peer
     (206813:200:REMOTE_ASN)    Route learned from peer REMOTE_ASN
-    (206813:300:REMOTE_ASN)    Route learned from "customer" REMOTE_ASN
+    (206813:300:REMOTE_ASN)    Route learned from "customer" ASN
+    (206813:400:0)             Route learned from transit (i. e. do not re-propagate)
+    (206813:400:REMOTE_ASN)    Route learned from transit ASN
 
 
 
