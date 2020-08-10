@@ -88,8 +88,7 @@ int set bogon_asns;
     bgp_community.add((<%=local_ouras%>,1)); /* mark peering routes as peering routes */
 <% end -%>
     bgp_large_community.delete([(<%=local_ouras%>, 0, *), (<%=local_ouras%>, 5, *), (<%=local_ouras%>, 6, *)]);
-    bgp_large_community.add((<%=local_ouras%>, 0, <%=community_in%>));
-    bgp_large_community.add((<%=local_ouras%>, 0, <%= node['peeras'] %>));
+    bgp_large_community.add((<%=local_ouras%>, <%=community_in%>, <%= node['peeras'] %>));
     accept;
   }
 <% else -%>
