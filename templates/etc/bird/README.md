@@ -4,27 +4,27 @@
 
 ### Communities ###
 
-(65535:65281)              NO_EXPORT
-(65535:65282)              NO_ADVERTISE
-(65535:666)                BLACKHOLE
+    (65535:65281)              NO_EXPORT
+    (65535:65282)              NO_ADVERTISE
+    (65535:666)                BLACKHOLE
 
 ### Large Communities ###
 
-(206813:2:REMOTE_ASN)      Prepend 206813 to REMOTE_ASN
-(206813:2:0)               Prepend 206813 generally
-(206813:3:REMOTE_ASN)      Prepend 206813 2x to REMOTE_ASN
-(206813:3:0)               Prepend 206813 2x generally
-(206813:4:REMOTE_ASN)      Reject export to REMOTE_ASN
-(206813:4:0)               Reject export at all
-(206813:5:REMOTE_ASN)      Allow export to REMOTE_ASN (precedence over (206813:4:*))
+    (206813:2:REMOTE_ASN)      Prepend 206813 to REMOTE_ASN
+    (206813:2:0)               Prepend 206813 generally
+    (206813:3:REMOTE_ASN)      Prepend 206813 2x to REMOTE_ASN
+    (206813:3:0)               Prepend 206813 2x generally
+    (206813:4:REMOTE_ASN)      Reject export to REMOTE_ASN
+    (206813:4:0)               Reject export at all
+    (206813:5:REMOTE_ASN)      Allow export to REMOTE_ASN (precedence over (206813:4:*))
 
 
 Read-only:
 
-(206813:100:REMOTE_ASN)    Route learned from REMOTE_ASN
-(206813:1xx:REMOTE_ASN)    Route learned from REMOTE_ASN at IXP xx
-(206813:200:REMOTE_ASN)    Route learned from peer REMOTE_ASN
-(206813:300:REMOTE_ASN)    Route learned from "customer" REMOTE_ASN
+    (206813:100:REMOTE_ASN)    Route learned from REMOTE_ASN
+    (206813:1xx:REMOTE_ASN)    Route learned from REMOTE_ASN at IXP xx
+    (206813:200:REMOTE_ASN)    Route learned from peer REMOTE_ASN
+    (206813:300:REMOTE_ASN)    Route learned from "customer" REMOTE_ASN
 
 
 
@@ -34,17 +34,17 @@ Read-only:
 
 IXPs:
 
-01   Community-IX BER
-02   Community-IX FRA
-03   ECIX HAM
-04   DECIX HAM
-05   DECIX FRA (remote)
-07   DECIX DUS (remote)
-08   DECIX MUC (remote)
-09   BCIX
-10   DECIX FRA
-11   LocIX
-12   KleyRex
+    01   Community-IX BER
+    02   Community-IX FRA
+    03   ECIX HAM
+    04   DECIX HAM
+    05   DECIX FRA (remote)
+    07   DECIX DUS (remote)
+    08   DECIX MUC (remote)
+    09   BCIX
+    10   DECIX FRA
+    11   LocIX
+    12   KleyRex
 
 
 ## Configuration example ##
