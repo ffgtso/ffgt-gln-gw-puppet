@@ -24,6 +24,12 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
 <% if @dfz != "" -%>
     if is_default() then accept;
 <% end -%>
+<% if @no_export_prefix != "none" -%>
+    if (net ~ [ <%=@no_export_prefix%> ]) then  {
+      #print "Blocked export: ", net, " ", bgp_path;
+      reject;
+    }
+<% end -%>
     if in_prefix_range_ibgp() then accept;
     reject;
   };
