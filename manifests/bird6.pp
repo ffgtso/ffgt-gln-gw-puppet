@@ -331,7 +331,7 @@ define ff_gln_gw::bird6::ibgp (
   $our_as = $ff_gln_gw::params::icvpn_as,
   $next_hop_self = "",
   $bgp_options = "",
-  $dont_export_prefix = "none",
+  $no_export_prefix = "none",
   $dfz = "",
   $mesh_code = $ff_gln_gw::params::mesh_code,
 ) {

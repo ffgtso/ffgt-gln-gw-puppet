@@ -224,7 +224,7 @@ define ff_gln_gw::bird4::ospf (
   $ospf_instance_id = "",
   $ospf_int_area = ""
 ) {
-  include ff_gln_gw::bird4
+  include ff_gln_gw::bird4::ibgp
 
   file_line { "bird-ospf-${mesh_code}-include":
     path => '/etc/bird/bird.conf.inc',
@@ -457,7 +457,7 @@ define ff_gln_gw::bird4::ibgp (
   $our_as = $ff_gln_gw::params::icvpn_as,
   $next_hop_self = "",
   $bgp_options = "",
-  $dont_export_prefix = "none",
+  $no_export_prefix = "none",
   $dfz = "",
   $mesh_code = $ff_gln_gw::params::mesh_code,
 ) {
