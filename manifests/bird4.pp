@@ -224,7 +224,7 @@ define ff_gln_gw::bird4::ospf (
   $ospf_instance_id = "",
   $ospf_int_area = ""
 ) {
-  include ff_gln_gw::bird4::ibgp
+  include ff_gln_gw::bird4
 
   file_line { "bird-ospf-${mesh_code}-include":
     path => '/etc/bird/bird.conf.inc',
