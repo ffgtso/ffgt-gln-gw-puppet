@@ -33,21 +33,8 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
     }
 
     if (proto = "o_p_<%= @mesh_code.gsub('-', '_') %>") then reject;
-<% if @dont_export_prefix != "none" -%>
-    if (net ~ [ <%=@dont_export_prefix%> ]) then  {
-      reject;
-    }
-<% end -%>
-
-    accept;
-
-#    if (source = RTS_BGP || source = RTS_STATIC_DEVICE || source = RTS_STATIC || RTS_DEVICE) then {
-<% if @dfz != "" -%>
-#      if is_default() then accept;
-<% end -%>
-#      if in_prefix_range_ibgp() && ok_to_export_<%= @name.gsub('-', '_') %>_ibgp() then accept;
-#    }
-#    reject;
+    if ok_to_export_<%= @name.gsub('-', '_') %>_ibgp() then accept;
+    reject;
   };
 <% if @next_hop_self != "" -%>  next hop self;
 <% end -%>
