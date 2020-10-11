@@ -200,6 +200,8 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
 <% end -%>
 <% if defined?(node['direct']) && node['direct'] -%>  direct;
 <% end -%>
+<% if defined?(node['passive']) && node['passive'] -%>  passive;
+<% end -%>
 <% if defined?(node['passwd4']) && node['passwd4'] -%>  password "<%= node['passwd4'] %>";
 <% else -%>
 <% if defined?(node['passwd']) && node['passwd'] -%>  password "<%= node['passwd'] %>";
