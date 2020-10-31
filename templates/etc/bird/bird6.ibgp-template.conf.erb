@@ -19,6 +19,7 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
   local as <%= @our_as %>;
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80:/i) %> % '<%= tunnel %>'<% end -%> as <%= @our_as %>;
+  bfd graceful;
   import filter {
     bgp_local_pref = <%= pref %>;
 <% if @dfz != "" -%>

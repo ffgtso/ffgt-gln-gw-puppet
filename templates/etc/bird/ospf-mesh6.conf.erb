@@ -53,6 +53,7 @@ protocol ospf o_<%= @mesh_code.gsub('-', '_') %> {
 <% if defined?(node['options']) && node['options'] -%>
       <%= node['options'] %>;
 <% end -%>
+      bfd yes;
     };
 
 <% end -%>
@@ -70,6 +71,7 @@ protocol ospf o_<%= @mesh_code.gsub('-', '_') %> {
 <% if defined?(node['options']) && node['options'] -%>
       <%= node['options'] %>;
 <% end -%>
+      bfd yes;
     };
 <% end -%>
 <% end -%>

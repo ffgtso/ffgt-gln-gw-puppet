@@ -193,6 +193,7 @@ protocol bgp e_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%> from e
   local as <%=local_ouras%>;
   source address <%= node['ipv6src'] %>;
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80/i) %> % '<%= tunnelname %>'<% end -%> as <%= node['peeras'] %>;
+  bfd graceful;
   import keep filtered;
   import filter peer_in_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
   export filter peer_out_<%=node['name'].gsub('-', '_')%>_<%=@name.gsub('-', '_')%>;
