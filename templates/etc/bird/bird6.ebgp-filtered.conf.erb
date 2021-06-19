@@ -163,18 +163,18 @@ int set bogon_asns;
     }
 
 <% if @location != 0 -%>
-    if ((<%=local_ouras%>, 800, *) ~ bgp_large_community) then {
+    if ([(<%=local_ouras%>, 800, *)] ~ bgp_large_community) then {
       if ((<%=local_ouras%>, 800, <%=@location%>) !~ bgp_large_community) then {
         bgp_path.prepend(<%=local_ouras%>);
       }
     }
-    if ((<%=local_ouras%>, 801, *) ~ bgp_large_community) then {
+    if ([(<%=local_ouras%>, 801, *)] ~ bgp_large_community) then {
       if ((<%=local_ouras%>, 801, <%=@location%>) !~ bgp_large_community) then {
         bgp_path.prepend(<%=local_ouras%>);
         bgp_path.prepend(<%=local_ouras%>);
       }
     }
-    if ((<%=local_ouras%>, 802, *) ~ bgp_large_community) then {
+    if ([(<%=local_ouras%>, 802, *)] ~ bgp_large_community) then {
       if ((<%=local_ouras%>, 802, <%=@location%>) !~ bgp_large_community) then {
         bgp_path.prepend(<%=local_ouras%>);
         bgp_path.prepend(<%=local_ouras%>);
