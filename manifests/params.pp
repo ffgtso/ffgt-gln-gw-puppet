@@ -12,6 +12,7 @@ class ff_gln_gw::params (
   $ipv6_main_prefix = "",
   $loopback_ipv6 = "::1/128",
   $loopback_ipv4 = $router_id,
+  $location = 0,
   # Default values for ff_gln_gw config
   $maintenance = 0, # Shall the maintenance mode be active after installation
   $batman_compat = "14",
