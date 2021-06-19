@@ -625,6 +625,7 @@ define ff_gln_gw::bird4::ebgp_filtered (
   $our_as = $ff_gln_gw::params::icvpn_as,
   $sitelocal_prefix = "none",
   $no_export_prefix = "none",
+  $location = $ff_gln_gw::params::location,
 ) {
   include ff_gln_gw::bird4
   include ff_gln_gw::resources::meta

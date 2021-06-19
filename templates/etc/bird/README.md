@@ -10,15 +10,6 @@
 
 ### Large Communities ###
 
-    (206813:2:REMOTE_ASN)      Prepend 206813 to REMOTE_ASN
-    (206813:2:0)               Prepend 206813 generally
-    (206813:3:REMOTE_ASN)      Prepend 206813 2x to REMOTE_ASN
-    (206813:3:0)               Prepend 206813 2x generally
-    (206813:4:REMOTE_ASN)      Reject export to REMOTE_ASN
-    (206813:4:0)               Reject export at all
-    (206813:5:REMOTE_ASN)      Allow export to REMOTE_ASN (precedence over (206813:4:*))
-
-
 Read-only:
 
     (206813:0:REMOTE_ASN)      Route learned from REMOTE_ASN (legacy)
@@ -29,11 +20,31 @@ Read-only:
     (206813:400:0)             Route learned from transit (i. e. do not re-propagate)
     (206813:400:REMOTE_ASN)    Route learned from transit ASN
 
+Traffic-Engineering:
 
+    (206813:2:REMOTE_ASN)      Prepend 206813 to REMOTE_ASN
+    (206813:2:0)               Prepend 206813 generally
+    (206813:3:REMOTE_ASN)      Prepend 206813 2x to REMOTE_ASN
+    (206813:3:0)               Prepend 206813 2x generally
+    (206813:4:REMOTE_ASN)      Reject export to REMOTE_ASN
+    (206813:4:0)               Reject export at all
+    (206813:5:REMOTE_ASN)      Allow export to REMOTE_ASN (precedence over (206813:4:*))
 
+    (206813:800:xxx)           Route originates at location xxx;
+                               locations != xxx will prepend ASN twice
+    (206813:801:xxx)           Route originates at location xxx;
+                               locations != xxx will prepend ASN three times
+    (206813:802:xxx)           Route originates at location xxx;
+                               locations != xxx will prepend ASN four times
 
+Locations:
 
-
+     1   DUS01 (PlusServer)
+     2   BER01 (IN-BERLIN)
+     3   FRA01 (vserver.site)
+     4   HAM01 (irz42)
+     5   HAM02 (IPHH)
+     6   HAM03 (work)
 
 IXPs:
 
