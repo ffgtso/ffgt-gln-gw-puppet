@@ -42,9 +42,10 @@ Locations:
      1   DUS01 (PlusServer)
      2   BER01 (IN-BERLIN)
      3   FRA01 (vserver.site)
-     4   HAM01 (irz42)
+     4   HAM01 (irz42; AS49745 location)
      5   HAM02 (IPHH)
      6   HAM03 (work)
+     7   AMS01 (coloclue; AS49745 location)
 
 IXPs:
 
@@ -131,6 +132,7 @@ IXPs:
       loopback_ipv6 => "2a06:e881:1702:1::1",
       loopback_ipv4 => "193.26.120.85",
       mesh_code    => "ffgt",
+      location => 5,
     }
 
     ff_gln_gw::gateway { 'ham02':
