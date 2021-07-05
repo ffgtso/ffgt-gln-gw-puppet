@@ -45,7 +45,7 @@ int set bogon_asns;
   # ignore bogon AS_PATHs
   bogon_asns = BOGON_ASNS;
   if (bgp_path ~ bogon_asns) then {
-    print "Import rejected: bogon AS_PATH: ", net, " ", bgp_path;
+    #print "Import rejected: bogon AS_PATH: ", net, " ", bgp_path;
     reject;
   }
 <% if defined?(node['import6']) && node['import6'] -%>
@@ -64,7 +64,7 @@ int set bogon_asns;
     # Don't import our prefixes we'll export
     include "/etc/bird/bird6.conf.d/<%=node['reimport_filter6']%>_PFX6.inc";
     if (net ~ <%=node['reimport_filter6'].gsub('-', '_').gsub(':', '__')%>_PFX) then {
-      print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
+      #print "REJECT: Import of own export prefix: ", net, " via ", bgp_path;
       reject;
     }
 
@@ -107,7 +107,7 @@ int set bogon_asns;
 <% end -%>
 <% if @sitelocal_prefix != "none" -%>
   if (net ~ [ <%=@sitelocal_prefix%> ]) then {
-    print "Forced export: ", net, " ", bgp_path;
+    #print "Forced export: ", net, " ", bgp_path;
 <% if defined?(node['bgpprepend']) && node['bgpprepend'] -%>
     # Path Prepending: <%=node['bgpprepend']%> times (1<=n<=5)
 <% numprep=Integer(node['bgpprepend']) -%>
@@ -122,7 +122,7 @@ int set bogon_asns;
 <% end -%>
 <% if @no_export_prefix != "none" -%>
   if (net ~ [ <%=@no_export_prefix%> ]) then  {
-    print "Blocked export: ", net, " ", bgp_path;
+    #print "Blocked export: ", net, " ", bgp_path;
     reject;
   }
 <% end -%>
@@ -139,7 +139,7 @@ int set bogon_asns;
 
     # Do not propagate routes learned from upstreams!
     if ((<%=local_ouras%>, 400, 0) ~ bgp_large_community) then {
-      print "Export rejected: route from upstream, AS_PATH: ", net, " ", bgp_path;
+      #print "Export rejected: route from upstream, AS_PATH: ", net, " ", bgp_path;
       reject;
     }
 
@@ -148,17 +148,17 @@ int set bogon_asns;
     # ignore bogon AS_PATHs
     bogon_asns = BOGON_ASNS;
     if (bgp_path ~ bogon_asns) then {
-      print "Export rejected: bogon AS_PATH: ", net, " ", bgp_path;
+      #print "Export rejected: bogon AS_PATH: ", net, " ", bgp_path;
       reject;
     }
 
     if ((65535, 65281) ~ bgp_community) then {
-      print "Export rejected: no-export community set: ", net, " ", bgp_path;
+      #print "Export rejected: no-export community set: ", net, " ", bgp_path;
       reject;
     }
 
     if ((65535, 65282) ~ bgp_community) then {
-      print "Export rejected: no-advertise community set: ", net, " ", bgp_path;
+      #print "Export rejected: no-advertise community set: ", net, " ", bgp_path;
       reject;
     }
 
