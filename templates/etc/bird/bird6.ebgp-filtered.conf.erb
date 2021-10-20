@@ -191,7 +191,7 @@ int set bogon_asns;
       bgp_path.prepend(<%=local_ouras%>);
       bgp_path.prepend(<%=local_ouras%>);
     }
-    if ((<%=local_ouras%>, 4, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 4, 0) ~ bgp_large_community) then {
+    if ((<%=local_ouras%>, 8, <%=node['peeras']%>) ~ bgp_large_community || (<%=local_ouras%>, 8, 0) ~ bgp_large_community) then {
       reject;
     }
 
