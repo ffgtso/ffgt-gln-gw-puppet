@@ -163,24 +163,49 @@ int set bogon_asns;
     }
 
 <% if @location != "0" -%>
+    if ((<%=local_ouras%>, 899, 0) ~ bgp_large_community) then {
+      if ((<%=local_ouras%>, 899, <%=@location%>) !~ bgp_large_community) then {
+        reject;
+      }
+    }
+
     if ((<%=local_ouras%>, 800, 0) ~ bgp_large_community) then {
       if ((<%=local_ouras%>, 800, <%=@location%>) !~ bgp_large_community) then {
         bgp_path.prepend(<%=local_ouras%>);
       }
-    } else {
-      if ((<%=local_ouras%>, 801, 0) ~ bgp_large_community) then {
-        if ((<%=local_ouras%>, 801, <%=@location%>) !~ bgp_large_community) then {
-          bgp_path.prepend(<%=local_ouras%>);
-          bgp_path.prepend(<%=local_ouras%>);
-        }
-      } else {
-        if ((<%=local_ouras %>, 802, 0) ~ bgp_large_community) then {
-          if ((<%=local_ouras%>, 802, <%=@location%>) !~ bgp_large_community) then {
-            bgp_path.prepend(<%=local_ouras%>);
-            bgp_path.prepend(<%=local_ouras%>);
-            bgp_path.prepend(<%=local_ouras%>);
-          }
-        }
+    }
+
+    if ((<%=local_ouras%>, 801, 0) ~ bgp_large_community) then {
+      if ((<%=local_ouras%>, 801, <%=@location%>) !~ bgp_large_community) then {
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+      }
+    }
+
+    if ((<%=local_ouras %>, 802, 0) ~ bgp_large_community) then {
+      if ((<%=local_ouras%>, 802, <%=@location%>) !~ bgp_large_community) then {
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+      }
+    }
+
+    if ((<%=local_ouras %>, 803, 0) ~ bgp_large_community) then {
+      if ((<%=local_ouras%>, 803, <%=@location%>) !~ bgp_large_community) then {
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+      }
+    }
+
+    if ((<%=local_ouras %>, 804, 0) ~ bgp_large_community) then {
+      if ((<%=local_ouras%>, 804, <%=@location%>) !~ bgp_large_community) then {
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
+        bgp_path.prepend(<%=local_ouras%>);
       }
     }
 <% end %>
