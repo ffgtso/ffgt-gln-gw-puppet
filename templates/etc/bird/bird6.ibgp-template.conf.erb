@@ -21,6 +21,9 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
   neighbor <%= node['ipv6dst'] %><% if node['ipv6dst'].match(/^fe80:/i) %> % '<%= tunnel %>'<% end -%> as <%= @our_as %>;
   bfd graceful;
   import filter {
+<% if node['import_filter6'] != "" -%>
+    include "/etc/bird/bird6.conf.d/<%= node['import_filter6'] %>";
+<% end -%>
     bgp_local_pref = <%= pref %>;
 <% if @dfz != "" -%>
     if is_default() then accept;

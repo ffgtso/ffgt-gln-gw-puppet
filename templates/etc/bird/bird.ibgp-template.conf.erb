@@ -21,7 +21,10 @@ protocol bgp i_<%= tunnel.gsub('-', '_') %> {
   neighbor <%= node['ipv4dst'] %> as <%= @our_as %>;
   bfd graceful;
   import filter {
-    bgp_local_pref = <%= pref %>;
+<% if node['import_filter4'] != "" -%>
+    include "/etc/bird/bird.conf.d/<%= node['import_filter4'] %>";
+<% end -%>
+   bgp_local_pref = <%= pref %>;
 <% if @dfz != "" -%>
     if is_default() then accept;
 <% end -%>
